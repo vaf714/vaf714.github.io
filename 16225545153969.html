@@ -1,0 +1,595 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  JVM 内存划分 - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">JVM 内存划分</h1>
+				<p class="meta"><time datetime="2021-06-01T21:35:15+08:00" pubdate data-updated="true">2021/06/01</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#jvm%E4%BD%8D%E7%BD%AE">JVM 位置</a></li>
+<li><a href="#jvm%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84">JVM 的体系结构</a></li>
+<li><a href="#native%E9%87%8D%E7%82%B9">Native (重点)</a></li>
+<li><a href="#pc%E5%AF%84%E5%AD%98%E5%99%A8">PC 寄存器</a></li>
+<li><a href="#%E6%96%B9%E6%B3%95%E5%8C%BA">方法区</a></li>
+<li><a href="#%E6%A0%88">栈</a></li>
+<li><a href="#%E5%A0%86%E9%87%8D%E7%82%B9">堆 (重点)</a>
+<ul>
+<li><a href="#%E6%96%B0%E7%94%9F%E4%BB%A3">新生代</a></li>
+<li><a href="#%E8%80%81%E5%B9%B4%E4%BB%A3">老年代</a></li>
+<li><a href="#%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D">内存分配</a></li>
+</ul>
+</li>
+<li><a href="#%E6%B0%B8%E4%B9%85%E5%8C%BA%E5%85%83%E7%A9%BA%E9%97%B4%E6%96%B9%E6%B3%95%E5%8C%BA">永久区 &amp; 元空间 &amp; 方法区</a></li>
+</ul>
+</div>
+<h2><a id="jvm%E4%BD%8D%E7%BD%AE" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JVM 位置</h2>
+<p>JVM本质是虚拟机, 运行在操作系统之上, 而 Java 程序运行在 JVM 之上, 运行 Java 程序只需要 JRE 就够了, JRE 包括了 Java 运行环境以及 JVM, 如果需要开发 Java 程序, 才需要安装 JDK</p>
+<ul>
+<li>三种 JVM
+<ul>
+<li>Sun 公司: HotSpot</li>
+<li>BEA 公司: JRockit, 不常用, 但性能很高</li>
+<li>IBM 公司: J9VM, 不常用, 资料少, 在 IBM 独占平台会用到</li>
+</ul>
+</li>
+</ul>
+<h2><a id="jvm%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JVM 的体系结构</h2>
+<p>我们所说的 JVM 调优就是调<strong>方法区</strong>和<strong>堆</strong>, 其他的地方不会产生垃圾</p>
+<p><img src="media/16225545153969/16225646536509.jpg" alt="" class="mw_img_center" style="width:479px;display: block; clear:both; margin: 0 auto;" /></p>
+<h2><a id="native%E9%87%8D%E7%82%B9" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Native (重点)</h2>
+<p>凡是带了 <code>native</code> 关键字的, 说明 Java 的作用范围达不到了, 会调用底层的库</p>
+<p>过程: 在内存区域中专门开辟了一块标记的区域 (Native Method Stack), 登记了 native 方法, 等到执行的时候, 再通过 JNI 执行本地方法库中的方法</p>
+<p>作用: 扩展 Java 的使用, 融合不同的编程语言为 Java 所用 (最初: C/C++)<br />
+目前 Java 调用其他接口方法: Socket / WebService / http 等</p>
+<h2><a id="pc%E5%AF%84%E5%AD%98%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>PC 寄存器</h2>
+<p>每个线程都有一个 PC, 是一个指向下一条指令的指针, 用于执行引擎执行下一条指令, 空间非常小可以忽略不计</p>
+<h2><a id="%E6%96%B9%E6%B3%95%E5%8C%BA" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>方法区</h2>
+<ul>
+<li>方法区是所有线程<strong>共享</strong>的, 所有定义的方法 (字段 / 方法字节码 / 构造函数 / 接口等) 都保存在该区域</li>
+<li><strong>静态变量 / 常量 / 类信息 (构造函数 接口定义) / 运行时常量池存在方法区中, 但是实例变量存在堆内存中</strong></li>
+</ul>
+<h2><a id="%E6%A0%88" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>栈</h2>
+<ul>
+<li>
+<p>栈内存主要存放 8 大基本类型 / 对象引用 / 实例的方法</p>
+</li>
+<li>
+<p><strong>栈是线程级的</strong>, 主管程序的运行, 当调用另一个方法, 就会把这个方法压入栈顶 (栈帧), 执行完毕就被弹出栈, 继续执行调用它的方法, 生命周期和线程同步, 线程结束, 栈内存也就释放<br />
+<code>StackOverflowError</code>: 递归程序处理不当容易栈满</p>
+</li>
+</ul>
+<p><img src="media/16225545153969/16225662992996.jpg" alt="" class="mw_img_center" style="width:223px;display: block; clear:both; margin: 0 auto;" /></p>
+<h2><a id="%E5%A0%86%E9%87%8D%E7%82%B9" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>堆 (重点)</h2>
+<ul>
+<li>一个 JVM 只有一个堆内存, 内存大小是可以调节的</li>
+<li>堆中存放类 / 方法 / 常量 / 变量, 保存所有引用类型的真实对象</li>
+<li>堆内存分为两个区域: 新生区, 老年区</li>
+</ul>
+<h3><a id="%E6%96%B0%E7%94%9F%E4%BB%A3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>新生代</h3>
+<ul>
+<li>一个类诞生, 成长的地方, 甚至死亡</li>
+<li>分为两个区
+<ul>
+<li>伊甸园 <code>Eden Space</code>: 所有的对象都是在伊甸园区 New 出来的</li>
+<li>幸存区(from, to 区): 轻 GC 后活下来的对象</li>
+</ul>
+</li>
+</ul>
+<h3><a id="%E8%80%81%E5%B9%B4%E4%BB%A3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>老年代</h3>
+<p>大对象直接进入老年代，存活年龄超过阈值的对象进入老年代</p>
+<h3><a id="%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>内存分配</h3>
+<ol>
+<li>对象优先在 Eden 分配</li>
+<li>大对象直接进入老年代</li>
+<li>存活年龄超过阈值的对象进入老年代（动态年龄判断：如果幸存区相同年龄的对象超过一半，那么超过这个年龄的对象直接进入老年代）</li>
+</ol>
+<h2><a id="%E6%B0%B8%E4%B9%85%E5%8C%BA%E5%85%83%E7%A9%BA%E9%97%B4%E6%96%B9%E6%B3%95%E5%8C%BA" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>永久区 &amp; 元空间 &amp; 方法区</h2>
+<p>参考: <a href="https://blog.csdn.net/u011635492/article/details/81046174">永久区 &amp; 方法区</a></p>
+<p>Java 虚拟机规范只是规定了有方法区这么个概念和它的作用，并没有规定如何去实现它。在不同的 JVM 上方法区的实现不同。在 HotSpot 中利用永生代实现方法区。其他的虚拟机实现并没有永久带这一说法。</p>
+<ul>
+<li>在 1.7 之前，HotSpot 把堆中一部分区域用来实现方法区, 同时 GC 分代收集也扩展至这一区域，就称为永久代。</li>
+<li>对于 Java8， HotSpots 取消了永久代. 取代永久代的就是元空间。永生代和元空间不同点为:
+<ul>
+<li>存储位置不同: 永久代物理是是堆的一部分，和新生代，老年代地址是连续的，而元空间属于本地内存</li>
+<li>存储内容不同: 元空间存储类的元信息，静态变量和常量池等并入堆中。相当于永久代的数据被分到了堆和元空间中。</li>
+</ul>
+</li>
+<li>一个启动类, 加载了大量的第三方 Jar 包, tomcat 部署了太多应用, 大量动态生成的反射类. 不断加载就会出现 OOM</li>
+</ul>
+<p><strong>为什么使用元空间替换永久代？</strong><br />
+为了避免OOM异常。因为通常使用PermSize和MaxPermSize设置永久代的大小就决定了永久代的上限，但是不是总能知道应该设置为多大合适, 如果使用默认值很容易遇到OOM错误。<br />
+当使用元空间时，可以加载多少类的元数据就不再由MaxPermSize控制, 而由系统的实际可用空间来控制。<br />
+更深层的原因还是要合并HotSpot和JRockit的代码，JRockit从来没有所谓的永久代，也不需要开发运维人员设置永久代的大小，但是运行良好。同时也不用担心运行性能问题了,在覆盖到的测试中, 程序启动和运行速度降低不超过1%，但是这点性能损失换来了更大的安全保障。</p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='JVM.html'>JVM</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16227314617502.html" 
+	        title="Previous Post: JMM">&laquo; JMM</a>
+	    
+	    
+	        <a class="basic-alignment right" href="16247740620828.html" 
+	        title="Next Post: AQS">AQS &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

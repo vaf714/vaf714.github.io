@@ -1,0 +1,589 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  Callable & Futrue - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">Callable & Futrue</h1>
+				<p class="meta"><time datetime="2021-06-02T21:58:43+08:00" pubdate data-updated="true">2021/06/02</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#future">Future</a></li>
+<li><a href="#runnablefuture-futretask">RunnableFuture &amp; FutreTask</a></li>
+<li><a href="#completablefuture">CompletableFuture</a></li>
+</ul>
+</div>
+<p>之前创建线程的 2 种方式：一种是直接继承 <code>Thread</code>，另外一种就是实现 <code>Runnable</code> 接口。这 2 种方式都有一个缺陷就是：在执行完任务之后无法获取执行结果。<br />
+<code>Callable</code> 和 <code>Runnable</code> 类似，都是多线程一种实现方式，但是可以有返回值，可以抛出异常，使用 <code>call()</code> 方法启动</p>
+<h2><a id="future" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Future</h2>
+<p><code>Future</code> 就是对于具体的 <code>Runnable</code> 或者 <code>Callable</code> 任务的执行结果进行取消、查询是否完成、获取结果。</p>
+<pre><code class="language-java">ExecutorService threadPool = Executors.newFixedThreadPool(2);
+Future&lt;Integer&gt; future = threadPool.submit((Callable&lt;Integer&gt;) () -&gt; {
+    Thread.sleep(2000);
+    return 0;
+});
+System.out.println(future.get()); // 0
+threadPool.shutdown();
+</code></pre>
+<h2><a id="runnablefuture-futretask" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>RunnableFuture &amp; FutreTask</h2>
+<p><code>RunnableFuture</code> 实现了 <code>Runnable</code> 接口和 <code>Future</code> 接口，而 <code>FutureTask</code> 实现了 <code>RunnableFuture</code> 接口。所以 <code>FutureTask</code> 既可以作为 <code>Runnable</code> 被线程执行，又可以作为 <code>Future</code> 得到 <code>Callable</code> 的返回值。</p>
+<pre><code class="language-java">import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
+public class CallableTest {
+    public static void main(String[] args) {
+        // 实例化 Callable 子类对象
+        MyThread myThread = new MyThread();
+        // 使用 Callable 子类对象构造 FutureTask 对象，它是一个 Runnable 的实现类，所以可以使用 Thread 运行，
+        FutureTask futureTask = new FutureTask(myThread);
+        new Thread(futureTask, &quot;callable&quot;).start();
+
+        // FutureTask 同时也时 Future 的实现类，所以可以对任务进行取消、查询是否完成、获取结果
+        try {
+            String result = (String) futureTask.get(); // 这里可能产生阻塞
+            System.out.println(result);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class MyThread implements Callable&lt;String&gt; {
+    @Override
+    public String call() throws Exception {
+        return &quot;hello Callable.&quot;;
+    }
+}
+</code></pre>
+<h2><a id="completablefuture" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CompletableFuture</h2>
+<p>原始 <code>Future</code> 可以对执行的线程进行管理结果查询等（配合 <code>Callable</code>），但是查询结果需要阻塞等待线程执行完毕，效果不好。<br />
+从 Java 8 开始引入了 <code>CompletableFuture</code>，它针对 <code>Future</code> 做了改进，可以事先定义好回调方法，当异步任务完成或者发生异常时，自动调用回调对象的回调方法。</p>
+<pre><code class="language-java">CompletableFuture.supplyAsync(Supplier).thenAccept(Consumer).exceptionally(Function);
+// 传入的 supplyAsync 对象在内部会被转成一个 Runnable 线程执行
+// 执行完毕自动调用 thenAccept 传入的 Consumer
+// 出现异常自动调用 exceptionally 传入的 Function
+</code></pre>
+<ul>
+<li>使用</li>
+</ul>
+<pre><code class="language-java">CompletableFuture completableFuture = CompletableFuture.supplyAsync(() -&gt; {
+    try {
+        TimeUnit.SECONDS.sleep(1);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+    System.out.println(&quot;hello completableFuture&quot;);
+    return 1024;
+}).thenAccept((t) -&gt; { // 成功执行完，自动调用这个
+    System.out.println(t);
+}).exceptionally((e)-&gt;{
+    System.out.println(e);
+    return null;
+});
+
+System.out.println(&quot;hello main1&quot;);
+TimeUnit.SECONDS.sleep(2);
+System.out.println(&quot;hello main2&quot;);
+
+// 结果
+// hello main1
+// hello completableFuture // 线程执行时输出的语句
+// 1024 // 线程正常执行完，自动调用 Consumer 输出的语句
+// hello main2
+</code></pre>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='JUC.html'>JUC</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16226447097561.html" 
+	        title="Previous Post: 辅助类">&laquo; 辅助类</a>
+	    
+	    
+	        <a class="basic-alignment right" href="16226261701341.html" 
+	        title="Next Post: JUC 容器">JUC 容器 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="asset/prism.js"></script>
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

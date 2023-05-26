@@ -1,0 +1,1875 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  Algorithm - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16290200093355.html">Java 基础</a></h1>
+			<p class="meta"><time datetime="2021-08-15T17:33:29+08:00" 
+			pubdate data-updated="true">2021/08/15</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#pacake">Pacake</a></li>
+<li><a href="#%E8%BE%93%E5%85%A5">输入</a></li>
+<li><a href="#%E5%B8%B8%E7%94%A8%E7%B1%BB">常用类</a></li>
+<li><a href="#%E6%8E%92%E5%BA%8F">排序</a></li>
+<li><a href="#%E5%AD%97%E7%AC%A6">字符</a></li>
+<li><a href="#%E6%95%B0%E5%AD%A6">数学</a></li>
+<li><a href="#%E9%98%B2%E6%AD%A2%E6%BA%A2%E5%87%BA">防止溢出</a></li>
+</ul>
+</div>
+<h2><a id="pacake" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pacake</h2>
+<pre><code class="language-java">import java.util.*;
+import java.lang.*;
+</code></pre>
+<h2><a id="%E8%BE%93%E5%85%A5" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>输入</h2>
+<pre><code class="language-java">Scanner in = new Scanner(System.in);
+/*
+ * 第一行 n 代表下面有 n 行
+ * 2
+ * 1 2 3 4
+ * 2 4 52
+ */
+int n = in.nextInt();
+in.nextLine(); // 把上一行 nextInt 后遗留的 \n 读取掉
+while (n &gt; 0) {
+    String line = in.nextLine();
+    System.out.println(line);
+    n--;
+}
+
+/*
+ * 直接给定 n 行，空行结束
+ * 1 2 3 4
+ * 2 4 52
+ *
+ */
+while (in.hasNextLine()) { // 获得换行前输入的内容
+    String line = in.nextLine();
+    if (line.equals(&quot;&quot;)) break;
+    System.out.println(line);
+}
+</code></pre>
+<h2><a id="%E5%B8%B8%E7%94%A8%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>常用类</h2>
+<ol>
+<li>List
+<pre><code class="language-java">ArrayList&lt;Integer&gt; list = new ArrayList&lt;&gt;();
+// 增
+list.add(1);
+list.add(0, 0); // 向第 0 位插入元素
+Collections.addAll(list, xxx); // 将 xxx 追加到 list
+// 查
+list.get(0); // 查
+list.size();
+list.isEmpty();
+// 改
+list.set(0, 5);
+// 删
+list.remove(0); // 删
+list.clear();
+
+list.subList(0, 1); // 获取子数组 [0, 1)
+
+// 数组 -&gt; list
+ Collections.addAll(list, Integer[]); // 不能是 int[]
+ Arrays.asList(Integer[]); // 这样转换的 list 不能增删，只能查改
+</code></pre>
+</li>
+<li>Map
+<pre><code class="language-java">// Map
+Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();
+// 增，修改
+map.put(1, 2);
+// 删
+map.remove(1);
+map.clear();
+// 查
+map.get(1);
+map.getOrDefault(1, xxx); // 找不到就设置成 xxx
+map.containsKey(1); // 判断 key 是否存在
+map.containsValue(3); // 判断 value 是否存在
+map.size();
+map.isEmpty();
+// 遍历
+Set&lt;Integer&gt; keys = map.keySet();// 获取 key 组成的 set
+Collection&lt;Integer&gt; values = map.values();// 获取 value 组成的 collection
+</code></pre>
+</li>
+<li>Set
+<pre><code class="language-java">Set&lt;Integer&gt; set = new HashSet&lt;&gt;();
+// 增
+set.add(1);
+// 删
+set.remove(1);
+set.clear();
+// 查
+set.contains(1);
+set.size();
+set.isEmpty();
+</code></pre>
+</li>
+<li>Stack
+<pre><code class="language-java">Stack&lt;Integer&gt; stack = new Stack&lt;&gt;();
+// 入栈
+stack.push(1);
+// 出栈
+stack.pop();
+stack.clear();
+// 查看
+stack.peek();
+stack.isEmpty();
+stack.size();
+</code></pre>
+</li>
+<li>Queue &amp; PriorityQueue
+<pre><code class="language-java">Queue&lt;Integer&gt; queue = new LinkedList&lt;&gt;();
+PriorityQueue&lt;Integer&gt; priorityQueue = new PriorityQueue&lt;&gt;(); // 方法与 LinkedList 相同
+// 入队
+queue.offer(1);
+// 出队
+queue.poll();
+queue.clear();
+// 查看
+queue.peek();
+queue.isEmpty();
+queue.size();
+</code></pre>
+</li>
+<li>深拷贝
+<pre><code class="language-java">int[] i1 = {1, 2};
+int[] clone = i1.clone();
+
+ArrayList&lt;Integer&gt; list = new ArrayList&lt;&gt;();
+ArrayList&lt;Integer&gt; clone1 = (ArrayList&lt;Integer&gt;) list.clone();
+
+HashMap&lt;Integer, Integer&gt; hashMap = new HashMap&lt;&gt;();
+HashMap&lt;Integer, Integer&gt; clone2 = (HashMap&lt;Integer, Integer&gt;) hashMap.clone();
+</code></pre>
+</li>
+</ol>
+<h2><a id="%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>排序</h2>
+<pre><code class="language-java">// list 排序
+ArrayList&lt;Integer&gt; list = new ArrayList&lt;&gt;();
+// add...
+Collections.sort(list); // 正序
+Collections.sort(list, Comparator.reverseOrder()); // 逆序
+
+// 复杂对象排序
+ArrayList&lt;User&gt; users = new ArrayList&lt;&gt;();
+// add...
+Collections.sort(users, (User a, User b) -&gt; {
+    return a.age - b.age; // 根据年龄排序
+});
+
+// 数组排序
+int[][] is = new int[][]{{1, 2}, {2, 1}};
+Arrays.sort(is, (int[] a, int[] b) -&gt; {
+    return a[1] - b[1]; // 根据第 2 个元素排序
+});
+</code></pre>
+<h2><a id="%E5%AD%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>字符</h2>
+<pre><code class="language-java">String str = &quot;hello world!&quot;;
+str.length(); // 获取长度
+char[] chars = str.toCharArray(); // 转成 char 数组
+str.charAt(1); // 通过索引获取字符
+int i = Integer.parseInt(&quot;6&quot;); // 字符 -&gt; 数字
+char c = (char) 66; // 数字 -&gt; char
+String substr = str.substring(0, 6); // 截取
+</code></pre>
+<h2><a id="%E6%95%B0%E5%AD%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>数学</h2>
+<pre><code class="language-java">Integer.MAX_VALUE // 最大整数
+Integer.MIN_VALUE // 最小整数
+Collections.max(list); // 集合最大值
+Arrays.stream(i).min().getAsInt(); // 数组最小值
+Math.min(a, Math.min(b, c)) // 比较三个数大小，效率高
+</code></pre>
+<h2><a id="%E9%98%B2%E6%AD%A2%E6%BA%A2%E5%87%BA" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>防止溢出</h2>
+<pre><code class="language-java">% 1000000007
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16265229592142.html">海量数据算法</a></h1>
+			<p class="meta"><time datetime="2021-07-17T19:55:59+08:00" 
+			pubdate data-updated="true">2021/07/17</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<blockquote>
+<p>针对时间，我们可以采用巧妙的算法搭配合适的数据结构，如Bloom filter/Hash/bit-map/堆/数据库或倒排索引/trie树，针对空间，无非就一个办法：大而化小，分而治之（hash映射）</p>
+</blockquote>
+<h2><a id="%E5%88%86%E8%80%8C%E6%B2%BB%E4%B9%8Bhash%E6%98%A0%E5%B0%84-hash-map%E7%BB%9F%E8%AE%A1%E5%A0%86%E5%BF%AB%E9%80%9F%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>分而治之/Hash映射 + Hash_map统计 + 堆/快速/归并排序</h2>
+<ol>
+<li>
+<p><strong>海量日志数据，提取出某日访问百度次数最多的那个IP</strong></p>
+<ul>
+<li>hash 映射，相同的ip分到同一个块</li>
+<li>各个块内使用 hash map 统计</li>
+<li>对各个 hashmap 最大的那个进行排序，得到答案</li>
+</ul>
+</li>
+<li>
+<p><strong>寻找热门查询，300万个查询字符串中统计最热门的10个查询（重复度比较高）</strong><br />
+由于有重复，可以直接使用 hashmap 完全放入内存统计，然后排序</p>
+</li>
+<li>
+<p><strong>有一个1G大小的一个文件，里面每一行是一个词，词的大小不超过16字节，内存限制大小是1M。返回频数最高的100个词</strong><br />
+hash 映射 + hashmap 统计 + 排序</p>
+</li>
+<li>
+<p><strong>海量数据分布在100台电脑中，想个办法高效统计出这批数据的TOP10</strong></p>
+<ul>
+<li>遍历一遍数据，重新 hash 分配，使得同一数据存在同一机器</li>
+<li>每个机器求出 top 10，把所有的结果文件再进行 top10</li>
+</ul>
+</li>
+<li>
+<p><strong>有10个文件，每个文件1G，每个文件的每一行存放的都是用户的query，每个文件的query都可能重复。要求你按照query的频度排序</strong></p>
+<ul>
+<li>重新分配到 10 个文件</li>
+<li>对每个文件分别 hashmap 统计，把结果排序</li>
+<li>对 10 个排好序的结果进行归并排序</li>
+</ul>
+</li>
+<li>
+<p><strong>给定a、b两个文件，各存放50亿个url，每个url各占64字节，内存限制是4G，让你找出a、b文件共同的url？</strong></p>
+<ul>
+<li>对 a hash映射到1000个小文件 [a1,a2...a1000]，对 b 也这样做[b1,b2...b1000]，这样所有可能共同的 url 都在同一个编号的小文件中，比如 a1 vs b1</li>
+<li>把 a1 文件 url 存到 hashset，遍历 b1，对比 hashset，重复 1000 遍比较完所有文件</li>
+</ul>
+</li>
+</ol>
+<h2><a id="%E5%A4%9A%E5%B1%82%E5%88%92%E5%88%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>多层划分</h2>
+<ol>
+<li><strong>5亿个int找它们的中位数。</strong>
+<ul>
+<li>将这些数据按照分界值划分到多个桶里面，桶之间是有顺序的，桶内无序</li>
+<li>分别统计每个桶里的数据，找出中位数落在哪一个桶里，并且找出在这个桶里排序后位置k</li>
+<li>重复上述划分-查找的过程，直到桶里的数据可以完全载入内存查找</li>
+</ul>
+</li>
+</ol>
+<h2><a id="bloom-filterbitmap" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bloom filter/Bitmap</h2>
+<ol>
+<li>
+<p><strong>在2.5亿个整数中找出不重复的整数，注，内存不足以容纳这2.5亿个整数。</strong></p>
+<ul>
+<li>每个数分配2bit，00表示不存在，01表示出现一次，10表示多次，11无意义，共1GB内存</li>
+<li>然后扫描这2.5亿个整数，查看Bitmap中相对应位，如果是00变01，01变10，10保持不变。</li>
+<li>查看bitmap，把对应位是01的整数输出</li>
+</ul>
+</li>
+<li>
+<p><strong>给40亿个不重复的unsigned int的整数，没排过序的，然后再给一个数，如何快速判断这个数是否在那40亿个数当中？</strong></p>
+<ul>
+<li>申请512M的内存，一个bit位代表一个unsigned int值。读入40亿个数，设置相应的bit位</li>
+<li>读入要查询的数，查看相应bit位是否为1，为1表示存在，为0表示不存在。</li>
+</ul>
+</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16262426905528.html">常见题</a></h1>
+			<p class="meta"><time datetime="2021-07-14T14:04:50+08:00" 
+			pubdate data-updated="true">2021/07/14</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2><a id="%E5%87%A0%E6%95%B0%E4%B9%8B%E5%92%8C" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>几数之和</h2>
+<p><a href="https://leetcode-cn.com/problems/two-sum">1.两数之和</a> （哈希）<br />
+<a href="https://leetcode-cn.com/problems/3sum">15.三数之和</a> （排序 + 二分查找）</p>
+<h2><a id="%E5%AD%90%E5%BA%8F%E5%88%97%E5%AD%90%E4%B8%B2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>子序列 &amp; 子串</h2>
+<h3><a id="dp" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>dp</h3>
+<p><a href="https://leetcode-cn.com/problems/maximum-subarray">53.最大子序和</a>、<a href="https://leetcode-cn.com/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/">连续子数组的最大和</a><br />
+<a href="https://leetcode-cn.com/problems/edit-distance">72.编辑距离</a><br />
+<a href="https://leetcode-cn.com/problems/longest-increasing-subsequence/">300.最长递增子序列</a> -&gt; <a href="https://leetcode-cn.com/problems/russian-doll-envelopes/">354.俄罗斯套娃信封问题</a> （优化：贪心+二分查找）<br />
+<a href="https://leetcode-cn.com/problems/longest-common-subsequence/">1143.最长公共子序列</a> -&gt; <a href="https://leetcode-cn.com/problems/delete-operation-for-two-strings/">583.两个字符串的删除操作</a> -&gt; <a href="https://leetcode-cn.com/problems/minimum-ascii-delete-sum-for-two-strings/">712.两个字符串的最小ASCII删除和</a><br />
+<a href="https://leetcode-cn.com/problems/longest-palindromic-subsequence">516.最长回文子序列</a><br />
+<a href="https://leetcode-cn.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/submissions/">1312.让字符串成为回文串的最少插入次数</a></p>
+<h3><a id="%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>滑动窗口</h3>
+<p><a href="https://leetcode-cn.com/problems/longest-substring-without-repeating-characters">3.无重复最长子串</a><br />
+<a href="https://leetcode-cn.com/problems/minimum-window-substring">76.最小覆盖子串</a><br />
+<a href="https://leetcode-cn.com/problems/minimum-size-subarray-sum/">209.长度最小的子数组</a><br />
+<a href="https://leetcode-cn.com/problems/maximum-length-of-repeated-subarray/">718.最长重复子数组</a> （交替滑动）</p>
+<h3><a id="%E5%85%B6%E4%BB%96" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>其他</h3>
+<p><a href="https://leetcode-cn.com/problems/longest-palindromic-substring/">5.最长回文子串</a> （中心扩散）<br />
+<a href="https://leetcode-cn.com/problems/subarray-sum-equals-k">560.和为 K 的子数组</a> （前缀和 + hash）<br />
+<a href="https://leetcode-cn.com/problems/shortest-palindrome/">214.最短回文串</a> （字符串哈希）<br />
+<a href="https://leetcode-cn.com/problems/longest-consecutive-sequence/">128.最长连续序列</a> （哈希set）<br />
+<a href="https://leetcode-cn.com/problems/split-array-largest-sum/">410.分割数组的最大值</a> （二分查找）</p>
+<h2><a id="%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88%E5%AD%90%E9%9B%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>排列 &amp; 组合 &amp; 子集</h2>
+<h3><a id="%E5%AD%90%E9%9B%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>子集</h3>
+<p>求数组所有子集：递归回溯</p>
+<pre><code class="language-java">// 注意 i 从 start 开始递增
+for (int i = start; i &lt;= n; i++) {
+    // 回溯 ...
+}
+</code></pre>
+<p><a href="https://leetcode-cn.com/problems/partition-to-k-equal-sum-subsets/">698.划分为k个相等的子集</a></p>
+<h3><a id="%E7%BB%84%E5%90%88" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>组合</h3>
+<p>输出 [1..n] 中 k 个数字的所有组合：递归回溯 + 剪枝：传入一个 start 参数，来排除 start 索引之前的数字</p>
+<pre><code class="language-java">// 剪枝
+if (k == track.size()) {
+    res.push_back(track);
+    return;
+}
+// 注意 i 从 start 开始递增
+for (int i = start; i &lt;= n; i++) {
+    // 回溯 ...
+}
+</code></pre>
+<p><a href="https://leetcode-cn.com/problems/combination-sum-ii/">40.组合总数II</a>，改题目的关键在于如何去重：先排序，然后在同一层次内（<code>i &gt; idx</code>）不添加相同的数字（<code>candidates[i-1] == candidates[i]</code>）</p>
+<pre><code class="language-py">def combinationSum2(self, candidates: List[int], target: int) -&gt; List[List[int]]:
+    candidates.sort() # 排序
+    n = len(candidates)
+    res = []
+    def helper(s, path, idx):
+        if s == target: 
+            res.append(path[:])
+            return
+        
+        for i in range(idx, n):
+            if s + candidates[i] &gt; target: break
+            if i &gt; idx and candidates[i-1] == candidates[i]: continue # 去重
+            path.append(candidates[i])
+            helper(s + candidates[i], path, i + 1)
+            path.pop()
+    
+    helper(0, [], 0)
+    return res
+</code></pre>
+<h3><a id="%E6%8E%92%E5%88%97" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>排列</h3>
+<p>求数组的所有排列：回溯，通过 contains 方法来排除在 track 中已经选择过的数字</p>
+<pre><code class="language-java">for (int i = 0; i &lt; nums.length; i++) {
+    // 排除不合法的选择
+    if (track.contains(nums[i])) continue;
+    // 回溯 ...
+}
+</code></pre>
+<p>方法二：原地交换数组顺序，当前正在排第几个，就把需要遍历的交换到这里，代表这个位置之前的都已经在路径中，就不需要在使用 contains 判断</p>
+<pre><code class="language-py">def helper(idx):
+    if idx == n:
+        res.append(nums.copy())
+        return
+    for i in range(idx, n):
+        nums[i], nums[idx] = nums[idx], nums[i]
+        helper(idx+1)
+        nums[i], nums[idx] = nums[idx], nums[i]
+</code></pre>
+<h2><a id="%E8%83%8C%E5%8C%85" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>背包</h2>
+<p><a href="https://leetcode-cn.com/problems/word-break/solution/yi-tao-kuang-jia-jie-jue-bei-bao-wen-ti-kchg9/">一套框架解决「背包问题」</a></p>
+<h3><a id="0-1%E8%83%8C%E5%8C%85" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>0-1 背包</h3>
+<p>通用状态方程： <code>dp[i][w] = max(dp[i-1][w], dp[i-1][w-wt[i-1]] + val[i-1])</code>，代表使用前 i 个数组成 w</p>
+<ul>
+<li>
+<p><a href="https://leetcode-cn.com/problems/partition-equal-subset-sum/">416.分割等和子集</a></p>
+<pre><code class="language-py">def canPartition(self, nums: List[int]) -&gt; bool:
+    sm = sum(nums)
+    lm = len(nums)
+    if sm &amp; 1 == 1: return False
+    sm //= 2
+    dp = [[True if j == 0 else False for j in range(sm + 1)] for i in range(lm + 1)]
+    for n in range(1, lm+1):
+        for s in range(1, sm+1):
+            if s &lt; nums[n-1]: dp[n][s] = dp[n-1][s]
+            else: dp[n][s] = dp[n-1][s] or dp[n-1][s-nums[n-1]]
+    return dp[lm][sm]
+</code></pre>
+<p>状态压缩：由于 <code>dp[i]</code> 只依赖上一行的 <code>dp[i-1]</code>，可以状态压缩成一维：<code>dp[j] = dp[j] | dp[j-nums[i]]</code>，注意为了不覆盖上一行数据，需要倒序遍历 dp</p>
+<pre><code class="language-py">def canPartition(self, nums: List[int]) -&gt; bool:
+    n = len(nums)
+    s = sum(nums)
+    if s &amp; 1 == 1: return False
+    target = s // 2
+    dp = [False for _ in range(target + 1)]
+    dp[0] = True
+    for i in range(n):
+        num = nums[i]
+        for j in range(target, num - 1, -1): # 倒序
+            dp[j] = dp[j] or dp[j-num]
+
+    return dp[-1]
+</code></pre>
+</li>
+<li>
+<p><a href="https://leetcode-cn.com/problems/target-sum/">494.目标和</a><br />
+因为 <code>target = x - y， sum = x + y</code> 所以 <code>x = (sum + target) // 2</code>，转化成分割子集问题</p>
+<pre><code class="language-py">def findTargetSumWays(self, nums: List[int], target: int) -&gt; int:
+    # target = x - y
+    # sum = x + y
+    # x = (sum + target) // 2
+
+    n = len(nums)
+    x = target + sum(nums)
+    if target &gt; sum(nums) or x &amp; 1 == 1: return 0
+    x = x // 2
+    dp = [0 for _ in range(x + 1)]
+    dp[0] = 1
+
+    for n in nums:
+        for j in range(x, n-1, -1):
+            dp[j] = dp[j] + dp[j-n]
+    
+    return dp[-1]
+</code></pre>
+</li>
+</ul>
+<h3><a id="%E5%AE%8C%E5%85%A8%E8%83%8C%E5%8C%85" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>完全背包</h3>
+<p><code>dp[i][j] = dp[i-1][j] + dp[i][j-coins[i-1]]</code>，状态方程和 0-1 不同的地方在于当选择了第 i 个物品时，那么这个物品由于是不限量的，所以前面的也必须可以选择这个物品，因此，<code>dp[i][j-coins[i-1]]</code> 里面不再是 <code>i-1</code>。<br />
+0-1 背包一个物品只能选一次，所以如果选了这个物品，前面必然不能选这个物品，前面的物品只能是使用前 i-1 个物品组成。</p>
+<ul>
+<li>
+<p><a href="https://leetcode-cn.com/problems/coin-change-2">518.零钱兑换II</a></p>
+<pre><code class="language-py">def change(self, amount: int, coins: List[int]) -&gt; int:
+    n = len(coins)
+    dp = [[1 if j == 0 else 0 for j in range(amount+1)] for i in range(n+1)]
+    
+
+    for i in range(1, n+1):
+        c = coins[i-1]
+        for j in range(1, amount+1):
+            if j &gt;= c:
+                dp[i][j] = dp[i-1][j] + dp[i][j-c]
+            else:
+                dp[i][j] = dp[i-1][j]
+    
+    return dp[n][amount]
+</code></pre>
+<p>状态压缩：更新 dp[i][j] 时，j 位置上依赖上一次的结果 dp[i-1][j]，i 位置上依赖本行刚刚计算过的值，因此可以压缩状态：<code>dp[i] = dp[i] + dp[i-num]</code>，但是需要正向遍历，这样才能保证在 i 行，使用的是前面计算过的值。</p>
+<pre><code class="language-py">def change(self, amount: int, coins: List[int]) -&gt; int:
+    dp = [0 for j in range(amount+1)]
+    dp[0] = 1
+
+    for c in coins:
+        for i in range(c, amount+1):
+            dp[i] = dp[i] + dp[i-c]
+    
+    return dp[-1]
+</code></pre>
+</li>
+<li>
+<p><a href="https://leetcode-cn.com/problems/word-break/">139.单词拆分</a><br />
+可以转化为完全背包问题，但是需要考虑顺序问题，外层循环需要为 target ，内层循环为选择池 wordDict。dp[i] 表示以 i 结尾的字符串是否可以被 wordDict 中组合而成。</p>
+<pre><code class="language-py">def wordBreak(self, s: str, wordDict: List[str]) -&gt; bool:
+    n = len(s)
+    dp = [False for _ in range(n+1)]
+    dp[0] = True
+
+    for i in range(1, n+1):
+        for word in wordDict:
+            size = len(word)
+            if i &gt;= size and s[i-size: i] == word:
+                dp[i] = dp[i] or dp[i-size]
+    
+    return dp[-1]
+</code></pre>
+</li>
+<li>
+<p><a href="https://leetcode-cn.com/problems/combination-sum-iv/">377.组合总和 Ⅳ</a><br />
+需要考虑顺序问题，注意内外层循环</p>
+<pre><code class="language-py">def combinationSum4(self, nums: List[int], target: int) -&gt; int:
+    n = len(nums)
+    dp = [0 for _ in range(target+1)]
+    dp[0] = 1
+
+    for i in range(1, target+1):
+        for n in nums:
+            if i &gt;= n:
+                dp[i] = dp[i] + dp[i-n]
+    
+    return dp[-1]
+</code></pre>
+</li>
+</ul>
+<h3><a id="%E6%80%BB%E7%BB%93" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>总结</h3>
+<ul>
+<li>
+<p>0-1 背包<br />
+即数组中的元素不可重复使用，外循环遍历 arrs，内循环遍历 target，且内循环倒序</p>
+</li>
+<li>
+<p>完全背包</p>
+<ul>
+<li>即数组中的元素可重复使用并且不考虑元素之间顺序，arrs 放在外循环（保证 arrs 按顺序），target在内循环。且内循环正序。</li>
+<li>如合问题需考虑元素之间的顺序，需将 target 放在外循环，将 arrs 放在内循环，且内循环正序。</li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E8%82%A1%E7%A5%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>股票</h2>
+<p>状态方程定义：<code>dp[i][k][0|1]</code>，表示第 i 天，操作 k 次，0 不持有股票，1 持有股票</p>
+<p>框架：</p>
+<pre><code class="language-py">dp[-1][k][0] = dp[i][0][0] = 0
+dp[-1][k][1] = dp[i][0][1] = float('-inf')
+
+dp[i][k][0] = max(dp[i-1][k][0], dp[i-1][k][1] + prices[i])
+dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i])
+</code></pre>
+<ul>
+<li>
+<p>只能买卖一次：省略 k</p>
+<pre><code class="language-py">dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i])
+dp[i][1] = max(dp[i-1][1], -prices[i])
+</code></pre>
+</li>
+<li>
+<p>可以买卖任意次：省略 k</p>
+<pre><code class="language-py">dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i])
+dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i])
+</code></pre>
+</li>
+<li>
+<p>卖了之后隔一天才能交易：买的时候关注前天的利益</p>
+<pre><code class="language-py">dp[i][k][1] = max(dp[i-1][k][1], dp[i-2][k-1][0] - prices[i])
+</code></pre>
+</li>
+<li>
+<p>有手续费：</p>
+<pre><code class="language-py">dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i] - fee)
+</code></pre>
+</li>
+<li>
+<p>限制交易次数：注意遍历 k</p>
+</li>
+</ul>
+<h2><a id="%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>打家劫舍</h2>
+<ul>
+<li>
+<p>不能偷相邻的房屋：<code>dp[i] = max(dp[i-2] + nums[i-1], dp[i-1])</code></p>
+</li>
+<li>
+<p>屋子围城一个圆，不能偷相邻房屋：分两种情况，偷 [0, n-1] 个房屋，偷 [1, n] 个房屋，找较大值</p>
+</li>
+<li>
+<p>二叉树结构的房屋：递归遍历，如果偷某个结点，那么他的两个孩子结点都不能偷，如果不偷这个结点，可以选择两个孩子结点偷或不偷的较优值。返回给付结点这个结点偷或不偷两种情况的收益。</p>
+<pre><code class="language-py">rob = root.val + l_n_rob + r_n_rob
+n_rob = max(l_rob, l_n_rob) + max(r_rob, r_n_rob)
+</code></pre>
+</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16255578488940.html">质因子分解</a></h1>
+			<p class="meta"><time datetime="2021-07-06T15:50:48+08:00" 
+			pubdate data-updated="true">2021/07/06</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2><a id="%E8%B4%A8%E5%9B%A0%E5%AD%90%E5%88%86%E8%A7%A3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>质因子分解</h2>
+<ul>
+<li><code>i * i &lt;= n</code>，保证不会重复判断，防止超时</li>
+<li>因为是从 2 开始分解的，2 的倍数也会循环分解，所以 i 是前面遍历过的数的倍数时，肯定是不会再分解的，直接跳过，例如 4 在前面分解 2 的时候第二次判断 %2 就已经是在判断 %4 了，就不用每次都判断是不是质数了。</li>
+</ul>
+<pre><code class="language-python">import sys
+
+n = int(sys.stdin.readline().strip())
+i = 2
+while i * i &lt;= n and i &lt;= n:
+    while n % i == 0:
+        print(i, end=' ')
+        n //= i
+    i += 1
+
+if n != 1:
+    print(n, end=' ')
+</code></pre>
+<h2><a id="%E6%9C%80%E5%B0%8F%E5%85%AC%E5%80%8D%E6%95%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>最小公倍数</h2>
+<p>把两个数的所有不重复质因子相乘</p>
+<h2><a id="%E6%9C%80%E5%A4%A7%E5%85%AC%E7%BA%A6%E6%95%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>最大公约数</h2>
+<p>把两个数的所有公共质因子相乘</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16253942755012.html">LFU</a></h1>
+			<p class="meta"><time datetime="2021-07-04T18:24:35+08:00" 
+			pubdate data-updated="true">2021/07/04</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"></div>
+<pre><code class="language-java">class LFUCache {
+    
+    HashMap&lt;Integer, Integer&gt; k2v;
+    HashMap&lt;Integer, Integer&gt; k2f;
+    HashMap&lt;Integer, LinkedHashSet&lt;Integer&gt;&gt; f2ks;
+    int minf;
+    int capacity;
+
+    public LFUCache(int capacity) {
+        this.capacity = capacity;
+        this.minf = 0;
+        this.k2v = new HashMap&lt;&gt;();
+        this.k2f = new HashMap&lt;&gt;();
+        this.f2ks = new HashMap&lt;&gt;();
+    }
+    
+    public int get(int key) {
+        if (!k2v.containsKey(key)) return -1; // 没有返回 -1
+        increaseFreq(key); // 有则把频率 +1 返回
+        return k2v.get(key);
+    }
+    
+    public void put(int key, int value) {
+        if (capacity &lt;= 0) return;
+        if (k2v.containsKey(key)) { // 已存在，变更值并把频率 +1
+            k2v.put(key, value);
+            increaseFreq(key);
+        } else {
+            if (k2v.size() &gt;= capacity) { // 容量满了，需要删除一个
+                removeMinFreqKey();
+            }
+            k2v.put(key, value);
+            k2f.put(key, 1);
+            f2ks.putIfAbsent(1, new LinkedHashSet&lt;&gt;()); // 判断有没有频率是 1 的，没有先插入一个空节点
+            f2ks.get(1).add(key); // 把 key 插入到频率是 1 的链表里
+            minf = 1;
+        }
+    }
+
+    public void increaseFreq(int key) {
+        int freq = k2f.get(key);
+        // 1. 维护 k2f
+        k2f.put(key, freq + 1);
+
+        // 2. 维护 f2ks
+        f2ks.get(freq).remove(key); // 2.1 删除旧的
+        if (f2ks.get(freq).isEmpty()) { // 删除旧的后，如果没有其他的 key 频率是 freq，把这个freq删除
+            f2ks.remove(freq);
+            if (minf == freq) minf++; // 刚好删除的 freq 就是目前最小的，那就更新一下
+        }
+        f2ks.putIfAbsent(freq + 1, new LinkedHashSet&lt;&gt;());
+        f2ks.get(freq + 1).add(key); // 2.2 插入新的
+    }
+
+    public void removeMinFreqKey() {
+        LinkedHashSet&lt;Integer&gt; minFreqKeyList = f2ks.get(minf);
+        int delKey = minFreqKeyList.iterator().next();
+        // 1. 维护 f2ks
+        minFreqKeyList.remove(delKey);
+        if (minFreqKeyList.isEmpty()) {
+            f2ks.remove(minf);
+            // 不用更新 minf，因为删除后会插入新的 key，频率是 1
+        }
+        // 2. 维护 k2v
+        k2v.remove(delKey);
+        // 3. 维护 k2f
+        k2f.remove(delKey);
+    }
+}
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16224660155317.html">排序</a></h1>
+			<p class="meta"><time datetime="2021-05-31T21:00:15+08:00" 
+			pubdate data-updated="true">2021/05/31</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2><a id="py%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>py 内置函数</h2>
+<h3><a id="sort-sorted" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>sort &amp; sorted</h3>
+<pre><code class="language-python">list.sort() # 原地对 list 排序
+another_list = sorted(list) # 返回一个新的 list
+</code></pre>
+<h3><a id="%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>自定义排序</h3>
+<pre><code class="language-python"># 实现一个类，重载其中的__lt__函数 (实现 self 小于 s 的逻辑)
+class Compare(str):
+    def __lt__(self, s):
+        return self + s &lt; s + self
+
+# 传给 sort 或 sorted 的 key 参数
+list.sort(key=Compare)
+another_list = sorted(list, key=Compare)
+</code></pre>
+<h2><a id="%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>插入排序</h2>
+<h3><a id="%E7%9B%B4%E6%8E%A5%E6%8F%92%E5%85%A5" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>直接插入</h3>
+<p>时间复杂度：n^2<br />
+空间复杂度：1<br />
+稳定<br />
+适用于顺序存储和链式存储</p>
+<pre><code class="language-python">def insert_sort(elements):
+    for i in range(1, len(elements)):
+        if elements[i] &lt; elements[i-1]:
+            tmp = elements[i]
+            j = i - 1
+            while j &gt;= 0 and elements[j] &gt; tmp:
+                elements[j+1] = elements[j]
+                j -= 1
+            elements[j+1] = tmp
+    return elements
+</code></pre>
+<h3><a id="%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>希尔排序</h3>
+<p>时间复杂度：当 n 在某个特定情况下，复杂度位 n^1.3，最坏为 n^2<br />
+空间复杂度：O(1)<br />
+不稳定<br />
+仅试用顺序存储</p>
+<pre><code class="language-python">def shell_sort(elements):
+    n = len(elements)
+    k = n // 2
+    while k &gt;= 1: # 步长
+        for i in range(k, n): # 排序每个子集
+            if elements[i] &lt; elements[i - k]:
+                tmp = elements[i]
+                j = i - k
+                while j &gt;= 0 and elements[j] &gt; tmp:
+                    elements[j+k] = elements[j]
+                    j -= k
+                elements[j+k] = tmp
+
+        k //= 2
+    return elements
+</code></pre>
+<h2><a id="%E4%BA%A4%E6%8D%A2%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>交换排序</h2>
+<h3><a id="%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>冒泡排序</h3>
+<p>时间复杂度：n^2<br />
+空间复杂度：1<br />
+稳定</p>
+<pre><code class="language-python">def bubble_sort(elements):
+    for i in range(len(elements)-1):
+        flag = False
+        for j in range(len(elements)-1, i, -1):
+            if elements[j] &lt; elements[j-1]:
+                flag = True
+                elements[j], elements[j-1] = elements[j-1], elements[j]
+        if not flag: break # 扫描一趟，没有发生交换，代表已经有序
+    return elements
+</code></pre>
+<h3><a id="%E5%BF%AB%E6%8E%92" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>快排</h3>
+<p>时间复杂度：nlog2n<br />
+空间复杂度：log2n<br />
+不稳定</p>
+<pre><code class="language-python">def quick_sort(nums):
+    def partition(start, end):
+        idx = random.randint(start, end) # 随机选一个，交换到头部
+        nums[start], nums[idx] = nums[idx], nums[start]
+
+        slow = fast = start + 1  # 快慢指针, 慢指针记录当前交换到哪一个位置, 快指针遍历数组找到小于标兵的数, 然后交换
+        while fast &lt;= end:
+            if nums[fast] &lt;= nums[start]:
+                nums[slow], nums[fast] = nums[fast], nums[slow]
+                slow += 1
+            fast += 1
+        nums[start], nums[slow - 1] = nums[slow - 1], nums[start] # 把标兵放到分界点
+        return slow - 1
+
+    def helper(start, end):
+        if start &lt; end:
+            p = partition(start, end)
+            helper(start, p-1)
+            helper(p+1, end)
+
+    helper(0, len(nums)-1)
+    return nums
+</code></pre>
+<h2><a id="%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>选择排序</h2>
+<h3><a id="%E7%AE%80%E5%8D%95%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>简单选择排序</h3>
+<p>时间复杂度：n^2<br />
+空间复杂度：1<br />
+不稳定</p>
+<pre><code class="language-py">def select_sort(nums):
+    n = len(nums)
+    for i in range(n - 1): # 共进行 n-1 躺选择
+        min = i
+        for j in range(i+1, n):
+            if nums[j] &lt; nums[min]: min = j
+        nums[i], nums[min] = nums[min], nums[i]
+    return nums
+</code></pre>
+<h3><a id="%E5%A0%86%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>堆排序</h3>
+<p>时间复杂度：nlog2n<br />
+空间复杂度：1<br />
+不稳定<br />
+<a href="16215209148366.html">优先队列</a></p>
+<pre><code class="language-py">def heap_sort(nums):
+    n = len(nums)
+    nums.append(0)  # 添加一个元素，交换到第一个位置，作为占位，从 1 开始排序
+    nums[0], nums[n] = nums[n], nums[0]
+
+    def build_max_heap():
+        for i in range(n // 2, 0, -1):
+            adjust_heap(i, n)
+
+    def adjust_heap(k, l):  # 调整以 k 为根的堆
+        i = 2 * k
+        while i &lt;= l:
+            if i &lt; l and nums[i] &lt; nums[i + 1]: i += 1
+            if nums[k] &gt;= nums[i]:
+                break
+            else:
+                nums[i], nums[k] = nums[k], nums[i]
+                k = i
+            i *= 2
+
+    build_max_heap()  # 构建堆
+    for i in range(n, 1, -1):  # n-1 趟，堆顶堆尾交换，重新调整堆顶
+        nums[i], nums[1] = nums[1], nums[i]
+        adjust_heap(1, i - 1)
+
+    return nums[1:]
+</code></pre>
+<h2><a id="%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>归并排序</h2>
+<p>时间复杂度：nlog2n<br />
+空间复杂度：n<br />
+稳定</p>
+<pre><code class="language-py">def merge_sort(nums):
+    def merge(start, mid, end):
+        tmp = nums.copy()  # 因为需要原地排序，需要拷贝一份
+        p1, p2 = start, mid + 1
+        p = start
+        while p1 &lt;= mid and p2 &lt;= end:
+            if tmp[p1] &gt; tmp[p2]:
+                nums[p] = tmp[p2]
+                p2 += 1
+            else:
+                nums[p] = tmp[p1]
+                p1 += 1
+            p += 1
+        while p1 &lt;= mid:
+            nums[p] = tmp[p1]
+            p += 1
+            p1 += 1
+        while p2 &lt;= end:
+            nums[p] = tmp[p2]
+            p += 1
+            p2 += 1
+
+    def helper(start, end):
+        if start &lt; end:
+            mid = start + (end - start) // 2
+            helper(start, mid)
+            helper(mid + 1, end)
+            merge(start, mid, end)
+    helper(0, len(nums)-1)
+    return nums
+</code></pre>
+<h2><a id="%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>基数排序</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16215209148366.html">优先队列</a></h1>
+			<p class="meta"><time datetime="2021-05-20T22:28:34+08:00" 
+			pubdate data-updated="true">2021/05/20</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%B0%8F%E9%A1%B6%E5%A0%86">小顶堆</a></li>
+<li><a href="#%E5%AE%9E%E7%8E%B0">实现</a></li>
+</ul>
+</div>
+<h2><a id="%E5%B0%8F%E9%A1%B6%E5%A0%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>小顶堆</h2>
+<p>python 中内置了小顶堆，如果想实现大顶堆，操作的时候取反<br />
+heapq 同样支持自定义的数据类型，需要给自定义的数据类型定义 <code>__cmp__</code> 函数</p>
+<pre><code class="language-python">from heapq import *
+
+heap = []
+heappush(heap, 1) # 像堆中插入元素
+heappush(heap, 3)
+heappush(heap, 2)
+heappush(heap, 9)
+heappop(heap)     # 弹出最小的元素
+print(heap)
+heap = [1,2,4,2,1] 
+heapify(heap)      # 将list转成堆
+print(heap)
+</code></pre>
+<p><a href="https://mp.weixin.qq.com/s/o7tdyLiYm668dpUWd-x7Lg">优先队列的实现</a></p>
+<h2><a id="%E5%AE%9E%E7%8E%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>实现</h2>
+<pre><code class="language-python">class Heap:
+    def __init__(self):
+        self.heap = []
+
+    def inset(self, x):
+        self.heap.append(x)
+        self.swim(len(self.heap)-1)
+
+    def delete_max(self):
+        tmp = self.heap[0]
+        self.exchange(0, len(self.heap)-1)
+        self.heap.pop()
+        self.sink(0)
+        return tmp
+
+    def swim(self, k):
+        while k &gt; 0 and self.heap[k] &lt; self.heap[self.parent(k)]:
+            self.exchange(k, self.parent(k))
+            k = self.parent(k)
+
+    def sink(self, k):
+        while self.left(k) &lt; len(self.heap):
+            tmp = self.left(k)
+            if self.right(k) &lt; len(self.heap) and self.heap[self.right(k)] &lt; self.heap[tmp]:
+                tmp = self.right(k)
+            if self.heap[k] &lt; self.heap[tmp]: break
+            self.exchange(k, tmp)
+            k = tmp
+
+    def exchange(self, i, j):
+        self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
+
+    def parent(self, i):
+        return (i - 1) // 2
+
+    def left(self, i):
+        return 2 * i + 1
+
+    def right(self, i):
+        return 2 * (i + 1)
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16201483523405.html">并查集 Union-Find</a></h1>
+			<p class="meta"><time datetime="2021-05-05T01:12:32+08:00" 
+			pubdate data-updated="true">2021/05/05</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p><a href="https://labuladong.gitee.io/algo/2/19/33/">UNION-FIND算法详解</a></p>
+<pre><code class="language-python">class UF:
+    def __init__(self, lenght):
+        self.count = lenght
+        self.parent = [-1]*lenght
+        self.size = [1]*lenght # 记录以每个节点为根节点的负载
+        for i in range(lenght):
+            self.parent[i] = i
+    
+    def conected(self, a, b):
+        return self.find_parent(a) == self.find_parent(b)
+
+    def union(self, a, b):
+        a_p = self.find_parent(a)
+        b_p = self.find_parent(b)
+        if self.size[a_p] &gt; self.size[b_p]: # 负载平衡
+            self.parent[b_p] = a_p
+            self.size[a_p] += self.size[b_p]
+        else:
+            self.parent[a_p] = b_p
+            self.size[b_p] += self.size[a_p]
+        self.count -= 1
+
+    def find_parent(self, x):
+        while self.parent[x] != x:
+            self.parent[x] = self.parent[self.parent[x]] # 压缩
+            x = self.parent[x]
+        return x
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16197852235052.html">二分查找</a></h1>
+			<p class="meta"><time datetime="2021-04-30T20:20:23+08:00" 
+			pubdate data-updated="true">2021/04/30</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2><a id="%E9%97%AE%E9%A2%98" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>问题</h2>
+<p><a href="https://leetcode-cn.com/problems/koko-eating-bananas/">https://leetcode-cn.com/problems/koko-eating-bananas/</a></p>
+<h2><a id="code" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>code</h2>
+<pre><code class="language-python">class Solution:
+    def minEatingSpeed(self, piles: List[int], h: int) -&gt; int:
+        max_speed = max(piles)
+        piles_len = len(piles)
+        def can_eat(speed):
+            tmp = map(lambda x: math.ceil(x/speed), piles)
+            if sum(tmp) &lt;= h: return True
+            else: return False
+        
+        up, low = max_speed, 1
+        while up &gt; low:
+            m = (low + up) // 2 
+            if can_eat(m):
+                up = m
+            else: 
+                low = m+1
+            
+        return low
+</code></pre>
+<h2><a id="%E5%A6%82%E4%BD%95%E7%A1%AE%E5%AE%9Amid%E5%90%91%E4%B8%8B%E5%8F%96%E6%95%B4%E8%BF%98%E6%98%AF%E5%90%91%E4%B8%8A%E5%8F%96%E6%95%B4" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>如何确定 mid 向下取整还是向上取整</h2>
+<p>主要考虑开闭区间，参考 <a href="https://labuladong.gitee.io/algo/%E7%AE%97%E6%B3%95%E6%80%9D%E7%BB%B4%E7%B3%BB%E5%88%97/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E8%AF%A6%E8%A7%A3/">https://labuladong.gitee.io/algo/算法思维系列/二分查找详解/</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16191881416396.html">Python 基础</a></h1>
+			<p class="meta"><time datetime="2021-04-23T22:29:01+08:00" 
+			pubdate data-updated="true">2021/04/23</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E7%89%9B%E5%AE%A2%E8%BE%93%E5%85%A5">牛客输入</a></li>
+<li><a href="#%E6%9C%80%E5%A4%A7%E6%9C%80%E5%B0%8F%E5%80%BC">最大最小值</a></li>
+<li><a href="#list">list</a></li>
+<li><a href="#set">set</a></li>
+<li><a href="#math">math</a></li>
+<li><a href="#str">str</a></li>
+<li><a href="#random">random</a></li>
+</ul>
+</div>
+<h2><a id="%E7%89%9B%E5%AE%A2%E8%BE%93%E5%85%A5" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>牛客输入</h2>
+<pre><code class="language-python">import sys 
+for line in sys.stdin:
+    a = line.split()
+    print(int(a[0]) + int(a[1]))
+</code></pre>
+<h2><a id="%E6%9C%80%E5%A4%A7%E6%9C%80%E5%B0%8F%E5%80%BC" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>最大最小值</h2>
+<pre><code class="language-python">float('-inf') # min
+float('inf') # max
+sys.maxsize # int max
+</code></pre>
+<h2><a id="list" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>list</h2>
+<ol>
+<li>
+<p>切片是左闭右开 <code>[start, end)</code></p>
+</li>
+<li>
+<p>切片是浅拷贝，可能会浪费空间</p>
+</li>
+<li>
+<p>使用 <code>index(a, start, end)</code> 查找元素时，如果制定了起止范围 (左闭右开)，返回的索引仍然是全局的索引，而不是在起止范围内的索引</p>
+</li>
+<li>
+<p>多维排序，<code>list.sort(key=lambda x: (x[0], -x[1]))</code> 代表先使用第一维排序，第一维相等的利用第二维倒序排序</p>
+</li>
+<li>
+<p><code>sum(a, [])</code> 可以将多维 list 转成一维, 原理是:</p>
+<pre><code class="language-python">sum(a) # 计算结果是sum(a) = 0 + 1 + 2 + 3， 起始start默认为0，是整数，加法没问题
+</code></pre>
+<p>如果是二维list，如[[1,2,3],[4,5,6]], 这时迭代器每个元素均为list，这些元素作加法时start不能再使用默认整数类型值0了，因为整数和list无法做加法运算,即1+[1,2,3]+[4,5,6]运算是错误的，此时需要设置起始变量也为list类型，如start=[],如下：</p>
+<pre><code class="language-python">sum(a, start=[]) # 正确, sum(a, []) = [] + [1,2,3] + [4,5,6] = [1,2,3,4,5,6] ,这样才对
+</code></pre>
+</li>
+</ol>
+<h2><a id="set" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>set</h2>
+<pre><code class="language-python">set.update(list) # 将 list 批量添加到 set
+</code></pre>
+<h2><a id="math" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>math</h2>
+<ol>
+<li>
+<p>精准除法，返回浮点 <code>a/b</code></p>
+</li>
+<li>
+<p>向下取整 <code>a//b</code> 或 <code>math.floor(a/b)</code></p>
+</li>
+<li>
+<p>向上取整 <code>math.ceil(a/b)</code> 或 <code>(a-1)/b + 1</code></p>
+</li>
+<li>
+<p>四舍五入 <code>round(a/b)</code></p>
+<blockquote>
+<p>python3.5 中，如果距离两边一样远，会保留到偶数的一边。比如<code>round(0.5)</code>和round(-0.5)都会保留到0，而<code>round(1.5)</code>会保留到2。</p>
+</blockquote>
+</li>
+</ol>
+<h2><a id="str" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>str</h2>
+<ol>
+<li>python 中没有字符之间的直接相减运算，但可以通过 <code>ord()</code> 函数实现 <code>ord()</code> 函数主要用来返回对应字符的 ascii 码</li>
+<li><code>chr()</code> 实现 ascii 转 chr</li>
+</ol>
+<h2><a id="random" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>random</h2>
+<pre><code class="language-python">import random
+
+random.randint(start, end)
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16190964524317.html">二叉树</a></h1>
+			<p class="meta"><time datetime="2021-04-22T21:00:52+08:00" 
+			pubdate data-updated="true">2021/04/22</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E9%80%92%E5%BD%92">递归</a></li>
+<li><a href="#%E9%9D%9E%E9%80%92%E5%BD%92">非递归</a>
+<ul>
+<li><a href="#%E5%89%8D%E5%BA%8F">前序</a></li>
+<li><a href="#%E4%B8%AD%E5%BA%8F">中序</a></li>
+<li><a href="#%E5%90%8E%E5%BA%8F">后序</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<pre><code class="language-python"># Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+</code></pre>
+<h2><a id="%E9%80%92%E5%BD%92" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>递归</h2>
+<pre><code class="language-python">class Solution:
+    def preorderTraversal(self, root: TreeNode) -&gt; List[int]:
+        l = []
+        def pre(root):
+            if root == None:
+                return
+            # 前、中、后只需调整下面的顺序
+            l.append(root.val）
+            pre(root.left)
+            pre(root.right)
+        
+        pre(root)
+        return l
+</code></pre>
+<h2><a id="%E9%9D%9E%E9%80%92%E5%BD%92" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>非递归</h2>
+<h3><a id="%E5%89%8D%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>前序</h3>
+<pre><code class="language-python">class Solution:
+    def inorderTraversal(self, root: TreeNode) -&gt; List[int]:
+        stack = []
+        l = []
+        p = root
+        while stack or p: # 注意 p != None
+            while p:
+                stack.append(p)
+                l.append(p.val) # 和中序仅仅这一行位置不同
+                p = p.left 
+            p = stack.pop()
+            p = p.right
+        return l
+</code></pre>
+<h3><a id="%E4%B8%AD%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>中序</h3>
+<pre><code class="language-python">class Solution:
+    def inorderTraversal(self, root: TreeNode) -&gt; List[int]:
+        stack = []
+        l = []
+        p = root
+        while stack or p : # 注意 p != None
+            while p: # stack 的作用是保存遍历过的节点，原路返回时能找到右子树
+                stack.append(p)
+                p = p.left 
+            p = stack.pop()
+            l.append(p.val)
+            p = p.right
+        return l
+</code></pre>
+<h3><a id="%E5%90%8E%E5%BA%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>后序</h3>
+<pre><code class="language-python">class Solution:
+    def postorderTraversal(self, root: TreeNode) -&gt; List[int]:
+        stack = []
+        l = []
+        p = root
+        lastVisit = None
+        while stack or p:
+            while p:
+                stack.append(p)
+                p = p.left
+            node = stack[-1] # 这里只看不 pop
+            if node.right == None or node.right == lastVisit: # 如果这个节点没有右子树或者右子树刚刚访问过，就访问这个节点
+                result = stack.pop()
+                l.append(result.val)
+                lastVisit = result # 标记当前 pop 出来的节点
+            else:
+                p = node.right
+        
+        return l
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16190960540396.html">栈 & 队列</a></h1>
+			<p class="meta"><time datetime="2021-04-22T20:54:14+08:00" 
+			pubdate data-updated="true">2021/04/22</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#deque">deque</a></li>
+</ul>
+</div>
+<h2><a id="deque" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>deque</h2>
+<pre><code class="language-python">s = deque()
+q = deque()
+
+s.append(1) # 入栈
+q.append(1) # 入队列
+
+s.pop() # 出栈
+q.popleft() # 出队列
+
+len(q) # 统计个数
+q.clear() # 清空
+if q: # 判断是否为空
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16190805100771.html">KMP</a></h1>
+			<p class="meta"><time datetime="2021-04-22T16:35:10+08:00" 
+			pubdate data-updated="true">2021/04/22</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%88%A9%E7%94%A8next%E8%A1%A8%E5%8C%B9%E9%85%8D">利用 next 表匹配</a></li>
+<li><a href="#%E6%9E%84%E5%BB%BAnext%E8%A1%A8">构建 next 表</a></li>
+<li><a href="#code">code</a></li>
+<li><a href="#ref">ref</a></li>
+</ul>
+</div>
+<blockquote>
+<p>有一个字符串&quot;BBC ABCDAB ABCDABCDABDE&quot;，我想知道，里面是否包含另一个字符串&quot;ABCDABD&quot;？</p>
+</blockquote>
+<h2><a id="%E5%88%A9%E7%94%A8next%E8%A1%A8%E5%8C%B9%E9%85%8D" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>利用 next 表匹配</h2>
+<ol>
+<li>
+<p>首先，字符串&quot;BBC ABCDAB ABCDABCDABDE&quot;的第一个字符与搜索词&quot;ABCDABD&quot;的第一个字符，进行比较。因为B与A不匹配，所以搜索词后移一位。<br />
+<img src="media/16190805100771/16190805443698.png" alt="" style="width:442px;" /></p>
+</li>
+<li>
+<p>因为B与A不匹配，搜索词再往后移。<br />
+<img src="media/16190805100771/16190805526871.png" alt="" style="width:453px;" /></p>
+</li>
+<li>
+<p>就这样，直到字符串有一个字符，与搜索词的第一个字符相同为止。<br />
+<img src="media/16190805100771/16190805661187.png" alt="" style="width:432px;" /></p>
+</li>
+<li>
+<p>接着比较字符串和搜索词的下一个字符，还是相同。<br />
+<img src="media/16190805100771/16190805790433.png" alt="" style="width:438px;" /></p>
+</li>
+<li>
+<p>直到字符串有一个字符，与搜索词对应的字符不相同为止。<br />
+<img src="media/16190805100771/16190805873795.png" alt="" style="width:432px;" /></p>
+</li>
+<li>
+<p>这时，最自然的反应是，将搜索词整个后移一位，再从头逐个比较。这样做虽然可行，但是效率很差，因为你要把&quot;搜索位置&quot;移到已经比较过的位置，重比一遍。<br />
+<img src="media/16190805100771/16190805942034.png" alt="" style="width:441px;" /></p>
+</li>
+<li>
+<p>一个基本事实是，当空格与D不匹配时，你其实知道前面六个字符是&quot;ABCDAB&quot;。KMP算法的想法是，设法利用这个已知信息，不要把&quot;搜索位置&quot;移回已经比较过的位置，继续把它向后移，这样就提高了效率。<br />
+<img src="media/16190805100771/16190806030270.png" alt="" style="width:432px;" /></p>
+</li>
+<li>
+<p>怎么做到这一点呢？可以针对搜索词，算出一张《部分匹配表》（Partial Match Table）。这张表是如何产生的，后面再介绍，这里只要会用就可以了。<br />
+<img src="media/16190805100771/16190806131922.png" alt="" style="width:483px;" /></p>
+</li>
+<li>
+<p>已知空格与D不匹配时，前面六个字符&quot;ABCDAB&quot;是匹配的。查表可知，最后一个匹配字符B对应的&quot;部分匹配值&quot;为2，因此按照下面的公式算出向后移动的位数：</p>
+</li>
+</ol>
+<pre><code class="language-plain_text">移动位数 = 已匹配的字符数 - 对应的部分匹配值
+</code></pre>
+<p>因为 6 - 2 等于4，所以将搜索词向后移动4位。<br />
+<img src="media/16190805100771/16190806209113.png" alt="" style="width:432px;" /></p>
+<ol start="10">
+<li>
+<p>因为空格与Ｃ不匹配，搜索词还要继续往后移。这时，已匹配的字符数为2（&quot;AB&quot;），对应的&quot;部分匹配值&quot;为0。所以，移动位数 = 2 - 0，结果为 2，于是将搜索词向后移2位。<br />
+<img src="media/16190805100771/16190806624602.png" alt="" style="width:435px;" /></p>
+</li>
+<li>
+<p>因为空格与A不匹配，继续后移一位。<br />
+<img src="media/16190805100771/16190806697281.png" alt="" style="width:426px;" /></p>
+</li>
+<li>
+<p>逐位比较，直到发现C与D不匹配。于是，移动位数 = 6 - 2，继续将搜索词向后移动4位。<br />
+<img src="media/16190805100771/16190806779279.png" alt="" style="width:442px;" /></p>
+</li>
+<li>
+<p>逐位比较，直到搜索词的最后一位，发现完全匹配，于是搜索完成。如果还要继续搜索（即找出全部匹配），移动位数 = 7 - 0，再将搜索词向后移动7位，这里就不再重复了。<br />
+<img src="media/16190805100771/16190806988634.png" alt="" style="width:432px;" /></p>
+</li>
+</ol>
+<h2><a id="%E6%9E%84%E5%BB%BAnext%E8%A1%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>构建 next 表</h2>
+<p><img src="media/16190805100771/16190809682187.png" alt="" style="width:1351px;" /><br />
+<img src="media/16190805100771/16190809758964.png" alt="" style="width:1356px;" /><br />
+如果 p[j] != p[i]，我们就要在 i-1 的已匹配的后缀从前面开始缩小位数，将后缀从前面开始缩小等于将匹配的前缀从后面开始缩小，等价于找 π(π(i−1)−1)，所以 j = next[j - 1]</p>
+<p><img src="media/16190805100771/16190809806861.png" alt="" style="width:1350px;" /><br />
+<img src="media/16190805100771/16190809876074.png" alt="" style="width:1292px;" /></p>
+<h2><a id="code" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>code</h2>
+<pre><code class="language-python">class Solution:
+    def strStr(self, haystack: str, needle: str) -&gt; int:
+        if needle == &quot;&quot;:
+            return 0
+
+        h_len, n_len = len(haystack), len(needle)
+
+        def cal_next():
+            next = [0]*n_len
+            j, i = 0, 1
+            while i &lt; n_len:
+                if needle[i] == needle[j]:
+                    next[i] = j + 1
+                    i += 1
+                    j += 1
+                elif j:
+                    j = next[j - 1]
+                else:
+                    next[i] = 0
+                    i += 1
+            return next
+
+        next = cal_next()
+        h_i, n_i = 0, 0
+        flag = -1
+        while h_i &lt; h_len:
+            if haystack[h_i] == needle[n_i]:
+                h_i += 1
+                n_i += 1
+            elif n_i:
+                n_i = next[n_i-1]
+            else:
+                h_i += 1
+            if n_i == n_len:
+                flag = h_i - n_i
+                break
+
+        return flag
+</code></pre>
+<h2><a id="ref" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ref</h2>
+<p>[1] <a href="http://www.ruanyifeng.com/blog/2013/05/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm.html">字符串匹配的KMP算法</a><br />
+[2] <a href="https://leetcode-cn.com/problems/implement-strstr/solution/shua-chuan-lc-shuang-bai-po-su-jie-fa-km-tb86/">【宫水三叶】简单题学 KMP 算法</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

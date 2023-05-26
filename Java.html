@@ -1,0 +1,3276 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  Java - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16248800865693.html">类加载</a></h1>
+			<p class="meta"><time datetime="2021-06-28T19:34:46+08:00" 
+			pubdate data-updated="true">2021/06/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8">类加载器</a></li>
+<li><a href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%EF%BC%88%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B%EF%BC%89">类加载机制（对象创建过程）</a>
+<ul>
+<li><a href="#%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6">双亲委派机制</a></li>
+</ul>
+</li>
+<li><a href="#%E6%B2%99%E7%AE%B1%E5%AE%89%E5%85%A8%E6%9C%BA%E5%88%B6">沙箱安全机制</a></li>
+</ul>
+</div>
+<h2><a id="%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>类加载器</h2>
+<p>作用: 加载 Class 文件 (<code>new Student();</code>), 从jvm角度来看只存在两种类加载器:</p>
+<ul>
+<li>启动类加载器（<code>Bootstrap ClassLoader</code>）</li>
+<li>其他类加载器：由Java语言实现，继承自抽象类 <code>ClassLoader</code>
+<ul>
+<li>扩展类加载器（<code>Extension ClassLoader</code>）: 负责加载<code>&lt;JAVA_HOME&gt;\lib\ext</code> 或 <code>java.ext.dirs</code> 系统变量指定的路径中的所有类库</li>
+<li>应用程序类加载器（<code>Application ClassLoader</code>）: 负责加载用户类路径上的指定类库，我们可以直接使用这个类加载器。一般情况，如果我们没有自定义类加载器默认就是用这个加载器。</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">Car car = new Car();
+Class c = car.getClass();
+System.out.println(c); // class cn.jvm.Car
+ClassLoader cl = c.getClassLoader();
+System.out.println(cl); // AppClassLoader
+System.out.println(cl.getParent()); // ExtClassLoader
+System.out.println(cl.getParent().getParent()); // null, BootClassLoader 调用的是 C++ 代码, java 获取不到
+</code></pre>
+<p><img src="media/16225545153969/16225606494777.jpg" alt="" class="mw_img_center" style="width:491px;display: block; clear:both; margin: 0 auto;" /></p>
+<h2><a id="%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%EF%BC%88%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>类加载机制（对象创建过程）</h2>
+<ul>
+<li>加载 ( Loading ): 将类的 <code>.class</code> 文件生成 Class 对象</li>
+<li>链接 ( Linking ):
+<ul>
+<li>验证 ( Verify ): 保证这个被加载的class类的正确性</li>
+<li>准备 ( Prepare ): 为类中的静态字段分配内存，并设置默认的初始值</li>
+<li>解析 ( Resolve ): 将常量池内的符号引用转换为直接引用的过程</li>
+</ul>
+</li>
+<li>初始化 ( initialization ): 执行类的构造器方法 <code>init()</code></li>
+</ul>
+<h3><a id="%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>双亲委派机制</h3>
+<p>如果一个类加载器收到了类加载的请求，它首先不会自己去加载这个类，而是把这个请求委派给父类加载器去完成，每一层的类加载器都是如此 (<code>BOOT &lt;-- EXT &lt;-- APP</code>)，这样所有的加载请求都会被传送到顶层的启动类加载器中，只有当父加载无法完成加载请求（它的搜索范围中没找到所需的类报出 <code>ClassNotFound</code>）时，子加载器才会尝试去加载类. 防止系统类库被恶意替换成用户自定义的类.</p>
+<p>例如: 程序员写了一个 <code>java.lang.String</code> 类, 执行加载类的时候, BOOT 加载器会发现 <code>rt.jar</code> 里有 <code>java.lang.String</code> 类, 这时最终加载的类就是 <code>rt.jar</code> 里面的类.</p>
+<pre><code class="language-java">package java.lang;
+    
+public class String {
+    public String toString() {
+        return &quot;hello, my String !&quot;;
+    }
+    
+    public static void main(String[] args) {
+        String s = new String();
+        s.toString();
+    }
+}
+// 错误: 在类 java.lang.String 中找不到 main 方法, 请将 main 方法定义为:
+// public static void main(String[] args)
+// 否则 JavaFX 应用程序类必须扩展javafx.application.Application
+</code></pre>
+<p>为了完成某些操作，可以 “破坏” 模型。</p>
+<ol>
+<li>重写 <code>ClassLoader</code> 类的 <code>loadClass</code> 方法</li>
+<li>利用线程上下文加载器（Thread Context ClassLoader）。这个类加载器可以通过 <code>java.lang.Thread</code> 类的 <code>setContextClassLoaser()</code> 方法进行设置，如果创建线程时还未设置，它将会从父线程中继承一个，如果在应用程序的全局范围内都没有设置过的话，那这个类加载器默认就是应用程序类加载器。</li>
+<li>为了实现热插拔，热部署，模块化，意思是添加一个功能或减去一个功能不用重启，只需要把这模块连同类加载器一起换掉就实现了代码的热替换。</li>
+</ol>
+<h2><a id="%E6%B2%99%E7%AE%B1%E5%AE%89%E5%85%A8%E6%9C%BA%E5%88%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>沙箱安全机制</h2>
+<p>沙箱安全机制: 将 Java 代码限定在虚拟机 JVM 特定的范围中，严格限制代码对本地资源的访问。</p>
+<p>由以下部分组成</p>
+<ul>
+<li>字节码校验器: 确保 Java 类文件遵循 Java 语言规范</li>
+<li>类装载器: 防止恶意代码干涉善意代码(双亲委派) / 守护被信任的类库边界 / 确定代码可以进行哪些操作(沙箱)</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16248798475118.html">GC</a></h1>
+			<p class="meta"><time datetime="2021-06-28T19:30:47+08:00" 
+			pubdate data-updated="true">2021/06/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#gc%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6">GC 触发条件</a></li>
+<li><a href="#%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E6%B4%BB%E7%9D%80">判断对象是否活着</a>
+<ul>
+<li><a href="#%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95">引用计数法</a></li>
+<li><a href="#%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90">可达性分析</a>
+<ul>
+<li><a href="#%E4%B8%89%E8%89%B2%E6%B3%95">三色法</a></li>
+</ul>
+</li>
+<li><a href="#%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8">四种引用</a></li>
+</ul>
+</li>
+<li><a href="#gc%E7%AE%97%E6%B3%95">GC 算法</a>
+<ul>
+<li><a href="#%E6%AF%94%E8%BE%83">比较</a></li>
+<li><a href="#%E5%88%86%E4%BB%A3%E5%9B%9E%E6%94%B6">分代回收</a></li>
+</ul>
+</li>
+<li><a href="#8%E7%A7%8D%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8">8 种垃圾收集器</a>
+<ul>
+<li><a href="#serial">Serial</a></li>
+<li><a href="#parnew">ParNew</a></li>
+<li><a href="#parallel-scavenge-parallel-old">Parallel ScaVenge &amp; Parallel Old</a></li>
+<li><a href="#cms">CMS</a></li>
+<li><a href="#g1">G1</a></li>
+</ul>
+</li>
+<li><a href="#%E5%A6%82%E4%BD%95%E8%B0%83%E4%BC%98">如何调优</a></li>
+</ul>
+</div>
+<p>GC 的作用区域是堆和方法区 ( 规范中不对方法区做要求, 但 HotSpot 为方法区实现了 GC ), 大部分都是在新生代。分为轻 GC (普通 GC), 重 GC (全局 GC)</p>
+<h2><a id="gc%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>GC 触发条件</h2>
+<ul>
+<li>Minor GC：当 Eden 空间满时，就将触发一次 Minor GC</li>
+<li>Full GC：
+<ul>
+<li>
+<p>当调用 <code>System.gc()</code> 建议虚拟机执行 FG，不建议使用</p>
+</li>
+<li>
+<p>老年代空间不足，（可以调大新生代空间或调大进入老年代的年龄尽量避免发生 FG）</p>
+</li>
+<li>
+<p>空间分配担保失败</p>
+<blockquote>
+<p>Minor GC 之前，先检查老年代的最大可用连续空间是否大于新生代所有对象空间，如果是，Minor GC 可以进行；如果不是，再检查 JVM 是否允许担保失败，如果允许再检查老年代的最大可用连续空间是否大于历代晋升到老年代对象的平均大小，如果大于，尝试进行 Minor GC，如果小于或不允许担保失败，就进行一次 Full GC</p>
+</blockquote>
+</li>
+<li>
+<p>JDK 1.7 之前永久代空间不足，且没有采用 CMS GC 时也会执行 Full GC。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E6%B4%BB%E7%9D%80" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>判断对象是否活着</h2>
+<h3><a id="%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>引用计数法</h3>
+<p>为每个对象维护一个计数器, 保存当前被引用次数，为 0 的对象被清除</p>
+<ul>
+<li>优点: 实现简单, 效率高</li>
+<li>缺点: 很难解决对象之间循环引用的问题</li>
+</ul>
+<h3><a id="%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>可达性分析</h3>
+<p>和 GC Roots 对象 ( 栈帧中的本地变量中引用的对象 / 方法区中类静态属性引用的对象 / 方法区中常量引用的对象 / 本地方法栈中引用的对象 ) 直接或间接关联的对象是有效对象，反之则是无效对象。</p>
+<h4><a id="%E4%B8%89%E8%89%B2%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>三色法</h4>
+<p>可达性分析时，把遍历对象图过程中遇到的对象，按“是否访问过”这个条件标记成以下三种颜色：</p>
+<ul>
+<li>白色：尚未访问过。</li>
+<li>黑色：本对象已访问过，而且本对象引用到的其他对象也全部访问过了。</li>
+<li>灰色：本对象已访问过，但是本对象引用到的其他对象尚未全部访问完。全部访问后，会转换为黑色。</li>
+</ul>
+<p><strong>过程</strong>：</p>
+<ol>
+<li>初始时，所有对象都在【白色集合】中；</li>
+<li>将 GC Roots 直接引用到的对象挪到 【灰色集合】中；</li>
+<li>从灰色集合中获取对象：
+<ul>
+<li>将本对象引用到的其他对象全部挪到【灰色集合】中；</li>
+<li>将本对象挪到【黑色集合】里面。</li>
+</ul>
+</li>
+</ol>
+<p><strong>问题</strong>：假设 A -&gt; B -&gt; C，一开始 A 在灰色，然后扫描 A，将 B 添加到灰色，将 A 添加到黑色；此时 A 新增引用 C，B 断开对 C 的引用。因为 A 已经在黑色中，不会再扫描，而 B 也没有了对 C 的引用，那么 C 会被当作垃圾回收，A -&gt; C 就出现了漏标。<br />
+解决：黑色对象引用白色对象或删除灰色对象对白色对象的引用时时，都将白色对象置为灰色；</p>
+<h3><a id="%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>四种引用</h3>
+<ul>
+<li>强引用: 绝大多数都是强引用, 垃圾回收器不会回收它</li>
+<li>软引用: 类似于可有可无的引用，当内存不足时，就会回收。</li>
+<li>弱引用: 也是可有可无的引用，比软引用具有更短暂的生命周期，在GC扫描时，无论内存是否够用，都会回收</li>
+<li>虚引用: 和没有引用一样，任何时候都有可能被回收</li>
+</ul>
+<h2><a id="gc%E7%AE%97%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>GC 算法</h2>
+<ul>
+<li>标记-清除: 第一次遍历 GC Roots 对象, 将 GC Roots 对象可达到的堆内存对象进行标记, 第二次遍历堆内存对象, 将没有标记的对象清除
+<ul>
+<li>优点: 不需要额外的空间</li>
+<li>缺点: 两次扫描效率不高, 产生内存碎片无法生成大对象造成频繁 GC</li>
+</ul>
+</li>
+<li>标记-复制: 进行可达性分析的时候, 凡是能达到的对象都复制到 to 区, 再一次性清除伊甸园区和 from 区
+<ul>
+<li>优点: 没有内存碎片, 因为每次清理, 都会把活下来的对象<strong>连续地</strong>复制到 to  区中</li>
+<li>缺点: 浪费内存空间, 复制的对象比较多时, 效率慢, 适合对象存活率低的情况</li>
+</ul>
+</li>
+<li>标记-压缩: 标记完成以后, 让所有存活对象向一端移动, 然后直接清理掉一端边界外的内存
+<ul>
+<li>优点: 内存规整</li>
+<li>缺点: 效率不如复制算法</li>
+</ul>
+</li>
+</ul>
+<h3><a id="%E6%AF%94%E8%BE%83" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>比较</h3>
+<p>效率: 标记复制 &gt; 标记压缩 &gt; 标记清除 ( 引发更多 GC )<br />
+内存规整率: 标记压缩 = 标记复制 &gt; 标记清除<br />
+内存利用率: 标记压缩 = 标记清除 &gt; 标记复制</p>
+<h3><a id="%E5%88%86%E4%BB%A3%E5%9B%9E%E6%94%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>分代回收</h3>
+<p>结合以上几种算法: 把 Java 堆分为新生代和老年代，根据各个对象的年代采用最合适的收集算法。针对新生代的对象，采取灵活比例的复制算法，只需要复制少量存活对象就可以完成收集。针对老年代的对象，因为这些对象存活率高，没有额外空间进行分配担保，必须使用标记清除或标记压缩算法。</p>
+<h2><a id="8%E7%A7%8D%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>8 种垃圾收集器</h2>
+<p><a href="https://github.com/CyC2018/CS-Notes/blob/master/notes/Java%20%E8%99%9A%E6%8B%9F%E6%9C%BA.md#minor-gc-%E5%92%8C-full-gc">参考</a></p>
+<p><img src="media/16248720428830/16248720638327.jpg" alt="" class="mw_img_center" style="display: block; clear:both; margin: 0 auto;" /></p>
+<h3><a id="serial" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Serial</h3>
+<p>进行垃圾收集工作的时候必须暂停其他所有的工作线程，单线程串行执行，简单高效<br />
+新生代采用<strong>复制算法</strong>，老年代采用<strong>标记-整理</strong>算法。</p>
+<h3><a id="parnew" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ParNew</h3>
+<p>Serial 的多线程版本，性能高，Server 模式下的虚拟机的首要选择，除了 Serial 收集器外，只有它能与 CMS 收集器配合工作<br />
+新生代采用<strong>复制算法</strong>，老年代采用<strong>标记-整理</strong>算法。</p>
+<h3><a id="parallel-scavenge-parallel-old" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parallel ScaVenge &amp; Parallel Old</h3>
+<p>多线程，其他收集器是尽量缩短垃圾收集的停顿时间，适合交互程序，而它的目标是吞吐量优先，尽可能高的利用 CPU，适合后台任务。<br />
+可以通过参数打开自适应调节，能根据系统运行情况动态调整参数以提供最适合的停顿时间或吞吐量。<br />
+Parallel ScaVenge 采用<strong>复制算法</strong>，Parallel Old 采用<strong>标记-整理</strong>算法。</p>
+<h3><a id="cms" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CMS</h3>
+<p>Concurrent Mark Sweep，采用<strong>标记-清除</strong>算法，真正意义上的并发收集器。分四个阶段：</p>
+<ul>
+<li>初始标记：暂停所有线程，记录直接与 root 相连的对象，时间很短</li>
+<li>并发标记：GC 和 用户线程同时开启，并跟踪用户线程发生引用更新的地方</li>
+<li>重新标记：暂停用户进程，根据第二步引用变更的地方，并发重新标记，时间很短</li>
+<li>并发清除：开启用户线程，同时 GC 线程开始清理工作</li>
+</ul>
+<p>在整个过程中耗时最长的并发标记和并发清除过程中，收集器线程都可以与用户线程一起工作，不需要进行停顿。</p>
+<p><img src="media/16248720428830/16248783456729.jpg" alt="" class="mw_img_center" style="width:705px;display: block; clear:both; margin: 0 auto;" /></p>
+<h3><a id="g1" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>G1</h3>
+<p>面向服务端应用，在多 CPU 和大内存的场景下有很好的性能。可以直接对新生代和老年代一起回收。（标记整理，可预测停顿）<br />
+G1 把堆划分成多个大小相等的独立区域（Region），新生代和老年代不再物理隔离，使得每个小空间可以单独进行垃圾回收。通过记录每个 Region 垃圾回收时间以及回收所获得的空间，维护一个优先列表，每次根据允许的收集时间，优先回收价值最大的 Region。<br />
+<img src="media/16248720428830/16248792437880.jpg" alt="" class="mw_img_center" style="width:489px;display: block; clear:both; margin: 0 auto;" /></p>
+<p>回收过程和 CMS 类似，但最后一步是筛选回收，对各个 Region 中的回收价值和成本进行排序，根据用户所期望的 GC 停顿时间来制定回收计划。</p>
+<h2><a id="%E5%A6%82%E4%BD%95%E8%B0%83%E4%BC%98" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>如何调优</h2>
+<p>现在都是分代回收，尽量让对象在新生代就回收，减少大对象的分配。需要平衡分代大小、垃圾回收次数和停顿时间。<br />
+对 GC 进行完整的监控，监控各年代占用大小、YGC、FGC 触发频率，对象分配速率等，然后根据实际情况调优。<br />
+比如 FGC 频率高，可能是第三方库调用了 System.gc，或者 CMS 触发阈值过低等；还有对象年龄晋升阈值、幸存区大小等。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16248673414388.html">OOM</a></h1>
+			<p class="meta"><time datetime="2021-06-28T16:02:21+08:00" 
+			pubdate data-updated="true">2021/06/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%A0%86%E7%A9%BA%E9%97%B4%E6%BA%A2%E5%87%BA%EF%BC%88java-lang-outofmemoryerror%EF%BC%9Ajava-heap-space%EF%BC%89">堆空间溢出（<code>java.lang.OutOfMemoryError：java heap space</code>）</a></li>
+<li><a href="#%E6%B0%B8%E4%B9%85%E4%BB%A3%E6%BA%A2%E5%87%BA%EF%BC%88java-lang-outofmemoryerror%EF%BC%9Apermgen-space%EF%BC%89">永久代溢出（<code>java.lang.OutOfMemoryError：PermGen space</code>）</a></li>
+<li><a href="#%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88outofmemoryerror-direct-buffer-memory%EF%BC%89">直接内存溢出（<code>OutOfMemoryError: Direct buffer memory</code>）</a></li>
+<li><a href="#jprofiler">Jprofiler</a></li>
+</ul>
+</div>
+<h2><a id="%E5%A0%86%E7%A9%BA%E9%97%B4%E6%BA%A2%E5%87%BA%EF%BC%88java-lang-outofmemoryerror%EF%BC%9Ajava-heap-space%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>堆空间溢出（<code>java.lang.OutOfMemoryError：java heap space</code>）</h2>
+<p>老年代区域剩余的内存，已经无法满足将要晋升到老年代区域的对象大小，会报此错。</p>
+<p>原因：</p>
+<ul>
+<li>设置的堆内存太小；</li>
+<li>内存泄露如 File 资源没有回收；</li>
+<li>请求创建超大对象或数组；</li>
+<li>设计问题如使用过多的缓存</li>
+</ul>
+<p>解决：</p>
+<ul>
+<li>调高 <code>-Xmx</code> 参数增大堆内存</li>
+<li>如果是内存泄漏，检查持有的对象，修改代码</li>
+<li>如果是超大对象，检查它的合理性，比如一次性查询了数据库全部结果</li>
+<li>业务峰值压力可以考虑增加机器资源，或者限流</li>
+</ul>
+<h2><a id="%E6%B0%B8%E4%B9%85%E4%BB%A3%E6%BA%A2%E5%87%BA%EF%BC%88java-lang-outofmemoryerror%EF%BC%9Apermgen-space%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>永久代溢出（<code>java.lang.OutOfMemoryError：PermGen space</code>）</h2>
+<p>该错误表示永久代（Permanent Generation）已用满，通常是因为加载的 class 数目太多或体积太大。</p>
+<p>解决：</p>
+<ul>
+<li>如果程序启动时报错，修改 <code>-XX:MaxPermSize</code> 或 <code>-XX:MaxMetaspaceSize</code> 调大永久区</li>
+<li>应用重新部署时报错，可能是应用根本没有重启，导致加载了过多的 class，重启 JVM</li>
+<li>运行时报错，可能是动态创建了大量 class，可以通过设置 <code>-XX:+CMSClassUnloadingEnabled</code> 和 <code>-XX:+UseConcMarkSweepGC</code> 这两个参数允许 JVM 卸载 class。</li>
+</ul>
+<h2><a id="%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88outofmemoryerror-direct-buffer-memory%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>直接内存溢出（<code>OutOfMemoryError: Direct buffer memory</code>）</h2>
+<p>Java 允许应用程序直接访问堆外内存，通过直接内存结合内存映射文件实现高速 IO。直接内存最大是 64 MB，一旦使用超出限制，就会抛出 Directbuffer memory 错误。</p>
+<p>解决：</p>
+<ul>
+<li>通过<code>-XX:MaxDirectMemorySize</code> 调整 Direct ByteBuffer 的上限值。</li>
+<li>检查是否有 <code>-XX:+DisableExplicitGC</code> 参数，如果有就去掉，因为该参数会使 <code>System.gc()</code> 失效。</li>
+<li>尝试使用 Cleaner 的 <code>clean()</code> 方法主动释放直接内存空间。</li>
+</ul>
+<h2><a id="jprofiler" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Jprofiler</h2>
+<p>内存快照分析工具 ( MAT, Jprofiler ) 分析 Dump 内存文件 ( 使用 <code>-XX:+HeapDumpOnOutOfMemoryError</code> 生成, 其中 <code>OutOfMemoryError</code> 可以改成其他错误类型 ), 查看堆中的数据和大对象, 然后查看 Thread Dump 里面具体的代码位置</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16227314617502.html">JMM</a></h1>
+			<p class="meta"><time datetime="2021-06-03T22:44:21+08:00" 
+			pubdate data-updated="true">2021/06/03</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%A6%82%E5%BF%B5">概念</a></li>
+<li><a href="#jmm%E6%93%8D%E4%BD%9C">JMM 操作</a></li>
+<li><a href="#%E5%90%8C%E6%AD%A5%E7%9A%84%E7%BA%A6%E5%AE%9A">同步的约定</a></li>
+<li><a href="#jmm%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98">JMM 解决的问题</a></li>
+<li><a href="#volatile%E4%BD%9C%E7%94%A8">volatile 作用</a></li>
+</ul>
+</div>
+<blockquote>
+<p>JMM (Java Memory Model)</p>
+</blockquote>
+<h2><a id="%E6%A6%82%E5%BF%B5" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>概念</h2>
+<p>JMM 规范了 Java 虚拟机与计算机内存是如何协同工作的, 用于屏蔽掉各种硬件和操作系统的内存访问差异，以实现让 Java 程序在各种平台下都能达到一致的并发效果</p>
+<p>JMM 定义了线程和主内存之间抽象关系:</p>
+<ul>
+<li>线程之间的共享变量存储在主内存 (硬件的内存)</li>
+<li>每个线程都有一个私有的本地内存, 这个本地内存是一个抽象概念, 涵盖了cpu寄存器和高速缓存等</li>
+</ul>
+<h2><a id="jmm%E6%93%8D%E4%BD%9C" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JMM 操作</h2>
+<p>JMM 定义了以下八种操作来完成主内存与工作内存之间的具体交互:</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>作用在哪里</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lock</td>
+<td>主内存</td>
+<td>锁定主内存变量, 让他只供一个线程使用</td>
+</tr>
+<tr>
+<td>read</td>
+<td>主内存</td>
+<td>把一个变量值从主内存传输到线程的工作内存中</td>
+</tr>
+<tr>
+<td>load</td>
+<td>线程内存</td>
+<td>把 read 到的变量值放入工作内存的变量副本中</td>
+</tr>
+<tr>
+<td>use</td>
+<td>线程内存</td>
+<td>把工作内存中的一个变量值传递给执行引擎</td>
+</tr>
+<tr>
+<td>assign</td>
+<td>线程内存</td>
+<td>把一个从执行引擎接收到的值赋值给工作内存的变量</td>
+</tr>
+<tr>
+<td>store</td>
+<td>线程内存</td>
+<td>把工作内存中的一个变量的值传送到主内存中</td>
+</tr>
+<tr>
+<td>write</td>
+<td>主内存</td>
+<td>把 store 操作传过来的值更新到主内存中</td>
+</tr>
+<tr>
+<td>unlock</td>
+<td>主内存</td>
+<td>解锁主内存变量</td>
+</tr>
+</tbody>
+</table>
+<h2><a id="%E5%90%8C%E6%AD%A5%E7%9A%84%E7%BA%A6%E5%AE%9A" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>同步的约定</h2>
+<ul>
+<li>解锁前，必须把共享变量立刻刷新会主存</li>
+<li>加锁前，必须读取主存中最新值到工作内存中</li>
+<li>加锁解锁是同一把锁</li>
+<li>read 和 load, store 和 write, lock 和 unlock 必须成对按顺序出现, 但可以不连续</li>
+</ul>
+<h2><a id="jmm%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JMM 解决的问题</h2>
+<ul>
+<li>可见性: 当一个线程修改了共享变量的值，其他线程能够立刻得知这个修改, 可以使用 <code>volatile</code>, <code>synchronized</code>, <code>final</code> 来保证</li>
+<li>原子性: 一个操作是不可分割，不可中断的, 可以使用 <code>synchronized</code> ，锁或原子类来保证</li>
+<li>有序性: 使用 <code>volatile</code> 和 <code>synchronized</code> 保证多线程之间操作的有序性</li>
+</ul>
+<h2><a id="volatile%E4%BD%9C%E7%94%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>volatile 作用</h2>
+<ol>
+<li>
+<p><strong>保证线程间变量的可见性</strong>: 读取变量时, 总是读取主存新值, 变量被修改后会立刻刷新到主内存。(可见性不能保证操作的原子性，需要保证线程安全的话，使用 <code>synchronized</code> 关键字或者 lock 锁)</p>
+</li>
+<li>
+<p><strong>不保证原子型</strong></p>
+</li>
+<li>
+<p><strong>禁止 CPU 进行指令重排序</strong>: 在加 <strong>volatile</strong> 的地方上下加一层<strong>内存屏障</strong> ( 禁止上面的指令和下面的指令顺序交换 )</p>
+<pre><code class="language-java">// 语句 3 固定位置, 但是语句1和2的顺序是不能保证的，同理，语句4、5也不能保证顺序
+a = 1;  //语句1
+b = 2;  //语句2
+k = 3;  // volatile 语句3
+a = 4;  //语句4
+b = 5;  //语句5
+</code></pre>
+</li>
+</ol>
+<p><strong>如果不加 lock 和 synchronized 怎么保证原子性？</strong><br />
+使用 <code>java.util.concurrent.atomic</code> 包下的原子类，解决原子性问题。 例如 <code>AtomicInteger</code> 类的 <code>getAndIncrement()</code> 使用的是底层 CAS 的 +1 方法，直接和操作系统挂钩，直接在内存中修改值，效率极高。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16225545153969.html">JVM 内存划分</a></h1>
+			<p class="meta"><time datetime="2021-06-01T21:35:15+08:00" 
+			pubdate data-updated="true">2021/06/01</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#jvm%E4%BD%8D%E7%BD%AE">JVM 位置</a></li>
+<li><a href="#jvm%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84">JVM 的体系结构</a></li>
+<li><a href="#native%E9%87%8D%E7%82%B9">Native (重点)</a></li>
+<li><a href="#pc%E5%AF%84%E5%AD%98%E5%99%A8">PC 寄存器</a></li>
+<li><a href="#%E6%96%B9%E6%B3%95%E5%8C%BA">方法区</a></li>
+<li><a href="#%E6%A0%88">栈</a></li>
+<li><a href="#%E5%A0%86%E9%87%8D%E7%82%B9">堆 (重点)</a>
+<ul>
+<li><a href="#%E6%96%B0%E7%94%9F%E4%BB%A3">新生代</a></li>
+<li><a href="#%E8%80%81%E5%B9%B4%E4%BB%A3">老年代</a></li>
+<li><a href="#%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D">内存分配</a></li>
+</ul>
+</li>
+<li><a href="#%E6%B0%B8%E4%B9%85%E5%8C%BA%E5%85%83%E7%A9%BA%E9%97%B4%E6%96%B9%E6%B3%95%E5%8C%BA">永久区 &amp; 元空间 &amp; 方法区</a></li>
+</ul>
+</div>
+<h2><a id="jvm%E4%BD%8D%E7%BD%AE" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JVM 位置</h2>
+<p>JVM本质是虚拟机, 运行在操作系统之上, 而 Java 程序运行在 JVM 之上, 运行 Java 程序只需要 JRE 就够了, JRE 包括了 Java 运行环境以及 JVM, 如果需要开发 Java 程序, 才需要安装 JDK</p>
+<ul>
+<li>三种 JVM
+<ul>
+<li>Sun 公司: HotSpot</li>
+<li>BEA 公司: JRockit, 不常用, 但性能很高</li>
+<li>IBM 公司: J9VM, 不常用, 资料少, 在 IBM 独占平台会用到</li>
+</ul>
+</li>
+</ul>
+<h2><a id="jvm%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JVM 的体系结构</h2>
+<p>我们所说的 JVM 调优就是调<strong>方法区</strong>和<strong>堆</strong>, 其他的地方不会产生垃圾</p>
+<p><img src="media/16225545153969/16225646536509.jpg" alt="" class="mw_img_center" style="width:479px;display: block; clear:both; margin: 0 auto;" /></p>
+<h2><a id="native%E9%87%8D%E7%82%B9" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Native (重点)</h2>
+<p>凡是带了 <code>native</code> 关键字的, 说明 Java 的作用范围达不到了, 会调用底层的库</p>
+<p>过程: 在内存区域中专门开辟了一块标记的区域 (Native Method Stack), 登记了 native 方法, 等到执行的时候, 再通过 JNI 执行本地方法库中的方法</p>
+<p>作用: 扩展 Java 的使用, 融合不同的编程语言为 Java 所用 (最初: C/C++)<br />
+目前 Java 调用其他接口方法: Socket / WebService / http 等</p>
+<h2><a id="pc%E5%AF%84%E5%AD%98%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>PC 寄存器</h2>
+<p>每个线程都有一个 PC, 是一个指向下一条指令的指针, 用于执行引擎执行下一条指令, 空间非常小可以忽略不计</p>
+<h2><a id="%E6%96%B9%E6%B3%95%E5%8C%BA" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>方法区</h2>
+<ul>
+<li>方法区是所有线程<strong>共享</strong>的, 所有定义的方法 (字段 / 方法字节码 / 构造函数 / 接口等) 都保存在该区域</li>
+<li><strong>静态变量 / 常量 / 类信息 (构造函数 接口定义) / 运行时常量池存在方法区中, 但是实例变量存在堆内存中</strong></li>
+</ul>
+<h2><a id="%E6%A0%88" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>栈</h2>
+<ul>
+<li>
+<p>栈内存主要存放 8 大基本类型 / 对象引用 / 实例的方法</p>
+</li>
+<li>
+<p><strong>栈是线程级的</strong>, 主管程序的运行, 当调用另一个方法, 就会把这个方法压入栈顶 (栈帧), 执行完毕就被弹出栈, 继续执行调用它的方法, 生命周期和线程同步, 线程结束, 栈内存也就释放<br />
+<code>StackOverflowError</code>: 递归程序处理不当容易栈满</p>
+</li>
+</ul>
+<p><img src="media/16225545153969/16225662992996.jpg" alt="" class="mw_img_center" style="width:223px;display: block; clear:both; margin: 0 auto;" /></p>
+<h2><a id="%E5%A0%86%E9%87%8D%E7%82%B9" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>堆 (重点)</h2>
+<ul>
+<li>一个 JVM 只有一个堆内存, 内存大小是可以调节的</li>
+<li>堆中存放类 / 方法 / 常量 / 变量, 保存所有引用类型的真实对象</li>
+<li>堆内存分为两个区域: 新生区, 老年区</li>
+</ul>
+<h3><a id="%E6%96%B0%E7%94%9F%E4%BB%A3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>新生代</h3>
+<ul>
+<li>一个类诞生, 成长的地方, 甚至死亡</li>
+<li>分为两个区
+<ul>
+<li>伊甸园 <code>Eden Space</code>: 所有的对象都是在伊甸园区 New 出来的</li>
+<li>幸存区(from, to 区): 轻 GC 后活下来的对象</li>
+</ul>
+</li>
+</ul>
+<h3><a id="%E8%80%81%E5%B9%B4%E4%BB%A3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>老年代</h3>
+<p>大对象直接进入老年代，存活年龄超过阈值的对象进入老年代</p>
+<h3><a id="%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>内存分配</h3>
+<ol>
+<li>对象优先在 Eden 分配</li>
+<li>大对象直接进入老年代</li>
+<li>存活年龄超过阈值的对象进入老年代（动态年龄判断：如果幸存区相同年龄的对象超过一半，那么超过这个年龄的对象直接进入老年代）</li>
+</ol>
+<h2><a id="%E6%B0%B8%E4%B9%85%E5%8C%BA%E5%85%83%E7%A9%BA%E9%97%B4%E6%96%B9%E6%B3%95%E5%8C%BA" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>永久区 &amp; 元空间 &amp; 方法区</h2>
+<p>参考: <a href="https://blog.csdn.net/u011635492/article/details/81046174">永久区 &amp; 方法区</a></p>
+<p>Java 虚拟机规范只是规定了有方法区这么个概念和它的作用，并没有规定如何去实现它。在不同的 JVM 上方法区的实现不同。在 HotSpot 中利用永生代实现方法区。其他的虚拟机实现并没有永久带这一说法。</p>
+<ul>
+<li>在 1.7 之前，HotSpot 把堆中一部分区域用来实现方法区, 同时 GC 分代收集也扩展至这一区域，就称为永久代。</li>
+<li>对于 Java8， HotSpots 取消了永久代. 取代永久代的就是元空间。永生代和元空间不同点为:
+<ul>
+<li>存储位置不同: 永久代物理是是堆的一部分，和新生代，老年代地址是连续的，而元空间属于本地内存</li>
+<li>存储内容不同: 元空间存储类的元信息，静态变量和常量池等并入堆中。相当于永久代的数据被分到了堆和元空间中。</li>
+</ul>
+</li>
+<li>一个启动类, 加载了大量的第三方 Jar 包, tomcat 部署了太多应用, 大量动态生成的反射类. 不断加载就会出现 OOM</li>
+</ul>
+<p><strong>为什么使用元空间替换永久代？</strong><br />
+为了避免OOM异常。因为通常使用PermSize和MaxPermSize设置永久代的大小就决定了永久代的上限，但是不是总能知道应该设置为多大合适, 如果使用默认值很容易遇到OOM错误。<br />
+当使用元空间时，可以加载多少类的元数据就不再由MaxPermSize控制, 而由系统的实际可用空间来控制。<br />
+更深层的原因还是要合并HotSpot和JRockit的代码，JRockit从来没有所谓的永久代，也不需要开发运维人员设置永久代的大小，但是运行良好。同时也不用担心运行性能问题了,在覆盖到的测试中, 程序启动和运行速度降低不超过1%，但是这点性能损失换来了更大的安全保障。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16247740620828.html">AQS</a></h1>
+			<p class="meta"><time datetime="2021-06-27T14:07:42+08:00" 
+			pubdate data-updated="true">2021/06/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%8E%9F%E7%90%86">原理</a>
+<ul>
+<li><a href="#%E5%85%B1%E4%BA%AB%E6%96%B9%E5%BC%8F">共享方式</a>
+<ul>
+<li><a href="#%E7%8B%AC%E5%8D%A0">独占</a></li>
+<li><a href="#%E5%85%B1%E4%BA%AB">共享</a></li>
+</ul>
+</li>
+<li><a href="#%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97">等待队列</a></li>
+<li><a href="#%E5%A6%82%E4%BD%95%E8%87%AA%E5%AE%9A%E4%B9%89%E5%90%8C%E6%AD%A5%E5%99%A8%EF%BC%9F">如何自定义同步器？</a></li>
+</ul>
+</li>
+<li>[常见的同步器（<a href="16226447097561.html">辅助类</a>）](#常见的同步器（辅助类16226447097561-html）)
+<ul>
+<li><a href="#semaphore">Semaphore</a></li>
+<li><a href="#countdownlatch">CountDownLatch</a></li>
+<li><a href="#cyclicbarrier">CyclicBarrier</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p><a href="https://snailclimb.gitee.io/javaguide/#/docs/java/multi-thread/AQS%E5%8E%9F%E7%90%86%E4%BB%A5%E5%8F%8AAQS%E5%90%8C%E6%AD%A5%E7%BB%84%E4%BB%B6%E6%80%BB%E7%BB%93?id=_5-cyclicbarrier%E5%BE%AA%E7%8E%AF%E6%A0%85%E6%A0%8F">参考</a></p>
+<h2><a id="%E5%8E%9F%E7%90%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>原理</h2>
+<p>AQS（<code>AbstractQueuedSynchronizer</code>）同步器，可以利用它协调线程之间的同步行为，核心思想是，如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，这个机制 AQS 是用 CLH 队列实现的，即将暂时获取不到锁的线程加入到队列中。<br />
+<img src="media/16247740620828/16247741942725.jpg" alt="" class="mw_img_center" style="width:600px;display: block; clear:both; margin: 0 auto;" /></p>
+<p>同步状态使用成员变量 state（ volatile、原子操作 ）表示，AQS 就是通过对 state 的原子操作来达到同步各个线程的目的。</p>
+<h3><a id="%E5%85%B1%E4%BA%AB%E6%96%B9%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>共享方式</h3>
+<h4><a id="%E7%8B%AC%E5%8D%A0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>独占</h4>
+<p>只有一个线程可以执行，如 ReentrantLock。又分为公平锁和非公平锁，区别有两点：</p>
+<ol>
+<li>非公平锁在调用 lock 后，会先使用 CAS 进行一次抢锁，抢不到就进入 <code>tryAcquire()</code> 方法；公平锁直接进入 <code>tryAcquire()</code></li>
+<li>如果锁释放了，非公平锁再抢一次锁，而公平锁要判断阻塞队列有没有线程在等待，非公平锁抢不到锁或公平锁有其他线程在等待就进入阻塞队列等待唤醒</li>
+</ol>
+<blockquote>
+<p><code>ReentrantLock</code>，state 初始化为 0，表示未锁定状态。A 线程 <code>lock()</code> 时，会调用 <code>tryAcquire()</code> 独占该锁并将 state+1。此后，其他线程再 <code>tryAcquire()</code> 时就会失败，直到 A 线程 <code>unlock()</code> 到 state=0（即释放锁）为止，其它线程才有机会获取该锁。</p>
+</blockquote>
+<h4><a id="%E5%85%B1%E4%BA%AB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>共享</h4>
+<p>多个线程可以同时执行，如 Semaphore、CountDownLatch。</p>
+<h3><a id="%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>等待队列</h3>
+<p>如果获取锁失败，就加入等待队列，是如何实现的？</p>
+<ol>
+<li>通过当前线程和锁模式新建一个节点</li>
+<li>pred 指针指向尾节点 tail</li>
+<li>将新节点的 prev 指向 pred</li>
+<li>通过 compareAndSetTail 完成尾节点的设置</li>
+<li>如果没有初始化就构造一个空的头结点</li>
+</ol>
+<h3><a id="%E5%A6%82%E4%BD%95%E8%87%AA%E5%AE%9A%E4%B9%89%E5%90%8C%E6%AD%A5%E5%99%A8%EF%BC%9F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>如何自定义同步器？</h3>
+<p>AQS 的设计是基于模版方法的，继承 <code>AbstractQueuedSynchronizer</code> 并重写指定的方法即可（<code>tryAcquire / tryRelease</code> 或 <code>tryAcquireShared / tryReleaseShared</code>）。</p>
+<pre><code class="language-java">isHeldExclusively()//该线程是否正在独占资源。只有用到condition才需要去实现它。
+tryAcquire(int)//独占方式。尝试获取资源，成功则返回true，失败则返回false。
+tryRelease(int)//独占方式。尝试释放资源，成功则返回true，失败则返回false。
+tryAcquireShared(int)//共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。
+tryReleaseShared(int)//共享方式。尝试释放资源，成功则返回true，失败则返回false。
+</code></pre>
+<h2><a id="%E5%B8%B8%E8%A7%81%E7%9A%84%E5%90%8C%E6%AD%A5%E5%99%A8%EF%BC%88%E8%BE%85%E5%8A%A9%E7%B1%BB16226447097561-html%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>常见的同步器（<a href="16226447097561.html">辅助类</a>）</h2>
+<h3><a id="semaphore" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Semaphore</h3>
+<p>可以限制访问共享资源的线程数量。</p>
+<p>原理是初始化 state 为 N，每个线程执行 <code>acquire()</code>，如果 state &gt; 0，就使得 state - 1，如果 state = 0，就加入阻塞队列，并自旋判断 state 是否大于 0；线程调用 <code>release()</code> 使 state + 1，阻塞的线程会竞争这个锁。</p>
+<h3><a id="countdownlatch" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CountDownLatch</h3>
+<p>可以使多个线程阻塞在一个地方，直到所有线程任务都执行完毕。（类似倒计时的效果，<strong>一次性的</strong>）</p>
+<p>原理是初始化 state 为 N，每个线程执行 <code>countDown()</code> 方法使得 state - 1，调用 <code>await()</code> 会阻塞并自旋判断 state，如果 state = 0，就释放所有等待的线程，执行 <code>await()</code> 之后的语句。</p>
+<p>典型用法：</p>
+<ul>
+<li>主线程（<code>await</code>）等待多个子线程执行完毕（<code>countDown</code>）；</li>
+<li>主线程通知（<code>countDown</code>）所有等待的线程执行（<code>await</code>），CountDownLatch 计数器需要初始化为 1。</li>
+</ul>
+<h3><a id="cyclicbarrier" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CyclicBarrier</h3>
+<p>基于 <code>ReentrantLock</code> 实现，和 <code>CountDownLatch</code> 类似但更强大，让一组线程全部到达同步点后，这组线程才向后执行。<br />
+提供了一个高级构造函数，能传入一个 <code>Runnable</code>，所有线程到达屏障后，优先执行 <code>Runnable</code>。</p>
+<p>构造时指定拦截的数量 count = N，每个线程调用 <code>await()</code> 使得 count - 1，如果 count = 0，执行构造器传入的任务，然后通知所有阻塞线程执行；如果 count &gt; 0，就自旋阻塞。</p>
+<blockquote>
+<p><code>CyclicBarrier</code> VS <code>CountDownLatch</code></p>
+<ol>
+<li><code>CyclicBarrier</code> 是多个线程在任意一个没有完成时，所有线程都等待（内部等待）；<code>CountDownLatch</code> 是一/多个线程等待其他 N 个线程完成某件事情（等待外部线程）</li>
+<li><code>CyclicBarrier</code> 调用 <code>await()</code> 减一后会阻塞直到计数器为 0；<code>CountDownLatch</code> 调用 <code>countDown()</code> 减一后继续运行，其他线程调用 <code>await()</code> 阻塞直到计数器为 0</li>
+<li><code>CountDownLatch</code> 是一次性的；<code>CyclicBarrier</code> 提供 reset 方法</li>
+</ol>
+</blockquote>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16227419427125.html">CAS</a></h1>
+			<p class="meta"><time datetime="2021-06-04T01:39:02+08:00" 
+			pubdate data-updated="true">2021/06/04</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%8E%9F%E5%AD%90%E7%B1%BB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90">原子类源码分析</a>
+<ul>
+<li><a href="#compareandswapint">compareAndSwapInt</a></li>
+<li><a href="#%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A0">实现自加</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BC%BA%E7%82%B9">缺点</a></li>
+<li><a href="#%E8%A7%A3%E5%86%B3aba">解决 ABA</a></li>
+</ul>
+</div>
+<blockquote>
+<p>CAS: Compare And Swap, 比较并交换, CPU 并发原语, 当内存中的值和期望值相等才设置新值</p>
+</blockquote>
+<p><code>java.util.concurrent.atomic</code> 包下的类是原子类，内部使用 <code>Unsafe</code> 类调用 C++ 本地方法，从而底层使用了 CAS 保证操作的原子性</p>
+<h2><a id="%E5%8E%9F%E5%AD%90%E7%B1%BB%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>原子类源码分析</h2>
+<p>参考 <a href="https://juejin.cn/post/6844903558937051144">Java CAS 原理剖析</a>：</p>
+<h3><a id="compareandswapint" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>compareAndSwapInt</h3>
+<pre><code class="language-java">compareAndSwapInt(Object var1, long var2, int var4, int var5);
+</code></pre>
+<ul>
+<li>var1 是当前 Unsafe 类，var2 是原子类中 value 属性的偏移量，有了这两个值，就可以从内存中取得 value 的值。</li>
+<li>var4 是期望值，CAS 原理就是比较内存值和期望值是否相同来决定是否更新</li>
+<li>var5 是要设置的新值</li>
+<li><strong>总结</strong>：如果通过 var、var2 取出来的内存值和 var4 相同，那么将内存值更新为 var5。判断比较这个过程是原子的，底层使用 <code>cmpxchgl</code> 指令，给总线加锁，同一芯片上的其他处理器就暂时不能通过总线访问内存</li>
+</ul>
+<h3><a id="%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>实现自加</h3>
+<pre><code class="language-java">public final int getAndAddInt(Object var1, long var2, int var4) {
+    int var5;
+    do {
+        var5 = this.getIntVolatile(var1, var2);
+    } while(!this.compareAndSwapInt(var1, var2, var5, var5 + var4));
+
+    return var5;
+}
+</code></pre>
+<ul>
+<li>首先从内存取出值 var5 作为期望值，然后尝试加 1 后更新内存值，更新的前提是刚刚取得 var5 (期望值) 和现在内存值相同（没有其他线程修改），这一步使用 <code>compareAndSwapInt</code>，while 循环是一个乐观锁，他会判断如果刚刚取出来的值被修改了，就再次尝试重新获取新的值加 1</li>
+</ul>
+<h2><a id="%E7%BC%BA%E7%82%B9" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>缺点</h2>
+<ul>
+<li>开销大：在并发量比较高的情况下，如果许多线程反复竞争，尝试更新某一个变量，却又一直更新不成功，会给CPU带来很大的压力。</li>
+<li>只是一个变量的原子性操作</li>
+<li>ABA 问题：A线程要修改变量，B线程取到了该变量修改了，然后又改回了最初值，所以A依然能够修改成功</li>
+</ul>
+<h2><a id="%E8%A7%A3%E5%86%B3aba" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>解决 ABA</h2>
+<p>使用带版本号的原子引用类 <code>AtomicStampedReference</code>，它携带一个版本号，每次更新都使版本号加 1。<code>compareAndSet</code> 首先检查当前引用是否等于预期引用，并且当前标志是否等于预期标志，如果全部相等，则以原子方式将该引用和该标志的值设置为给定的更新值。</p>
+<pre><code class="language-java">// 大坑：由于存储的值是 Object，127 自动装箱成 Ineger 类，而 Ineger 缓存池范围是 -128～127，
+// 超出这个范围，会重新在堆中 new 一个对象，所以哪怕值相同地址也不同，而 AtomicStampedReference
+// 内部恰恰是用 `==` 比较的地址，所以这里如果超出缓存范围，下面 CAS 会失败
+AtomicStampedReference&lt;Integer&gt; atomicStampedReference = new AtomicStampedReference(127, 1);
+
+@Test
+public void test4() {
+    int stamp = atomicStampedReference.getStamp();
+    atomicStampedReference.compareAndSet(127, 21, stamp, stamp + 1);
+    // stamp = atomicStampedReference.getStamp(); // 不加这一句获取最新版本号，下面就会执行失败，最终输出 21
+    atomicStampedReference.compareAndSet(21, 22, stamp, stamp + 1);
+    System.out.println(atomicStampedReference.getReference());
+}
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16227416766193.html">生产者消费者</a></h1>
+			<p class="meta"><time datetime="2021-06-04T01:34:36+08:00" 
+			pubdate data-updated="true">2021/06/04</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#synchronized%E7%89%88%E6%9C%AC%EF%BC%88-synchronized-wait-notify%EF%BC%89">synchronized 版本（<code>synchronized</code> <code>wait</code> <code>notify</code>）</a></li>
+<li><a href="#juc%E7%89%88%E6%9C%AC%EF%BC%88-lock-await-signal%EF%BC%89">JUC 版本（<code>Lock</code> <code>await</code> <code>signal</code>）</a></li>
+</ul>
+</div>
+<h2><a id="synchronized%E7%89%88%E6%9C%AC%EF%BC%88-synchronized-wait-notify%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>synchronized 版本（<code>synchronized</code> <code>wait</code> <code>notify</code>）</h2>
+<p>使用 <code>synchronized</code> 加锁, <code>wait</code> 和 <code>notify</code> 实现 (等待 业务 通知) <strong>判断等待的时候不要使用 if, 要使用 while, 防止超过两个线程时的虚假唤醒问题</strong><br />
+（拿两个加法线程A、B来说，比如A先执行，执行时调用了wait方法，那它会等待，此时会释放锁，那么线程B获得锁并且也会执行wait方法，两个加线程一起等待被唤醒。此时减线程中的某一个线程执行完毕并且唤醒了这俩加线程，那么这俩加线程不会一起执行，其中A获取了锁并且加1，执行完毕之后B再执行。如果是if的话，那么A修改完num后，B不会再去判断num的值，直接会给num+1。如果是while的话，A执行完之后，B还会去判断num的值，因此就不会执行。）</p>
+<pre><code class="language-java">class ProducerCustomer {
+    private int num;
+    
+    public synchronized void product() throws InterruptedException {
+        while (num &gt; 0) { // 使用 while 防止虚假唤醒
+            this.wait(); // 等待时释放锁
+        }
+        num++;
+        System.out.println(Thread.currentThread().getName() + &quot; --&gt; &quot; + num);
+        this.notifyAll();
+    }
+    
+    public synchronized void custom() throws InterruptedException {
+        while (num == 0) {
+            this.wait();
+        }
+        num--;
+        System.out.println(Thread.currentThread().getName() + &quot; --&gt; &quot; + num);
+        this.notifyAll();
+    }
+}
+</code></pre>
+<h2><a id="juc%E7%89%88%E6%9C%AC%EF%BC%88-lock-await-signal%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JUC 版本（<code>Lock</code> <code>await</code> <code>signal</code>）</h2>
+<p>使用 Lock 加锁, Condition 对象中的 <code>await</code> 和 <code>signal</code> / <code>SignalAll</code> 进行等待和唤醒</p>
+<pre><code class="language-java">class ProducerCustomerJUC {
+    private int num = 0;
+    private Lock lock = new ReentrantLock();
+    private Condition condition = lock.newCondition();
+    
+    public void product() {
+        lock.lock();
+        try {
+            while (num &gt; 0) condition.await();
+            num++;
+            System.out.println(Thread.currentThread().getName() + &quot; --&gt; &quot; + num);
+            condition.signalAll();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    public void custom() {
+        lock.lock();
+        try {
+            while (num == 0) condition.await();
+            num--;
+            System.out.println(Thread.currentThread().getName() + &quot; --&gt; &quot; + num);
+            condition.signalAll();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16227359619314.html">单例模式</a></h1>
+			<p class="meta"><time datetime="2021-06-03T23:59:21+08:00" 
+			pubdate data-updated="true">2021/06/03</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E9%A5%BF%E6%B1%89%E5%BC%8F">饿汉式</a></li>
+<li><a href="#dcl%E6%87%92%E6%B1%89%E5%BC%8F">DCL 懒汉式</a></li>
+<li><a href="#%E9%9D%99%E6%80%81%E5%86%85%E9%83%A8%E7%B1%BB%E5%8D%95%E4%BE%8B%EF%BC%88%E5%8D%95%E4%BE%8B%E6%8C%81%E6%9C%89%E8%80%85%E6%A8%A1%E5%BC%8F%EF%BC%89">静态内部类单例（单例持有者模式）</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E6%9E%9A%E4%B8%BE%E7%B1%BB%EF%BC%88%E6%9C%80%E5%AE%89%E5%85%A8%EF%BC%8C%E6%9C%80%E6%8E%A8%E8%8D%90%EF%BC%89">使用枚举类（最安全，最推荐）</a></li>
+</ul>
+</div>
+<h2><a id="%E9%A5%BF%E6%B1%89%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>饿汉式</h2>
+<pre><code class="language-java">class Singleton {
+    private final static Singleton instance = new Singleton();
+    private Singleton() {}
+    public static Singleton getInstance() {
+        return instance;
+    }
+}
+</code></pre>
+<h2><a id="dcl%E6%87%92%E6%B1%89%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>DCL 懒汉式</h2>
+<p>为什么必须是 <code>volatile</code> ？<br />
+<code>new SingletonV2();</code> 执行的时候分为三步：<br />
+1⃣️：分配内存空间<br />
+2⃣️：执行构造器，初始化对象<br />
+3⃣️：将引用指向这个空间<br />
+然而由于指令重排，实际执行顺序可能是 1⃣️ -&gt; 3⃣️ -&gt; 2⃣️，当一个线程已经执行完 3⃣️，还没有执行 2⃣️ 时，这时引用已经指向了堆内存一块地址，但是这个地址还没有执行构造器初始化。另一个线程进入方法直接判断 <code>instance != null</code>，直接把这个引用返回接着去用了，就会发生问题，所以必须加 <code>volatile</code> 防止指令重排。</p>
+<pre><code class="language-java">class SingletonV2 {
+    // 必须是 volatile
+    private volatile static SingletonV2 instance = null;
+    private SingletonV2() {}
+
+    public static SingletonV2 getInstance() {
+        // 该处判断，主要作用是提升性能, 因为如果没有该处判断，会直接去获取锁对象，再判断是否已经创建对象
+        if (instance == null) {
+            //将当前类作为锁对象，获取该锁后执行该部分范围的代码逻辑
+            synchronized (SingletonV2.class) {
+                if (instance == null) {
+                    instance = new SingletonV2();
+                }
+            }
+        }
+
+        return instance;
+    }
+}
+</code></pre>
+<h2><a id="%E9%9D%99%E6%80%81%E5%86%85%E9%83%A8%E7%B1%BB%E5%8D%95%E4%BE%8B%EF%BC%88%E5%8D%95%E4%BE%8B%E6%8C%81%E6%9C%89%E8%80%85%E6%A8%A1%E5%BC%8F%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>静态内部类单例（单例持有者模式）</h2>
+<p>原理：JVM 在加载外部类的过程中, 是不会加载静态内部类的, 只有内部类的属性/方法被调用时才会被加载, 并初始化其静态属性。这样就保证懒汉式懒加载的效果，同时又拥有了饿汉式线程安全的优点。</p>
+<pre><code class="language-java">class SingletonV3 {
+    
+    private SingletonV3(){}
+    
+    private static class InstanceHolder {
+        private final static SingletonV3 singletonV3 = new SingletonV3();
+    }
+    
+    public SingletonV3 getInstance() {
+        return InstanceHolder.singletonV3;
+    }
+}
+</code></pre>
+<h2><a id="%E4%BD%BF%E7%94%A8%E6%9E%9A%E4%B8%BE%E7%B1%BB%EF%BC%88%E6%9C%80%E5%AE%89%E5%85%A8%EF%BC%8C%E6%9C%80%E6%8E%A8%E8%8D%90%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>使用枚举类（最安全，最推荐）</h2>
+<p>三种单例模式都不是绝对安全的：</p>
+<ul>
+<li>用私有化构造器并不保险，因为它抵御不了反射攻击</li>
+<li>序列化后再反序列化，得到的对象就会改变，也不安全</li>
+</ul>
+<p>枚举类型是所用单例实现中唯一一种不会被破坏的单例实现模式，因为 Java 底层不允许通过反射创建枚举类，newInstance 创建对象时，会检查该类<strong>是否ENUM修饰</strong>，如果是则抛出异常，反射失败。同时，它也是序列化安全的</p>
+<pre><code class="language-java">enum SingletonV4 {
+    INSTANCE;
+}
+</code></pre>
+<p>参考：<a href="https://cloud.tencent.com/developer/article/1497592">Java单例模式的7种写法中，为何用Enum枚举实现被认为是最好的方式？</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16227146556632.html">Stram 流计算</a></h1>
+			<p class="meta"><time datetime="2021-06-03T18:04:15+08:00" 
+			pubdate data-updated="true">2021/06/03</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#stream">Stream</a></li>
+<li><a href="#parallelstream">parallelStream</a>
+<ul>
+<li><a href="#forkjoin">ForkJoin</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="stream" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Stream</h2>
+<p>Stream 使用一种类似 SQL 语句的直观方式，来对 Java 集合进行操作。</p>
+<pre><code class="language-java">User a1 = new User(1, &quot;a&quot;, 21);
+User a2 = new User(2, &quot;b&quot;, 22);
+User a3 = new User(3, &quot;c&quot;, 23);
+User a4 = new User(4, &quot;d&quot;, 24);
+User a5 = new User(5, &quot;e&quot;, 25);
+User a6 = new User(6, &quot;f&quot;, 26);
+List&lt;User&gt; users = Arrays.asList(a1, a2, a3, a4, a5, a6);
+users.stream()
+        .filter((u)-&gt;{return u.id % 2 == 0;})
+        .filter((u)-&gt;{return u.age &gt; 23;})
+        .map((u)-&gt;{
+            u.name = u.name.toUpperCase();
+            return u;
+        })
+        .sorted((u1, u2)-&gt;{return u2.compareTo(u1);})
+        .forEach(System.out::println);
+</code></pre>
+<h2><a id="parallelstream" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>parallelStream</h2>
+<p>并行流内部默认使用了 forkjoin，默认的线程数量就是处理器数量，parallelStream 适用的场景是CPU密集型</p>
+<pre><code class="language-java">long sum = LongStream.rangeClosed(0L,10_0000_0000L).parallel().reduce(0, Long::sum); // Long::sum 方法引用
+</code></pre>
+<h3><a id="forkjoin" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ForkJoin</h3>
+<p>Fork/Join 框架的核心是采用分治法的思想，将一个大任务拆分为若干互不依赖的子任务，把这些子任务分别放到不同的队列里，并为每个队列创建一个单独的线程来执行队列里的任务。同时，为了最大限度地提高并行处理能力，采用了工作窃取算法来运行任务，也就是说当某个线程处理完自己工作队列中的任务后，尝试当其他线程的工作队列中窃取一个任务来执行，直到所有任务处理完毕。所以为了减少线程之间的竞争，通常会使用双端队列，被窃取任务线程永远从双端队列的头部拿任务执行，而窃取任务的线程永远从双端队列的尾部拿任务执行。</p>
+<p><img src="media/16227169516018/16227193640438.jpg" alt="" class="mw_img_center" style="width:562px;display: block; clear:both; margin: 0 auto;" /></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16227134041299.html">函数式接口</a></h1>
+			<p class="meta"><time datetime="2021-06-03T17:43:24+08:00" 
+			pubdate data-updated="true">2021/06/03</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"></div>
+<p>只有一个方法的接口，配合 lambda 表达式可以简化编程模型</p>
+<ol>
+<li>
+<p><code>Function</code> 函数式接口，一个输入，一个返回</p>
+<pre><code class="language-java">// Function&lt;String, String&gt; function = new Function&lt;String, String&gt;() {
+//     @Override
+//     public String apply(String s) {
+//         return s + &quot;_funtion&quot;;
+//     }
+// };
+Function&lt;String, String&gt; function = (s) -&gt; { return s + &quot;_funtion&quot;; }; // 使用 lambda
+System.out.println(function.apply(&quot;hello&quot;)); // hello_funtion
+</code></pre>
+</li>
+<li>
+<p><code>Predicate</code> 断定式接口，一个输入，返回布尔</p>
+</li>
+<li>
+<p><code>Consumer</code> 消费型接口，只有输入，无返回</p>
+</li>
+<li>
+<p><code>Supplier</code> 供给型接口，无输入，有返回</p>
+</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16227100604511.html">线程池</a></h1>
+			<p class="meta"><time datetime="2021-06-03T16:47:40+08:00" 
+			pubdate data-updated="true">2021/06/03</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E4%B8%89%E4%B8%AA%E6%96%B9%E6%B3%95">三个方法</a></li>
+<li><a href="#%E4%B8%83%E4%B8%AA%E5%8F%82%E6%95%B0">七个参数</a></li>
+<li><a href="#%E5%9B%9B%E7%A7%8D%E6%8B%92%E7%BB%9D%E7%AD%96%E7%95%A5">四种拒绝策略</a></li>
+<li><a href="#%E5%A6%82%E4%BD%95%E7%A1%AE%E5%AE%9A%E6%A0%B8%E5%BF%83%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%95%B0%E9%87%8F">如何确定核心线程池数量</a></li>
+</ul>
+</div>
+<p>池化技术：事先准备好一些资源，用的时候拿去，用完还回来<br />
+池化技术的好处:降低资源消耗 (每次创建、销毁十分浪费资源)、提高响应速度、方便管理。</p>
+<h2><a id="%E4%B8%89%E4%B8%AA%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>三个方法</h2>
+<pre><code class="language-java">ExecutorService executor1 = Executors.newSingleThreadExecutor(); // 单个线程的线程池
+ExecutorService executor2 = Executors.newFixedThreadPool(5); // 指定数量线程的线程池
+ExecutorService executor3 = Executors.newCachedThreadPool(); // 可伸缩的线程池
+</code></pre>
+<h2><a id="%E4%B8%83%E4%B8%AA%E5%8F%82%E6%95%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>七个参数</h2>
+<p>Executors 三个方法底层都是返回一个 ThreadPoolExecutor 对象 。我们不要使用Executors 的方式创建，可能会导致 OOM，要通过底层 ThreadPoolExecutor 的方式</p>
+<pre><code class="language-java">ExecutorService executor4 = new ThreadPoolExecutor(
+                2, // 默认有 2 个线程
+                5, // 最多有 5 个线程
+                3, // 非默认线程等待 3s 后销毁
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue&lt;&gt;(3), // 默认线程满了后，新请求在队列等待，队列满了后开启新线程
+                Executors.defaultThreadFactory(), 
+                new ThreadPoolExecutor.AbortPolicy() // maximumPoolSize 和队列都满了，触发拒绝策略);
+</code></pre>
+<h2><a id="%E5%9B%9B%E7%A7%8D%E6%8B%92%E7%BB%9D%E7%AD%96%E7%95%A5" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>四种拒绝策略</h2>
+<pre><code class="language-java">AbortPolicy // 丢掉任务，抛出异常
+CallerRunPolicy // 返回给发出请求的线程执行，例如返回给 main 线程执行
+DiscardPolicy // 丢掉异常，不抛出异常
+DiscardOldestPolicy // 队列满了，尝试和最早的竞争，不抛出异常
+</code></pre>
+<h2><a id="%E5%A6%82%E4%BD%95%E7%A1%AE%E5%AE%9A%E6%A0%B8%E5%BF%83%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%95%B0%E9%87%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>如何确定核心线程池数量</h2>
+<p>线程数=cpu可用核心数/（1-阻塞系数），其中阻塞系数的取值在[0,1]之间。计算密集型任务的阻塞系数为0，而IO密集型任务的阻塞系数则接近1。一般，我们让线程执行的任务是比较复杂的，不会是单一的计算密集型任务，或者单一的IO密集型任务，通常会夹杂着。那么就需要我们去计算阻塞系数了。阻塞系数的定义就是执行该任务阻塞的时间与（阻塞时间+计算时间）的比值，也就是w/(w+c)。</p>
+<p>一般经验： IO密集型：2倍cpu可用线程数；计算密集型：cpu可用核数</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16227068332225.html">阻塞队列</a></h1>
+			<p class="meta"><time datetime="2021-06-03T15:53:53+08:00" 
+			pubdate data-updated="true">2021/06/03</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#blockingqueue">BlockingQueue</a>
+<ul>
+<li><a href="#%E5%9B%9B%E7%BB%84api">四组 API</a></li>
+</ul>
+</li>
+<li><a href="#synchronousqueue">SynchronousQueue</a></li>
+</ul>
+</div>
+<h2><a id="blockingqueue" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>BlockingQueue</h2>
+<p><code>java.util.concurrent.BlockingQueue</code> 接口有以下阻塞队列的实现：<br />
+FIFO 队列 ：<code>LinkedBlockingQueue</code>、<code>ArrayBlockingQueue</code>（固定长度）<br />
+优先级队列 ：<code>PriorityBlockingQueue</code></p>
+<p>提供了阻塞的 <code>take()</code> 和 <code>put()</code> 方法：如果队列为空 <code>take()</code> 将阻塞，直到队列中有内容；如果队列为满 <code>put()</code> 将阻塞，直到队列有空闲位置。</p>
+<p><img src="media/16227068332225/16227076040995.jpg" alt="" class="mw_img_center" style="width:453px;display: block; clear:both; margin: 0 auto;" /></p>
+<h3><a id="%E5%9B%9B%E7%BB%84api" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>四组 API</h3>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>抛出异常</th>
+<th>有返回值</th>
+<th>阻塞等待</th>
+<th>超时等待</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>添加</td>
+<td><code>add()</code></td>
+<td><code>offer()</code> (满后返回 false)</td>
+<td><code>put()</code> (满后一直等待)</td>
+<td><code>offer(e, timeout, TimeUnit)</code> (满后等待一段时间)</td>
+</tr>
+<tr>
+<td>移出</td>
+<td><code>remove()</code></td>
+<td><code>poll()</code> （空时返回 null）</td>
+<td><code>take()</code> (空时一直等待)</td>
+<td><code>poll(timeout, TimeUnit)</code> (空时一直等待)</td>
+</tr>
+<tr>
+<td>判断首元素</td>
+<td><code>element()</code></td>
+<td><code>peek()</code></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2><a id="synchronousqueue" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>SynchronousQueue</h2>
+<p>从效果上看，他的容量是 1，put了一个元素，必须先从里面 take 取出来，否则不能再继续 put 下一个元素<br />
+但是实际上它不是一个真正的队列, 不存储元素，它维护一组线程，这些线程在等待着把元素加入或移出队列。put 和 take 都在等待，put 线程直接把它交付给 take 线程，省去了加入取出队列的延迟。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16226447097561.html">辅助类</a></h1>
+			<p class="meta"><time datetime="2021-06-02T22:38:29+08:00" 
+			pubdate data-updated="true">2021/06/02</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#countdownlatch">CountDownLatch</a></li>
+<li><a href="#cyclicbarrier">CyclicBarrier</a></li>
+<li><a href="#semaphore%CB%88-sem%C9%99f%C9%94%CB%90r">Semaphore ([ˈseməfɔːr])</a></li>
+</ul>
+</div>
+<h2><a id="countdownlatch" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CountDownLatch</h2>
+<p>减法计数器，提供方法使计数器减1，以及等待计数器归零</p>
+<pre><code class="language-java"> 
+new CountDownLatch(int n) // 计数
+countDownLatch.countDown(); // -1 操作
+countDownLath.await(); // 等待计数器归零, 然后被唤醒再向下执行
+</code></pre>
+<h2><a id="cyclicbarrier" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CyclicBarrier</h2>
+<p>允许一组线程全部到达共同屏障点后再继续执行。加法计数器</p>
+<pre><code class="language-java">CyclicBarrier cb = new CyclicBarrier(7, () -&gt; {
+// 表示当有 n 个线程到达后，执行后面的 Runnable
+    System.out.println(&quot;7个线程都已经执行到 barrier 了&quot;);
+});
+
+for (int i = 0; i &lt; 7; i++) {
+    new Thread(()-&gt;{
+        System.out.println(&quot;第 &quot; + Thread.currentThread().getName() + &quot; 个线程将要执行到 barrier&quot;);
+        try {
+            cb.await(); // 线程到达这里，计数器 + 1 然后等待 n 个线程都到达后继续执行
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }
+    }, String.valueOf(i)).start();
+}
+// 第 0 个线程将要执行到 barrier
+// 第 1 个线程将要执行到 barrier
+// 第 2 个线程将要执行到 barrier
+// 第 3 个线程将要执行到 barrier
+// 第 4 个线程将要执行到 barrier
+// 第 5 个线程将要执行到 barrier
+// 第 6 个线程将要执行到 barrier
+// 7个线程都已经执行到 barrier 了
+</code></pre>
+<h2><a id="semaphore%CB%88-sem%C9%99f%C9%94%CB%90r" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Semaphore ([ˈseməfɔːr])</h2>
+<p>信号量，限流的时候可以用（例如下面代码模拟有3个停车位，6个车要进入）<br />
+<code>acquire()</code> 如果大于 0 就 -1，如果等于 0 就等待<br />
+<code>release()</code> 释放，将信号量 + 1，唤醒等待的进程</p>
+<pre><code class="language-java">Semaphore semaphore = new Semaphore(3);
+for (int i = 0; i &lt; 6; i++) {
+    new Thread(()-&gt;{
+        try {
+            semaphore.acquire(); // 等待获得
+            System.out.println(Thread.currentThread().getName() + &quot; 进入&quot;);
+            TimeUnit.SECONDS.sleep(1);
+            System.out.println(Thread.currentThread().getName() + &quot; 离开&quot;);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            semaphore.release();
+        }
+    }, String.valueOf(i)).start();
+}
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16226423231626.html">Callable & Futrue</a></h1>
+			<p class="meta"><time datetime="2021-06-02T21:58:43+08:00" 
+			pubdate data-updated="true">2021/06/02</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#future">Future</a></li>
+<li><a href="#runnablefuture-futretask">RunnableFuture &amp; FutreTask</a></li>
+<li><a href="#completablefuture">CompletableFuture</a></li>
+</ul>
+</div>
+<p>之前创建线程的 2 种方式：一种是直接继承 <code>Thread</code>，另外一种就是实现 <code>Runnable</code> 接口。这 2 种方式都有一个缺陷就是：在执行完任务之后无法获取执行结果。<br />
+<code>Callable</code> 和 <code>Runnable</code> 类似，都是多线程一种实现方式，但是可以有返回值，可以抛出异常，使用 <code>call()</code> 方法启动</p>
+<h2><a id="future" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Future</h2>
+<p><code>Future</code> 就是对于具体的 <code>Runnable</code> 或者 <code>Callable</code> 任务的执行结果进行取消、查询是否完成、获取结果。</p>
+<pre><code class="language-java">ExecutorService threadPool = Executors.newFixedThreadPool(2);
+Future&lt;Integer&gt; future = threadPool.submit((Callable&lt;Integer&gt;) () -&gt; {
+    Thread.sleep(2000);
+    return 0;
+});
+System.out.println(future.get()); // 0
+threadPool.shutdown();
+</code></pre>
+<h2><a id="runnablefuture-futretask" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>RunnableFuture &amp; FutreTask</h2>
+<p><code>RunnableFuture</code> 实现了 <code>Runnable</code> 接口和 <code>Future</code> 接口，而 <code>FutureTask</code> 实现了 <code>RunnableFuture</code> 接口。所以 <code>FutureTask</code> 既可以作为 <code>Runnable</code> 被线程执行，又可以作为 <code>Future</code> 得到 <code>Callable</code> 的返回值。</p>
+<pre><code class="language-java">import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
+public class CallableTest {
+    public static void main(String[] args) {
+        // 实例化 Callable 子类对象
+        MyThread myThread = new MyThread();
+        // 使用 Callable 子类对象构造 FutureTask 对象，它是一个 Runnable 的实现类，所以可以使用 Thread 运行，
+        FutureTask futureTask = new FutureTask(myThread);
+        new Thread(futureTask, &quot;callable&quot;).start();
+
+        // FutureTask 同时也时 Future 的实现类，所以可以对任务进行取消、查询是否完成、获取结果
+        try {
+            String result = (String) futureTask.get(); // 这里可能产生阻塞
+            System.out.println(result);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class MyThread implements Callable&lt;String&gt; {
+    @Override
+    public String call() throws Exception {
+        return &quot;hello Callable.&quot;;
+    }
+}
+</code></pre>
+<h2><a id="completablefuture" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CompletableFuture</h2>
+<p>原始 <code>Future</code> 可以对执行的线程进行管理结果查询等（配合 <code>Callable</code>），但是查询结果需要阻塞等待线程执行完毕，效果不好。<br />
+从 Java 8 开始引入了 <code>CompletableFuture</code>，它针对 <code>Future</code> 做了改进，可以事先定义好回调方法，当异步任务完成或者发生异常时，自动调用回调对象的回调方法。</p>
+<pre><code class="language-java">CompletableFuture.supplyAsync(Supplier).thenAccept(Consumer).exceptionally(Function);
+// 传入的 supplyAsync 对象在内部会被转成一个 Runnable 线程执行
+// 执行完毕自动调用 thenAccept 传入的 Consumer
+// 出现异常自动调用 exceptionally 传入的 Function
+</code></pre>
+<ul>
+<li>使用</li>
+</ul>
+<pre><code class="language-java">CompletableFuture completableFuture = CompletableFuture.supplyAsync(() -&gt; {
+    try {
+        TimeUnit.SECONDS.sleep(1);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+    System.out.println(&quot;hello completableFuture&quot;);
+    return 1024;
+}).thenAccept((t) -&gt; { // 成功执行完，自动调用这个
+    System.out.println(t);
+}).exceptionally((e)-&gt;{
+    System.out.println(e);
+    return null;
+});
+
+System.out.println(&quot;hello main1&quot;);
+TimeUnit.SECONDS.sleep(2);
+System.out.println(&quot;hello main2&quot;);
+
+// 结果
+// hello main1
+// hello completableFuture // 线程执行时输出的语句
+// 1024 // 线程正常执行完，自动调用 Consumer 输出的语句
+// hello main2
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16226261701341.html">JUC 容器</a></h1>
+			<p class="meta"><time datetime="2021-06-02T17:29:30+08:00" 
+			pubdate data-updated="true">2021/06/02</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#copyonwritearraylist">CopyOnWriteArrayList</a></li>
+<li><a href="#copyonwritearrayset">CopyOnWriteArraySet</a></li>
+<li><a href="#concurrenthashmap">ConcurrentHashMap</a></li>
+</ul>
+</div>
+<h2><a id="copyonwritearraylist" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CopyOnWriteArrayList</h2>
+<p>并发下 List 是线程不安全的, 如何解决:</p>
+<ul>
+<li>使用 <code>Vector</code>, 使用了 <code>synchronized</code> 方法, 为了防止遍历时容器被修改报错, 即使遍历时容器我们也要加锁, 效率低</li>
+<li>使用 <code>Collections.synchronizedList(List)</code> 转换成安全的, 内部也使用了 <code>synchronized</code> 方法</li>
+<li>JUC 解决方案 ( 推荐 ): 使用 <code>CopyOnWriteArrayList</code>, 有写操作的时候会 copy 一份数据，然后写完再设置成新的数据, 使得迭代时其他线程可以增删元素, 并且使用 lock, 保证线程安全, 由于读取和写的内存不是同一块, 解决了遍历时需要加锁的问题.</li>
+</ul>
+<p><code>CopyOnWriteArrayList</code> 缺点:</p>
+<ul>
+<li>比较耗费内存</li>
+<li>只能保证数据的最终一致性，不能保证数据的实时一致性</li>
+</ul>
+<h2><a id="copyonwritearrayset" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CopyOnWriteArraySet</h2>
+<p>并发下 Set 是不安全的, 和 List 解决方案类似:</p>
+<ul>
+<li>使用 <code>Collections.synchronizedSet(Set)</code> 转换成安全的, 内部使用 <code>synchronized</code> 方法</li>
+<li>JUC 解决方案: 使用 <code>CopyOnWriteArraySet</code></li>
+</ul>
+<p><strong>hashSet 底层是 hashMap</strong>: 利用了 map 的 key 是无法重复来实现的, 把值当作 map 的key 存起来, value 是一个全局常量</p>
+<pre><code class="language-java">private static final Object PRESENT = new Object();
+
+public HashSet() {
+    map = new HashMap&lt;&gt;();
+}
+
+public boolean add(E e) {
+    return map.put(e, PRESENT)==null;
+}
+</code></pre>
+<h2><a id="concurrenthashmap" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ConcurrentHashMap</h2>
+<p>HashMap 线程不安全, 解决方案:</p>
+<ul>
+<li>使用 <code>Collections.synchronizedMap(Map)</code></li>
+<li>JUC 解决方案: 使用 <code>ConcurrentHashMap</code>: 它有多个段，每个段下面都是一个<code>Hashtable</code>（相似），所以每个段上都有一把锁，各个段之间的锁互不影响，可以实现并发操作。</li>
+</ul>
+<p><img src="media/16226261701341/16226420497103.jpg" alt="" /></p>
+<p>Jdk 1.8 中， ConcurrentHashMap 取消了 segment 分段锁，而采用 CAS 和 synchronized 来保证并发安全。数据结构跟 HashMap1.8 的结构一样，数组 + 链表/红黑二叉树。synchronized 只锁定当前链表或红黑二叉树的首节点，这样只要 hash 不冲突，就不会产生并发，效率又提升N倍。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16226256624681.html">锁🔒</a></h1>
+			<p class="meta"><time datetime="2021-06-02T17:21:02+08:00" 
+			pubdate data-updated="true">2021/06/02</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%85%AC%E5%B9%B3%E9%94%81%E9%9D%9E%E5%85%AC%E5%B9%B3%E9%94%81">公平锁 &amp; 非公平锁</a></li>
+<li><a href="#%E4%B9%90%E8%A7%82%E9%94%81%E6%82%B2%E8%A7%82%E9%94%81">乐观锁 &amp; 悲观锁</a></li>
+<li><a href="#%E8%87%AA%E6%97%8B%E9%94%81%EF%BC%88spin-lock%EF%BC%89">自旋锁（spin lock）</a>
+<ul>
+<li><a href="#%E8%87%AA%E6%97%8B%E9%94%81%E6%98%AF%E4%B9%90%E8%A7%82%E9%94%81%E5%90%97%EF%BC%9F">自旋锁是乐观锁吗？</a></li>
+</ul>
+</li>
+<li><a href="#lock">Lock</a>
+<ul>
+<li><a href="#reentrantlock%EF%BC%88%E9%87%8D%E5%85%A5%E9%94%81%EF%BC%89">ReentrantLock（重入锁）</a></li>
+<li><a href="#readwritelock%EF%BC%88%E8%AF%BB%E5%86%99%E9%94%81%E3%80%81%E7%8B%AC%E5%8D%A0%E9%94%81%E3%80%81%E5%85%B1%E4%BA%AB%E9%94%81%EF%BC%89">ReadWriteLock（读写锁、独占锁、共享锁）</a></li>
+</ul>
+</li>
+<li><a href="#synchronized">synchronized</a>
+<ul>
+<li><a href="#%E6%97%A0%E9%94%81%E5%81%8F%E5%90%91%E9%94%81%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81">无锁 -&gt; 偏向锁 -&gt; 轻量级锁 -&gt; 重量级锁</a></li>
+<li><a href="#synchronized%E9%94%81%E5%8D%87%E7%BA%A7">synchronized 锁升级</a></li>
+<li><a href="#%E5%92%8Clock%E7%9A%84%E5%8C%BA%E5%88%AB">和 Lock 的区别</a></li>
+</ul>
+</li>
+<li><a href="#%E6%AD%BB%E9%94%81">死锁</a></li>
+</ul>
+</div>
+<p><strong>Blog: <a href="https://tech.meituan.com/2018/11/15/java-lock.html">不可不说的Java“锁”事</a></strong></p>
+<h2><a id="%E5%85%AC%E5%B9%B3%E9%94%81%E9%9D%9E%E5%85%AC%E5%B9%B3%E9%94%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>公平锁 &amp; 非公平锁</h2>
+<ul>
+<li>公平锁：公平，不可以插队</li>
+<li><strong>非公平锁</strong>：不公平，可以插队，Java 默认</li>
+</ul>
+<h2><a id="%E4%B9%90%E8%A7%82%E9%94%81%E6%82%B2%E8%A7%82%E9%94%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>乐观锁 &amp; 悲观锁</h2>
+<ul>
+<li>
+<p>乐观锁</p>
+<p>乐观锁是一种乐观思想，即认为读多写少，遇到并发写的可能性低，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，采取在写时先读出当前版本号，然后加锁操作（比较跟上一次的版本号，如果一样则更新），如果失败则要重复读-比较-写的操作。乐观锁也是通过 CAS 操作实现的。</p>
+</li>
+<li>
+<p>悲观锁</p>
+<p>悲观锁是就是悲观思想，即认为写多，遇到并发写的可能性高，每次去拿数据的时候都认为别人会修改，所以每次在读写数据的时候都会上锁，这样别人想读写这个数据就会 block 直到拿到锁。java 中的悲观锁就是 Synchronized, <strong>AQS 框架下的锁则是先尝试 cas 乐观锁去获取锁，获取不到，才会转换为悲观锁，如 RetreenLock</strong>。</p>
+</li>
+</ul>
+<h2><a id="%E8%87%AA%E6%97%8B%E9%94%81%EF%BC%88spin-lock%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>自旋锁（spin lock）</h2>
+<p>如果获取不到锁，它们只需要等一等（自旋），等锁被释放后即可立即获取锁，这样就避免用户线程和内核的切换的消耗，使用 CAS 实现。</p>
+<pre><code class="language-java">class SpinLock {
+    private AtomicReference&lt;Thread&gt; atomicReference = new AtomicReference&lt;&gt;();
+
+    public void lock() {
+        Thread thread = Thread.currentThread();
+        while(!atomicReference.compareAndSet(null, thread)); // 没有被锁住的时候，应该是 null
+    }
+    public void unlock() {
+        Thread thread = Thread.currentThread();
+        atomicReference.compareAndSet(thread, null); // 如果是当前线程获得锁，设置成 null
+    }
+}
+</code></pre>
+<h3><a id="%E8%87%AA%E6%97%8B%E9%94%81%E6%98%AF%E4%B9%90%E8%A7%82%E9%94%81%E5%90%97%EF%BC%9F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>自旋锁是乐观锁吗？</h3>
+<p><strong>不是。乐观锁其实是无锁，自旋锁只是在实现的时候利用了乐观锁来实现。应该站在应用层分析，看它们是如何锁住应用数据的，而不是站在底层看抢占锁的过程。如果一个线程尝试获取锁时，发现已经被占用，它是否继续读取数据，还是等后续要更新时再决定要不要重试。其实自旋锁对应用数据的读取操作都被挡住了。</strong></p>
+<h2><a id="lock" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lock</h2>
+<p><code>java.util.concurrent.locks</code> 三个实现类: <code>ReentrantLock</code>, <code>ReentrantReadWriteLock.ReadLock</code>, <code>ReentrantReadWriteLock.WriteLock</code></p>
+<ul>
+<li>如何使用</li>
+</ul>
+<pre><code class="language-java">lock.lock(); // 加锁
+try {
+    // 业务代码
+} catch (Exception e) {
+    e.printStackTrace();
+} finally {
+    lock.unlock(); // 解锁
+}
+</code></pre>
+<h3><a id="reentrantlock%EF%BC%88%E9%87%8D%E5%85%A5%E9%94%81%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ReentrantLock（重入锁）</h3>
+<p>重入锁、递归锁，Java 内置的锁（synchronized、Lock）都是重入锁。<br />
+锁的操作粒度是线程,而不是调用，同一个线程再次进入同步代码的时候，可以使用自己已经获取到的锁。</p>
+<h3><a id="readwritelock%EF%BC%88%E8%AF%BB%E5%86%99%E9%94%81%E3%80%81%E7%8B%AC%E5%8D%A0%E9%94%81%E3%80%81%E5%85%B1%E4%BA%AB%E9%94%81%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ReadWriteLock（读写锁、独占锁、共享锁）</h3>
+<p>读写锁，更加细粒度的控制。一对关联的锁，一个用于只读，一个用于写入。读锁可以共享，写锁只有一个线程可以获得。(可以同时读，不可以同时写，也不可以同时读写)<br />
+语义与 <code>ReentrantLock</code> 类似，也是重入锁，唯一实现类是 <code>ReentrantReadWriteLock</code></p>
+<pre><code class="language-java">ReadWriteLock rwLock = new ReentrantReadWriteLock();
+rwLock.writeLock(); // 获得写锁（独占锁）
+rwLock.readLock(); // 获得读锁（共享锁）
+</code></pre>
+<h2><a id="synchronized" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>synchronized</h2>
+<p>JDK 6 优化了 synchronized，将之前的重量级锁改为锁升级机制</p>
+<h3><a id="%E6%97%A0%E9%94%81%E5%81%8F%E5%90%91%E9%94%81%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>无锁 -&gt; 偏向锁 -&gt; 轻量级锁 -&gt; 重量级锁</h3>
+<p><strong>无锁</strong>：无锁没有对资源进行锁定，所有的线程都能访问并修改同一个资源，但同时只有一个线程能修改成功，例如乐观锁。<br />
+<strong>偏向锁</strong>：（当一个线程访问同步代码块并获取锁时，会记住这个线程 ID。当这个线程再次获取锁的时候，就可以直接获取资源。只需比较 ThreadID）<br />
+<strong>轻量级锁</strong>：是指当锁是偏向锁的时候，被另外的线程所访问，偏向锁就会升级为轻量级锁，其他线程会通过自旋的形式尝试获取锁（自旋锁），不会阻塞，从而提高性能。（自旋）<br />
+<strong>重量级锁</strong>：等待锁的线程都会进入阻塞状态。当轻量级锁自旋超过一定的次数，或者一个线程在持有锁，一个在自旋，又有第三个来访时，轻量级锁升级为重量级锁。（依赖OS的互斥锁 mutex lock）</p>
+<h3><a id="synchronized%E9%94%81%E5%8D%87%E7%BA%A7" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>synchronized 锁升级</h3>
+<p>初次执行到 synchronized 代码块的时候，锁对象变成偏向锁，执行完同步代码块后，线程并不会主动释放偏向锁。</p>
+<p>当第二次到达同步代码块时，线程会判断此时持有锁的线程ID是否就是自己，如果是则直接往下执行，性能极高。</p>
+<p>但是，一旦有第二个线程加入锁竞争，偏向锁就升级为轻量级锁（自旋锁），没有抢到锁的线程将自旋。抢到锁后线程将当前锁的持有者信息修改为自己。</p>
+<p>如果锁竞争情况严重，某个达到最大自旋次数的线程，会将轻量级锁升级为重量级锁，当后续线程尝试获取锁时，则直接将自己挂起（而不是忙等），等待将来被唤醒。</p>
+<p>⚠️：<strong>当第二个线程执行到这个 synchronized 代码块时是否一定会发生锁竞争然后升级为轻量级锁呢？</strong></p>
+<p>线程A第一次执行完同步代码块后，当线程B尝试获取锁的时候，发现是偏向锁，会判断线程A是否仍然存活。如果线程A仍然存活，将线程A暂停，此时偏向锁升级为轻量级锁，之后线程A继续执行，线程B自旋。但是如果判断结果是线程A不存在了，则线程B持有此偏向锁，锁不升级。</p>
+<h3><a id="%E5%92%8Clock%E7%9A%84%E5%8C%BA%E5%88%AB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>和 Lock 的区别</h3>
+<p><code>synchronized</code> 无法判断锁的状态<br />
+<code>synchronized</code> 会自动释放锁; Lock 必须手动释放<br />
+<code>synchronized</code> 获取不到锁会阻塞; Lock 可以使用 <code>tryLock()</code> 尝试获取不到不会一直等待<br />
+<code>synchronized</code> 适合锁少量代码同步; Lock 适合大量同步代码<br />
+<code>synchronized</code> 会锁升级，但是是不可逆的，一旦升级为重量级锁，就回不去了，如果并发量不稳定，可能造成性能损失<br />
+<code>synchronized</code> 由 JVM 实现，底层锁住的是对象头，<code>Lock</code> 由 JDK 实现，依赖 AQS，通过 state 判断</p>
+<p>synchronized 锁的是方法的调用者 (<code>this</code>), 静态方法锁的是 Class 对象, 所有的实例共享一把锁</p>
+<p>分别使用 <code>synchronized</code> 和 <code>Lock</code> 实现 <a href="16227416766193.html">生产者消费者</a><br />
+使用 Condition 有什么好处: 可以使用多个 Condition 达到精准通知某个线程的目的</p>
+<pre><code class="language-java">class ConditionTest {
+    private Lock lock = new ReentrantLock();
+    private Condition condition1 = lock.newCondition();
+    private Condition condition2 = lock.newCondition();
+    private int num = 1; // 默认第一个先执行
+    
+    public void show1() {
+        lock.lock();
+        try {
+            while (num != 1) condition1.await(); // 1等待
+            System.out.println(Thread.currentThread().getName());
+            num = 2;
+            condition2.signal(); // 执行完通知2
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    public void show2() {
+        lock.lock();
+        try {
+            while (num != 2) condition2.await(); // 2等待
+            System.out.println(Thread.currentThread().getName());
+            num = 1;
+            condition1.signal(); // 执行完通知1
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+</code></pre>
+<pre><code class="language-java">// 调用
+ConditionTest conditionTest = new ConditionTest();
+new Thread(() -&gt; { for (int i = 0; i &lt; 10; i++) conditionTest.show1(); }, &quot;A&quot;).start();
+    
+new Thread(() -&gt; { for (int i = 0; i &lt; 10; i++) conditionTest.show2(); }, &quot;B&quot;).start();
+// 结果: A B A B A B A B .....
+</code></pre>
+<h2><a id="%E6%AD%BB%E9%94%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>死锁</h2>
+<p>尝试获取对方的锁，如何排查？</p>
+<ol>
+<li>查看日志</li>
+<li><strong>查看堆栈信息</strong>（使用 <code>jps -l</code> 查看 java 进程号、使用 <code>jstack 进程号</code> 查看进程信息）</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16226153690757.html">线程进程</a></h1>
+			<p class="meta"><time datetime="2021-06-02T14:29:29+08:00" 
+			pubdate data-updated="true">2021/06/02</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%A6%82%E5%BF%B5">概念</a></li>
+<li><a href="#%E7%BA%BF%E7%A8%8B%E5%92%8C%E8%BF%9B%E7%A8%8B">线程和进程</a>
+<ul>
+<li><a href="#%E5%B9%B6%E5%8F%91%E5%92%8C%E5%B9%B6%E8%A1%8C">并发和并行</a></li>
+<li><a href="#%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81">线程状态</a></li>
+<li><a href="#wait-sleep">wait &amp; sleep</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="%E6%A6%82%E5%BF%B5" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>概念</h2>
+<p>Jdk 三个包: <code>java.util.concurrent</code> 包以及这个包下面的 atomic 和 lock 包里的工具</p>
+<h2><a id="%E7%BA%BF%E7%A8%8B%E5%92%8C%E8%BF%9B%E7%A8%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>线程和进程</h2>
+<p>一个进程可以包含多个线程, 至少包含一个<br />
+对于 Java 而言, 默认有 2 个线程: main 和 GC, 开启线程的方式: <code>Thread</code> <code>Callable</code> <code>Runnable</code>, 但最终时通过本地方法调用本地 C++ 方法.</p>
+<p>区别:</p>
+<ul>
+<li>资源: 进程时资源分配的基本单位, 线程不拥有资源</li>
+<li>调度: 线程是独立调度的基本单位</li>
+<li>开销: 创建销毁进程时, 会分配回收资源; 线程只需要设置少量寄存器, 开销小</li>
+<li>通信: 线程间通过共享内存进行数据通信, 进程一般需要借助 IPC</li>
+</ul>
+<h3><a id="%E5%B9%B6%E5%8F%91%E5%92%8C%E5%B9%B6%E8%A1%8C" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>并发和并行</h3>
+<p>并发: 宏观上在同一段时间同时运行多个程序, 多线程操作同一个资源<br />
+并行: 同一时刻能够运行多个指令, 需要硬件支持</p>
+<h3><a id="%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>线程状态</h3>
+<p><img src="media/16226153690757/16226167728821.jpg" alt="" class="mw_img_center" style="width:602px;display: block; clear:both; margin: 0 auto;" /></p>
+<h3><a id="wait-sleep" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>wait &amp; sleep</h3>
+<p>来自不同的类: wait 来自 Object; sleep 来自 Thread<br />
+锁的释放: wait 会释放锁; sleep 不会释放<br />
+使用范围不同: wait 必须在同步代码块中使用; sleep 可以在任何地方调用</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221777530736.html">6. 数组</a></h1>
+			<p class="meta"><time datetime="2021-05-28T12:55:53+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84">内存结构</a></li>
+<li><a href="#%E4%B8%80%E7%BB%B4%E6%95%B0%E7%BB%84">一维数组</a></li>
+<li><a href="#%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84">二维数组</a></li>
+<li><a href="#java-util-arrays%E5%B7%A5%E5%85%B7%E7%B1%BB">java.util.Arrays 工具类</a></li>
+</ul>
+</div>
+<h2><a id="%E6%A6%82%E8%BF%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>概述</h2>
+<ul>
+<li>数组存放的元素数据类型是统一的</li>
+<li>地址空间连续</li>
+<li>数组本身是<strong>引用类型</strong>, 元素可以是基本类型也可以是引用类型</li>
+<li>长度一旦确定不能修改</li>
+</ul>
+<h2><a id="%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>内存结构</h2>
+<p>栈 ( stack ): 存放局部变量, 对象的引用<br />
+堆 ( heap ): 存放 new 出来的对象. eg. 对象, 数组<br />
+方法区: 类信息 常量池 静态域 ...</p>
+<h2><a id="%E4%B8%80%E7%BB%B4%E6%95%B0%E7%BB%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>一维数组</h2>
+<ul>
+<li>
+<p>声明初始化: 一旦初始化完成, 长度就确定了. <code>[]</code> 放在类型后面和变量名后面都可以</p>
+<pre><code class="language-java">// 静态初始化: 数组初始化和元素赋值同时进行
+int[] is1 = new int[]{1, 2, 3};
+int[] is2 = {1, 2, 3}; // 编译器能够推断 is2 的类型, 可以省略 new int[]
+// int[] is; is = {1, 2, 3}; // 错误, 声明和赋值分开时, 编译器不能推断 is 类型, 不能省略 new int[]
+// 动态初始化: 数组初始化和元素赋值分开进行
+String[] ss = new String[5];
+</code></pre>
+</li>
+<li>
+<p>获取长度: 使用数组的 <code>length</code> 属性</p>
+</li>
+<li>
+<p>默认初始值</p>
+<ul>
+<li>整型 (<code>byte</code> <code>short</code> <code>int</code> <code>long</code>): 0</li>
+<li>浮点型 (<code>float</code> <code>double</code>): 0.0</li>
+<li><code>char</code>: ascii 码为 0 的字符</li>
+<li><code>boolean</code>: <code>false</code></li>
+<li>引用数据类型: <code>null</code></li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>二维数组</h2>
+<ul>
+<li>
+<p>底层没有二维数组, 只不过一维数组的元素仍然是一个数组的引用</p>
+</li>
+<li>
+<p>声明初始化</p>
+<pre><code class="language-java">// 静态初始化
+int[][] is = {{1, 2}, {3, 4, 5}};
+int[][] is = new int[][]{{1, 2}, {3, 4, 5}};
+
+// 动态初始化
+String[][] ss = new String[3][2]; // 外层有 3 个元素, 每个元素引用的数组有 2 个元素
+String[][] ss = new String[3][]; // 外层有 3 个元素, 每个元素引用需要后面定义
+// String[][] ss = new String[][2]; // 错误
+</code></pre>
+</li>
+</ul>
+<h2><a id="java-util-arrays%E5%B7%A5%E5%85%B7%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>java.util.Arrays 工具类</h2>
+<pre><code class="language-java">boolean equals(int[] a, int[] b) // 比较两个数组是否相等
+String toString(int[] a) // 输出数组信息
+void fill(int[] a, int val) // 用 val 填充 a
+void sort(int[] a) // 排序, 默认用快排
+int binarySearch(int[] a, int key) // 二分查找 key, 数组必须是有序的, 未找到返回负数
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221418018700.html">5. 分支循环</a></h1>
+			<p class="meta"><time datetime="2021-05-28T02:56:41+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%88%86%E4%B9%8B%E7%BB%93%E6%9E%84">分之结构</a>
+<ul>
+<li><a href="#if-else">if...else...</a></li>
+<li><a href="#switch-case">switch...case...</a></li>
+</ul>
+</li>
+<li><a href="#%E5%BE%AA%E7%8E%AF%E7%BB%93%E6%9E%84">循环结构</a>
+<ul>
+<li><a href="#for">for</a></li>
+<li><a href="#while">while</a></li>
+<li><a href="#do-while">do...while</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="%E5%88%86%E4%B9%8B%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>分之结构</h2>
+<h3><a id="if-else" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>if...else...</h3>
+<pre><code class="language-java">if(a) {
+    xxxxx;
+}
+
+// 二选一
+if(a) {
+    xxxxx;
+} else {
+    xxxxx;
+}
+
+// 多选一
+if(a) {
+    xxxxx;
+} else if(b) {
+    xxxxx;
+} else {
+    xxxxx;
+}
+</code></pre>
+<h3><a id="switch-case" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>switch...case...</h3>
+<ul>
+<li><code>switch</code> 中的表达式的类型只能是以下 6 种: <code>byte</code> <code>short</code> <code>char</code> <code>int</code> <code>枚举</code> <code>String</code></li>
+<li><code>case</code> 后只能写常量, 不能是范围</li>
+<li>当匹配到一个分支, 后面的分支不需要判断直接执行, 如果不想执行需要添加 <code>break</code></li>
+</ul>
+<pre><code class="language-java">switch(a) { // a 的类型只能是以下6种: byte short char int 枚举 String
+    case b: // a == b
+        xxxxx;
+        break; // 不加 break 会不进行判断直接继续向下执行 case c 和 default 的代码
+    case c: // a == c
+        xxxxx;
+    default: // 位置可任意
+        xxxxx;
+}
+</code></pre>
+<h2><a id="%E5%BE%AA%E7%8E%AF%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>循环结构</h2>
+<p>① 初始化条件<br />
+② 循环条件<br />
+③ 迭代部分<br />
+④ 循环体</p>
+<h3><a id="for" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>for</h3>
+<pre><code class="language-java">for ( ①; ②; ③ ) {
+    ④;
+}
+</code></pre>
+<h3><a id="while" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>while</h3>
+<pre><code class="language-java">①
+while ( ② ) { // 满足进入
+    ④;
+    ③;
+}
+</code></pre>
+<h3><a id="do-while" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>do...while</h3>
+<pre><code class="language-java">①
+do {
+    ④;
+    ③;
+} while ( ② ); // 满足再次进入
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221357067724.html">4. 运算符</a></h1>
+			<p class="meta"><time datetime="2021-05-28T01:15:06+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E7%AE%97%E6%9C%AF%E8%BF%90%E7%AE%97%E7%AC%A6">算术运算符</a></li>
+<li><a href="#%E8%B5%8B%E5%80%BC%E8%BF%90%E7%AE%97%E7%AC%A6">赋值运算符</a></li>
+<li><a href="#%E6%AF%94%E8%BE%83%E8%BF%90%E7%AE%97%E7%AC%A6">比较运算符</a></li>
+<li><a href="#%E9%80%BB%E8%BE%91%E8%BF%90%E7%AE%97%E7%AC%A6">逻辑运算符</a></li>
+<li><a href="#%E4%BD%8D%E8%BF%90%E7%AE%97%E7%AC%A6">位运算符</a></li>
+<li><a href="#%E4%B8%89%E5%85%83%E8%BF%90%E7%AE%97%E7%AC%A6">三元运算符</a></li>
+</ul>
+</div>
+<h2><a id="%E7%AE%97%E6%9C%AF%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>算术运算符</h2>
+<p><code>+ -</code>: 正 负<br />
+<code>+</code>: 字符串连接<br />
+<code>+ - * / %</code>: 加 减 乘 除 取模<br />
+<code>++ --</code>: 自加 自减</p>
+<pre><code class="language-java">int a = 10;
+int b = a++; // 先运算赋值 后自加
+System.out.println(b); // 10
+
+a = 10;
+int c = ++a; // 先自加 后运算赋值
+System.out.println(c); // 11
+
+// ++ -- 不会改变数据类型
+char c1 = 'a';
+System.out.println(++c1); // b
+short s = 1;
+System.out.println(++s); // 2
+</code></pre>
+<h2><a id="%E8%B5%8B%E5%80%BC%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>赋值运算符</h2>
+<p><code>=</code>: 支持连续赋值 <code>a = b = 1;</code><br />
+<code>-= += /= *= ...</code>: 相等于 <code>a = a -+/* b</code>, <strong>不会改变数据类型</strong></p>
+<pre><code class="language-java">char c2 = 'a';
+// c2 = c2 + 2; // 编译不通过, 因为 byte short char 相互运算都转成 int 
+c2 += 2; // 类型不改变
+System.out.println(c2); // c
+
+int i = 1;
+i *= 0.1; // 可以编译通过, 会把结果 0.1 截断成 0 赋值给 i, 不改变 数据类型
+System.out.println(i); // 0
+</code></pre>
+<h2><a id="%E6%AF%94%E8%BE%83%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>比较运算符</h2>
+<p>结果都是 boolean 类型<br />
+<code>== != &lt; &gt; &lt;= &gt;=</code> <code>instanceof</code></p>
+<h2><a id="%E9%80%BB%E8%BE%91%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>逻辑运算符</h2>
+<p>操作的是 boolean 类型<br />
+<code>&amp; |</code>: 逻辑与 逻辑或<br />
+<code>&amp;&amp; ||</code>: 短路与 短路或<br />
+<code>! ^</code>: 逻辑非 逻辑异或(相同为假 不同为真)</p>
+<h2><a id="%E4%BD%8D%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>位运算符</h2>
+<p>操作的是数值类型<br />
+<code>&lt;&lt;</code>: 左移, 低位补 0, <strong>在一定范围内</strong>相等于  [ 原数 * 2^n ], 但当有可能出现符号改变的问题<br />
+<code>&gt;&gt;</code>: 右移, 正数高位补 0, 负数高位补 1, 相等于原数 / 2^n<br />
+<code>&gt;&gt;&gt;</code>: 无符号右移, 不管正负数, 高位都补 0<br />
+<code>&amp; | ^</code>: 与 或 异或<br />
+<code>~</code>: 取反, 按补码各位取反</p>
+<h2><a id="%E4%B8%89%E5%85%83%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>三元运算符</h2>
+<p><code>b ? a1 : a2</code>: 如果 <code>b == true</code> 则取 <code>a1</code>, 否则取 <code>a2</code><br />
+<strong>要求a1和a2是相同数据类型, 如果不是就会转换</strong></p>
+<pre><code class="language-java">System.out.println(true ? 1 : 2.0); // 输出 1.0
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221160561779.html">3. 数据类型</a></h1>
+			<p class="meta"><time datetime="2021-05-27T19:47:36+08:00" 
+			pubdate data-updated="true">2021/05/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B">数据类型</a></li>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2">基本数据类型转换</a></li>
+<li><a href="#string">String</a></li>
+<li><a href="#%E8%BF%9B%E5%88%B6">进制</a></li>
+</ul>
+</div>
+<h2><a id="%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>数据类型</h2>
+<ul>
+<li>基本数据类型 ( 8 种 )
+<ul>
+<li>数值型
+<ul>
+<li>整数类型:
+<ul>
+<li><code>byte</code>(8): 范围 -128 ~ 127</li>
+<li><code>short</code>(16)</li>
+<li><code>int</code>(32)</li>
+<li><code>long</code>(64): 以 l 或 L 结尾, 有时不加也可以正常编译过, 是因为 <code>int</code> 转成了 <code>long</code>, 如果数字过大, 则会报错</li>
+</ul>
+</li>
+<li>浮点类型
+<ul>
+<li><code>float</code>(32): 有效数字 7 位, 以 f 或 F 结尾</li>
+<li><code>double</code>(64)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>字符型 <code>char</code>(16): 使用 '' 定义, 只能 (且必须) 写一个字符, 转义字符也算一个字符</li>
+<li>布尔型 <code>boolean</code>: true or false</li>
+</ul>
+</li>
+<li>引用数据类型 ( 3 种 )
+<ul>
+<li>类 <code>class</code> (eg. <code>String</code>)</li>
+<li>接口 <code>interface</code></li>
+<li>数组 <code>[]</code></li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>基本数据类型转换</h2>
+<ul>
+<li>
+<p>自动类型转换：容量小的数据类型自动转换为容量大的数据类型</p>
+<ul>
+<li>容量大小指的是, 表示数的范围大小, 不是内存占用大小, 比如: <code>float</code> 表示的范围比 <code>long</code> 大, 但 <code>long</code> 占用 64 bit, <code>long</code> 自动转成 <code>float</code></li>
+<li><code>byte</code> / <code>short</code> / <code>char</code> 之间 ( 甚至同种类型 ) 做运算，结果为 <code>int</code> 型</li>
+<li>整型常量默认位 <code>int</code>; 浮点型常量默认位 <code>double</code></li>
+</ul>
+</li>
+<li>
+<p>强制类型转换: 是自动类型转换的逆过程, 使用 “( )” 实现强转</p>
+</li>
+</ul>
+<h2><a id="string" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>String</h2>
+<ul>
+<li>不是基本类型</li>
+<li>可以和 8 种基本数据类型做运算 (只能是连接运算 <code>+</code>), 运算结果仍然是 <code>String</code></li>
+<li><code>String</code> 转成基本类型不能使用 <code>int(&quot;xxx&quot;)</code>, 要使用包装类例如 <code>Integer.parseInt(&quot;xxx&quot;)</code></li>
+</ul>
+<h2><a id="%E8%BF%9B%E5%88%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>进制</h2>
+<pre><code class="language-java">int n2 = 0b110;
+int n8 = 01;
+int n10 = 1;
+int n16 = 0x110A;
+</code></pre>
+<ul>
+<li>二进制: 以 <code>0b</code> <code>0B</code> 开头, 计算机底层以 <strong><a href="mweblib://15661155257627">补码</a></strong> 方式存储数据
+<ul>
+<li>正数: 补码 = 反码 = 原码</li>
+<li>负数: 补码 = 反码 + 1</li>
+</ul>
+</li>
+<li>八进制: 以 <code>0</code> 开头</li>
+<li>十进制</li>
+<li>十六进制: 以 <code>0x</code> <code>0X</code> 开头</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221150711459.html">2. 关键字</a></h1>
+			<p class="meta"><time datetime="2021-05-27T19:31:11+08:00" 
+			pubdate data-updated="true">2021/05/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%85%B3%E9%94%AE%E5%AD%97%E4%BF%9D%E7%95%99%E5%AD%97%E6%A0%87%E8%AF%86%E7%AC%A6">关键字 保留字 标识符</a></li>
+<li><a href="#%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99">命名规则</a></li>
+</ul>
+</div>
+<h2><a id="%E5%85%B3%E9%94%AE%E5%AD%97%E4%BF%9D%E7%95%99%E5%AD%97%E6%A0%87%E8%AF%86%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>关键字 保留字 标识符</h2>
+<p>关键字（keyword）：被Java语言赋予了特殊含义，用做专门用途的字符（单词）<br />
+保留字：现有Java版本尚未使用，但以后可能会使用的字符<br />
+标识符（Identifier）：对各种变量、方法和类等命名的字符</p>
+<ul>
+<li>字母（大小写）、0-9、_、$</li>
+<li>数字不可以开头</li>
+<li>不可以使用关键字和保留字，但能包含关键字和保留字</li>
+<li>严格区分大小写，长度无限制</li>
+<li>不能包含空格</li>
+</ul>
+<h2><a id="%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>命名规则</h2>
+<p>包名：多单词组成时所有字母都小写：xxxyyyzzz<br />
+类名、接口名：多单词组成时，所有单词的首字母大写：XxxYyyZzz<br />
+变量名、方法名：多单词组成时，第一个单词首字母小写，第二个单词开始每个单词首字母大写：xxxYyyZzz<br />
+常量名：所有字母都大写。多单词时每个单词用下划线连接：XXX_YYY_ZZZ</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221094537419.html">1. Hello World</a></h1>
+			<p class="meta"><time datetime="2021-05-27T17:57:33+08:00" 
+			pubdate data-updated="true">2021/05/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#config">Config</a></li>
+<li><a href="#jdk-jre-jvm">JDK JRE JVM</a></li>
+<li><a href="#%E7%BC%96%E8%AF%91">编译</a></li>
+</ul>
+</div>
+<h2><a id="config" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Config</h2>
+<table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>变量值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>JAVA_HOME</code></td>
+<td>Java 安装路径</td>
+</tr>
+<tr>
+<td><code>PATH</code></td>
+<td><code>%JAVA_HOME%\bin</code></td>
+</tr>
+<tr>
+<td><code>CLASSPATH</code></td>
+<td><code>.;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar</code></td>
+</tr>
+</tbody>
+</table>
+<h2><a id="jdk-jre-jvm" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JDK JRE JVM</h2>
+<p>JDK = JRE + Java 开发工具（javac java javadoc）<br />
+JRE = JVM + Java 核心类<br />
+<img src="media/16221094537419/16221148084817.jpg" alt="" style="width:1021px;" /></p>
+<h2><a id="%E7%BC%96%E8%AF%91" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>编译</h2>
+<p><img src="media/16221094537419/16221094887530.jpg" alt="" style="width:477px;" /></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221429228201.html">读取键盘</a></h1>
+			<p class="meta"><time datetime="2021-05-28T03:15:22+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"></div>
+<pre><code class="language-java">import java.util.Scanner;
+Scanner scan = new Scanner(System.in)
+String s = scan.next()
+int i = scan.nextInt()
+double d = scan.nextDouble()
+boolean b = scan.nextBoolean()
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16223735897370.html">7. abstract & interface</a></h1>
+			<p class="meta"><time datetime="2021-05-30T19:19:49+08:00" 
+			pubdate data-updated="true">2021/05/30</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#abstract">abstract</a>
+<ul>
+<li><a href="#%E6%8A%BD%E8%B1%A1%E7%B1%BB">抽象类</a></li>
+<li><a href="#%E6%8A%BD%E8%B1%A1%E6%96%B9%E6%B3%95">抽象方法</a></li>
+<li><a href="#%E6%8A%BD%E8%B1%A1%E7%B1%BB%E7%9A%84%E5%8C%BF%E5%90%8D%E5%AD%90%E7%B1%BB">抽象类的匿名子类</a></li>
+<li><a href="#%E5%BA%94%E7%94%A8%E6%A8%A1%E7%89%88%E6%96%B9%E6%B3%95">应用: 模版方法</a></li>
+</ul>
+</li>
+<li><a href="#interface">interface</a></li>
+<li><a href="#%E5%AE%9A%E4%B9%89">定义</a>
+<ul>
+<li><a href="#%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%A7%E6%89%BF">接口的继承</a></li>
+<li><a href="#%E6%8E%A5%E5%8F%A3%E5%8C%BF%E5%90%8D%E5%AE%9E%E7%8E%B0%E7%B1%BB">接口匿名实现类</a></li>
+<li><a href="#%E5%BA%94%E7%94%A8%E4%B8%80%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8Fproxy">应用一: 代理模式 (Proxy)</a></li>
+<li><a href="#%E5%BA%94%E7%94%A8%E4%BA%8C%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F">应用二: 工厂模式</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="abstract" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>abstract</h2>
+<h3><a id="%E6%8A%BD%E8%B1%A1%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>抽象类</h3>
+<p>当使用 <code>abstract</code> 修饰类后, 就不可以实例化, 但是一定有构造器, 便于子类实例化调用.<br />
+开发中都会提供抽象类的子类, 让子类实例化, 提供相关操作.</p>
+<h3><a id="%E6%8A%BD%E8%B1%A1%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>抽象方法</h3>
+<ul>
+<li>抽象方法没有方法体, 不能是 <code>private</code>, 不应该被调用, <strong>只能写在抽象类中 (抽象类中可以没有抽象方法)</strong>.</li>
+<li><strong>抽象方法一定要在非抽象子类中实现</strong></li>
+</ul>
+<pre><code class="language-java">public abstract 返回类型 方法名(型参);
+</code></pre>
+<h3><a id="%E6%8A%BD%E8%B1%A1%E7%B1%BB%E7%9A%84%E5%8C%BF%E5%90%8D%E5%AD%90%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>抽象类的匿名子类</h3>
+<pre><code class="language-java">Person p = new Person() { // Person 是抽象类
+    @Override
+    public void show() {
+        System.out.println(&quot;hello&quot;);
+    }
+};
+
+p.show(); // hello
+</code></pre>
+<h3><a id="%E5%BA%94%E7%94%A8%E6%A8%A1%E7%89%88%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>应用: 模版方法</h3>
+<p>当功能一部分实现时确定的 (这部分步骤很固定通用), 一部分实现是不确定的. 这时可以把不确定的部分暴露出去, 让子类去实现.</p>
+<h2><a id="interface" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>interface</h2>
+<ul>
+<li>Java 中, 接口和类是并列的两个结构</li>
+<li>Java 没有多继承, <code>interface</code> 可以得到多继承的效果 (<strong>单继承, 多实现</strong>)</li>
+<li>接口<strong>本质是规范</strong>, 契约等. 继承是一个 &quot;是不是&quot; 的关系, 而接口是 &quot;能不能&quot; 的关系</li>
+<li>接口的实现体现了多态, 接口的实现子类可以赋值给接口的引用变量 (<code>C c = new D();</code> <code>C</code> 是接口, <code>D</code> 实现了 <code>C</code>)</li>
+</ul>
+<h2><a id="%E5%AE%9A%E4%B9%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>定义</h2>
+<ul>
+<li>
+<p>Jdk 7: 只能定义全局常量和抽象方法</p>
+<ul>
+<li>全局常量: <code>public static final</code>, 书写时可以省略, 效果不变</li>
+<li>抽象方法: <code>public abstract</code></li>
+<li><strong>接口不能定义构造器</strong>, 不可以实例化</li>
+</ul>
+<pre><code class="language-java">interface Flyable {
+    public static final int MAX_SPEED = 7900;
+    int MIN_SPEED = 1; // 可以省略 public static final
+
+    public abstract void fly();
+    void stop(); // 可以省略 public abstract
+}
+</code></pre>
+</li>
+<li>
+<p>Jdk 8: 除了全局常量和抽象方法, 还可以定义静态方法和默认方法</p>
+<pre><code class="language-java">interface Java8Interface {
+    // 静态方法
+    public static void method1() { // public 可以省略
+        System.out.println(&quot;m1&quot;);
+    }
+    // 默认方法
+    public default void method2() {
+        System.out.println(&quot;interface m2&quot;);
+    }
+}
+class SuperClass {
+    public void method2() {
+        System.out.println(&quot;super class m2&quot;)
+    }
+}
+class SubClass extends SuperClass implements Java8Interface {
+    // 无需实现静态和默认方法, 但是可以重写
+}
+
+... main {
+    SubClass subClass = new SubClass();
+    // 如果子类继承的父类和实现的接口中声明了同名同参的方法, 在没有重写的情况下, 默认调用父类的方法
+    // 如果子类实现的多个接口中声明了同名同参的静态或默认方法, 子类必须重写
+    subClass.method2(); // super class m2
+    // subClass.method1(); // 接口的静态方法只能用接口调用
+    Java8Interface.method1();
+}
+</code></pre>
+</li>
+</ul>
+<h3><a id="%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%A7%E6%89%BF" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>接口的继承</h3>
+<pre><code class="language-java">interface A {
+    void method1();
+}
+interface B {
+    void method2();
+}
+interface C extends A, B { // 继承两个父接口, 里面实际有三个方法
+    void method3();
+}
+
+class D implements C { // 需要实现 3 个方法
+    @Override
+    public void method1() {}
+    @Override
+    public void method2() {}
+    @Override
+    public void method3() {}
+}
+</code></pre>
+<h3><a id="%E6%8E%A5%E5%8F%A3%E5%8C%BF%E5%90%8D%E5%AE%9E%E7%8E%B0%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>接口匿名实现类</h3>
+<p>和抽象类的匿名子类类似</p>
+<pre><code class="language-java">new A(){
+    @Override
+    public void method1() {
+        System.out.println(&quot;hi&quot;);
+    }
+}.method1(); // hi
+</code></pre>
+<h3><a id="%E5%BA%94%E7%94%A8%E4%B8%80%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8Fproxy" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>应用一: 代理模式 (Proxy)</h3>
+<p>代理模式就是为其他对象提供一种代理以控制对这个对象的访问. 分为静态代理和动态代理 ( 应用场景: 安全代理 / 远程代理 / 延迟加载 )</p>
+<p>静态代理举例:</p>
+<pre><code class="language-java">interface NetWork {
+    void browse();
+}
+class Server implements NetWork {
+    @Override
+    public void browse() {
+        System.out.println(&quot;Server browse...&quot;);
+    }
+}
+class ProxyServer implements NetWork {
+    private Server server;
+    public ProxyServer(Server server) {
+        this.server = server;
+    }
+    @Override
+    public void browse() {
+        System.out.println(&quot;check...&quot;);
+        server.browse();
+        System.out.println(&quot;ok.&quot;);
+    }
+}
+</code></pre>
+<p>调用</p>
+<pre><code class="language-java">Server server = new Server();
+ProxyServer proxyServer = new ProxyServer(server);
+proxyServer.browse();
+</code></pre>
+<p>结果</p>
+<pre><code class="language-plain_text">check...
+Server browse...
+ok.
+</code></pre>
+<h3><a id="%E5%BA%94%E7%94%A8%E4%BA%8C%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>应用二: 工厂模式</h3>
+<p>实现创建者与调用着的分离, 将创建对象的具体过程屏蔽隔离起来, 达到提高灵活性的目的.<br />
+分类: 简单工厂模式, 工厂方法模式, 抽象工厂模式</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16222923817986.html">6. static & final</a></h1>
+			<p class="meta"><time datetime="2021-05-29T20:46:21+08:00" 
+			pubdate data-updated="true">2021/05/29</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#static">static</a>
+<ul>
+<li><a href="#%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F">静态变量</a></li>
+<li><a href="#%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95">静态方法</a></li>
+<li><a href="#%E9%9D%99%E6%80%81%E4%BB%A3%E7%A0%81%E5%9D%97">静态代码块</a></li>
+</ul>
+</li>
+<li><a href="#final">final</a></li>
+</ul>
+</div>
+<h2><a id="static" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>static</h2>
+<p>如果我们希望无论创建多少个实例, 某些特定的属性在内存中只存在一份. 例如每个中国人的国籍都是 <code>中国</code>, 不必每个对象都有一个单独的国籍属性.</p>
+<p>可以修饰的是属性 / 方法 / 代码块 / 内部类</p>
+<h3><a id="%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>静态变量</h3>
+<p>实例变量: 非静态变量, 每个实例都有一个独立的属性<br />
+静态变量: 用 <code>static</code> 修饰的变量, 是共享的属性, 在内存中只有一份. 随着类加载, 存在于方法区的静态域. 可以通过 <code>类.属性</code> 调用</p>
+<pre><code class="language-java">public class StaticTest {
+    public static void main(String[] args) {
+        Chinese c1 = new Chinese();
+        Chinese c2 = new Chinese();
+        c1.name = &quot;a&quot;;
+        c1.nation = &quot;CHN&quot;;
+        c2.name = &quot;b&quot;;
+        c2.nation = &quot;CHINA&quot;;
+        System.out.println(c1.nation); // CHINA
+        System.out.println(Chinese.nation); // CHINA
+    }
+}
+class Chinese {
+    String name;
+    static String nation;
+}
+</code></pre>
+<h3><a id="%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>静态方法</h3>
+<p>随着类的加载而加载, 可以通过类直接调用<br />
+静态方法中只能调用静态方法或静态变量; 非静态方法既可以调用静态也可以调用非静态方法和变量<br />
+静态方法中不能有 <code>this</code> <code>super</code> 关键字</p>
+<h3><a id="%E9%9D%99%E6%80%81%E4%BB%A3%E7%A0%81%E5%9D%97" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>静态代码块</h3>
+<ul>
+<li>静态代码块随着类的加载而加载, 且只加载一次; 非静态代码块每次创建对象时都会加载一次</li>
+<li>静态代码块只能使用静态变量方法</li>
+<li>静态代码块早于非静态代码块的执行</li>
+</ul>
+<h2><a id="final" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>final</h2>
+<p>意为最终的版本, 可以用来修饰类 属性 方法</p>
+<ul>
+<li>修饰类: 这个类就不能被继承</li>
+<li>修饰方法: 这个方法不能被重写</li>
+<li>修饰属性: 这个属性就是常量 (没有默认值), 一旦初始化 (显式赋值 代码块 构造器) 就不能更改</li>
+<li>修饰型参或变量时, 方法内部只读, 不可再更改</li>
+</ul>
+<p><strong><code>static final</code></strong>: 全局静态常量, 内存只有一份, 且不能更改. eg. <code>Math.PI</code></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16222741834695.html">4. 多态</a></h1>
+			<p class="meta"><time datetime="2021-05-29T15:43:03+08:00" 
+			pubdate data-updated="true">2021/05/29</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%A4%9A%E6%80%81">多态</a></li>
+<li><a href="#instanceof">instanceof</a></li>
+</ul>
+</div>
+<h2><a id="%E5%A4%9A%E6%80%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>多态</h2>
+<p>可以理解为一个对象的多种形态<br />
+多态的形式：父类的引用指向子类的对象</p>
+<pre><code class="language-java">PClass p = new SubClass();
+</code></pre>
+<p>多态的应用（虚拟方法调用）：编译时只能调用父类的方法，执行时调用子类重写的方法。编译看左边，执行看右边<br />
+多态的前提：有继承关系，有方法重写</p>
+<p>注意：<strong>对象多态性不是用于属性</strong>，子类和父类属性重名时，运行时访问的是父类的属性</p>
+<p>多态是运行时行为</p>
+<h2><a id="instanceof" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>instanceof</h2>
+<p>如果想在多态时调用子类的特有方法，需要将父类引用向下转型成子类</p>
+<pre><code class="language-java">public class Animal {
+    public void eat() {
+        System.out.println(&quot;animal eat&quot;);
+    }
+
+    public static void main(String[] args) {
+        Animal animal = new Dog();
+        // dog.walk(); // error
+        if (animal instanceof Dog) {
+            Dog dog = (Dog)animal;
+            dog.walk();
+        }
+    }
+}
+
+class Dog extends Animal {
+    @Override
+    public void eat() {
+        System.out.println(&quot;dog eat&quot;);
+    }
+
+    public void walk() {
+        System.out.println(&quot;dog walk&quot;);
+    }
+}
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221979238015.html">3. 继承</a></h1>
+			<p class="meta"><time datetime="2021-05-28T18:32:03+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#object">Object</a></li>
+<li><a href="#%E9%87%8D%E5%86%99overrideoverwrite">重写 (override/overwrite)</a></li>
+<li><a href="#%E5%AD%90%E7%B1%BB%E5%AE%9E%E4%BE%8B%E5%8C%96%E8%BF%87%E7%A8%8B">子类实例化过程</a></li>
+</ul>
+</div>
+<h2><a id="%E6%A6%82%E8%BF%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>概述</h2>
+<pre><code class="language-java">class A extends B { }
+</code></pre>
+<ul>
+<li>子类可以获得父类中有私有的属性或方法，但由于封装性的设计，不可以直接调用</li>
+<li>子类是对父类功能的 “扩展”，不是父类的子集</li>
+<li>Java 一个类只能继承一个父类, 但可以有多个子类 （单继承 多实现）</li>
+<li>好处
+<ul>
+<li>减少代码冗余, 提高复用性</li>
+<li>便于功能扩展</li>
+<li>为多态提供了前提</li>
+</ul>
+</li>
+</ul>
+<h2><a id="object" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Object</h2>
+<p>所有的类都直接或间接的继承 <code>java.lang.Object</code> 类</p>
+<h2><a id="%E9%87%8D%E5%86%99overrideoverwrite" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>重写 (override/overwrite)</h2>
+<p>在继承的基础之上，子类在获取了父类的结构以后，可以对父类中同名的方法 ( 非 <code>private</code> )进行 “重构”</p>
+<ul>
+<li>方法名，形参列表形同</li>
+<li>方法的返回值需要是父类返回值类或父类返回值类子类</li>
+<li>权限修饰符不小于父类；异常类型不大于父类</li>
+<li>两个方法要同为 <code>static</code> 或同为非 <code>static</code></li>
+</ul>
+<h2><a id="%E5%AD%90%E7%B1%BB%E5%AE%9E%E4%BE%8B%E5%8C%96%E8%BF%87%E7%A8%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>子类实例化过程</h2>
+<ul>
+<li>从结果上来看，子类继承父类以后，就获取了父类的属性方法，创建子类的对象，的堆空间中，就会加载所有父类声明的属性。</li>
+<li>从过程来看，当我们通过子类的构造器创建对象的时候，我们一定会直接或间接的调用父类的构造器，进而调用父类的父类的构造器，知道调用了 <code>Object</code> 的空参构造器为止。正因为加载过所有父类的结构，所以才可以在内存中看到父类的结构，子类对象才可以调用。</li>
+<li>虽然创建子类对象时调用了父类构造器，但是自始至终只创建了一个对象，即子类对象<br />
+<img src="media/16221979238015/16222740581782.jpg" alt="" class="mw_img_center" style="width:368px;display: block; clear:both; margin: 0 auto;" /></li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221963348622.html">5. this & super</a></h1>
+			<p class="meta"><time datetime="2021-05-28T18:05:34+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#this">this</a>
+<ul>
+<li><a href="#%E8%B0%83%E7%94%A8%E5%B1%9E%E6%80%A7%E6%96%B9%E6%B3%95">调用属性方法</a></li>
+<li><a href="#%E8%B0%83%E7%94%A8%E6%9E%84%E9%80%A0%E5%99%A8">调用构造器</a></li>
+</ul>
+</li>
+<li><a href="#super">super</a>
+<ul>
+<li><a href="#%E8%B0%83%E7%94%A8%E5%B1%9E%E6%80%A7%E6%96%B9%E6%B3%95">调用属性方法</a></li>
+<li><a href="#%E8%B0%83%E7%94%A8%E6%9E%84%E9%80%A0%E5%99%A8">调用构造器</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="this" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>this</h2>
+<h3><a id="%E8%B0%83%E7%94%A8%E5%B1%9E%E6%80%A7%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>调用属性方法</h3>
+<ul>
+<li><code>this</code> 表示当前对象或正在创建的对象</li>
+<li>当形参与成员变量重名时, 如果在方法内部需要使用成员变量, 必须添加 <code>this</code> 来表明该变量时类成员, 无论是否同名, 都建议添加 <code>this</code> , 增强程序的阅读性</li>
+</ul>
+<h3><a id="%E8%B0%83%E7%94%A8%E6%9E%84%E9%80%A0%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>调用构造器</h3>
+<ul>
+<li>在构造器中使用 <code>this(形参列表)</code> 显式的调用本类中重载的其它的构造器时必须写在构造器的首行</li>
+<li>多个构造器使用 <code>this</code> 调用时, 调用关系不能形成环</li>
+</ul>
+<pre><code class="language-java">class Person{
+	private String name;
+	private int age;
+	
+	public Person(){
+		this.name = &quot;AA&quot;;
+		this.age = 1;
+	}
+	
+	public Person(String name){
+		this();
+		this.name = name;
+	}
+	public Person(String name, int age){
+		this(name);
+		this.age = age;
+	}
+	// ...
+}
+</code></pre>
+<h2><a id="super" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>super</h2>
+<h3><a id="%E8%B0%83%E7%94%A8%E5%B1%9E%E6%80%A7%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>调用属性方法</h3>
+<ul>
+<li>显式的调用父类的指定属性或方法。尤其是当子类与父类有同名的属性、或方法时</li>
+</ul>
+<h3><a id="%E8%B0%83%E7%94%A8%E6%9E%84%E9%80%A0%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>调用构造器</h3>
+<ul>
+<li><strong>任何一个类 (除 <code>Object</code> 类) 的构造器的首行，要么显式的调用本类中重载的其它的构造器 <code>this(形参列表)</code> 或显式的调用父类中指定的构造器 <code>super(形参列表)</code>, 要么默认的调用父类空参的构造器 <code>super()</code></strong></li>
+<li>建议在设计类时，提供一个空参的构造器</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221931135705.html">2. 封装</a></h1>
+			<p class="meta"><time datetime="2021-05-28T17:11:53+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%B0%81%E8%A3%85%E4%B8%8E%E9%9A%90%E8%97%8F">封装与隐藏</a></li>
+<li><a href="#%E4%BD%93%E7%8E%B0">体现</a></li>
+<li><a href="#%E6%9D%83%E9%99%90%E4%BF%AE%E9%A5%B0%E7%AC%A6">权限修饰符</a></li>
+<li><a href="#javabean">JavaBean</a></li>
+</ul>
+</div>
+<h2><a id="%E5%B0%81%E8%A3%85%E4%B8%8E%E9%9A%90%E8%97%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>封装与隐藏</h2>
+<p>当创建了类的对象以后，如果直接通过 &quot;对象.属性&quot; 的方式对相应的对象属性赋值的话，可能会出现不满足实际情况的意外（例如年龄被设置成负数）。<br />
+我们考虑不让对象来直接作用属性，而是通过 &quot;对象.方法&quot; 的形式，来控制对象对属性的访问。</p>
+<h2><a id="%E4%BD%93%E7%8E%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>体现</h2>
+<ul>
+<li>将成员变量权限设置成 <code>private</code>，提供公共的方法 <code>getter setter</code> 调用</li>
+</ul>
+<h2><a id="%E6%9D%83%E9%99%90%E4%BF%AE%E9%A5%B0%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>权限修饰符</h2>
+<p><img src="media/16221931135705/16221940741269.jpg" alt="" style="width:678px;" /></p>
+<p>类只可以用 <code>public</code> 和 <code>缺省</code> 修饰<br />
+属性、方法、构造器、内部类可以用上述四种修饰</p>
+<h2><a id="javabean" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JavaBean</h2>
+<p>用户可以使用 JavaBean 将功能、处理、值、数据库访问和其他任何可以用 Java 创建的对象进行打包, 提供了一种随时随地的复制和粘贴功能, 而不用关心任何改变<br />
+JavaBean 是符合如下标准的 Java 类 :</p>
+<ul>
+<li>类是公共的</li>
+<li>有一个无参的公共构造器</li>
+<li>有属性, 且有对应的 get set 方法</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221841137768.html">1. Class</a></h1>
+			<p class="meta"><time datetime="2021-05-28T14:41:53+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E7%B1%BB%E6%BA%90%E6%96%87%E4%BB%B6">类 &amp; 源文件</a></li>
+<li><a href="#%E6%9E%84%E6%88%90">构成</a></li>
+<li><a href="#%E5%B1%9E%E6%80%A7field">属性 (field)</a></li>
+<li><a href="#%E6%96%B9%E6%B3%95method">方法 (method)</a>
+<ul>
+<li><a href="#%E5%80%BC%E4%BC%A0%E9%80%92">值传递</a></li>
+<li><a href="#%E9%87%8D%E8%BD%BDoverload">重载 (overload)</a></li>
+<li><a href="#%E5%8F%AF%E5%8F%98%E4%B8%AA%E6%95%B0%E7%9A%84%E5%8F%82%E6%95%B0">可变个数的参数</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9E%84%E9%80%A0%E5%99%A8construction">构造器 (construction)</a></li>
+<li><a href="#%E4%BB%A3%E7%A0%81%E5%9D%97%E5%88%9D%E5%A7%8B%E5%8C%96%E5%9D%97">代码块 (初始化块)</a></li>
+<li><a href="#%E5%86%85%E9%83%A8%E7%B1%BB">内部类</a></li>
+</ul>
+</div>
+<h2><a id="%E7%B1%BB%E6%BA%90%E6%96%87%E4%BB%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>类 &amp; 源文件</h2>
+<ul>
+<li>一个源文件中最多只能有一个 <code>public</code> 类, 其它类的个数不限</li>
+<li>如果源文件包含一个 <code>public</code> 类，则文件名必须按该类名命名</li>
+</ul>
+<h2><a id="%E6%9E%84%E6%88%90" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>构成</h2>
+<ul>
+<li><code>field</code> ( 属性 / 成员变量 / 域 / 字段 ): 存在于堆空间中</li>
+<li><code>method</code> ( 方法 / 成员方法 / 函数 )</li>
+<li><code>construction</code> ( 构造器 )</li>
+<li>代码块</li>
+<li>内部类</li>
+</ul>
+<h2><a id="%E5%B1%9E%E6%80%A7field" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>属性 (field)</h2>
+<p>属性 &amp; 局部变量</p>
+<ul>
+<li>相同点
+<ul>
+<li>声明的格式</li>
+<li>先声明, 后使用</li>
+<li>都有对应的作用域</li>
+</ul>
+</li>
+<li>不同点
+<ul>
+<li>声明位置不同: 成员变量声明在类内; 局部变量声明在形参或方法, 代码块, 构造器内部</li>
+<li>是否有权限: 属性声明时可以指定权限: <code>private</code> <code>public</code> <code>defalut</code> <code>protected</code></li>
+<li>初始化值: 属性根据类型都有默认初始化值; 局部变量调用前一定要显式赋值</li>
+<li>内存位置: 属性在堆空间; 局部变量在栈空间</li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E6%96%B9%E6%B3%95method" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>方法 (method)</h2>
+<pre><code class="language-java">权限修饰符 [static final abstract] 返回值类型 方法名([形参]){
+    // ......
+}
+</code></pre>
+<h3><a id="%E5%80%BC%E4%BC%A0%E9%80%92" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>值传递</h3>
+<p>Java 中的参数传递机制: 值传递机制</p>
+<ul>
+<li>形参是基本数据类型: 传递的是变量保存的数据值</li>
+<li>形参是引用数据类型: 传递的是变量保存的数据的地址值</li>
+</ul>
+<h3><a id="%E9%87%8D%E8%BD%BDoverload" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>重载 (overload)</h3>
+<p>同一个类中, 存在<strong>同名</strong>的方法, 但是参数的类型, 数量, 顺序可以不同, 跟权限修饰符, 返回值都没关系</p>
+<pre><code class="language-java">public int getSum(int i, int j) {}
+public int getSum(int i, int j, int k) {}
+public double getSum(double d1, double d2) {}
+public void getSum(double d1, double d2, double d3) {}
+public void getSum(int ... is) {}
+</code></pre>
+<h3><a id="%E5%8F%AF%E5%8F%98%E4%B8%AA%E6%95%B0%E7%9A%84%E5%8F%82%E6%95%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>可变个数的参数</h3>
+<p>格式</p>
+<pre><code class="language-java">public void show(int ... is) { // 可变个数的参数必须声明在末尾
+    // 使用时把 is 看作一个数组
+}
+</code></pre>
+<ul>
+<li>调用时, 可以传 0 - n 个参数</li>
+<li>匹配不到其他的重载方法时再调用这个方法</li>
+</ul>
+<h2><a id="%E6%9E%84%E9%80%A0%E5%99%A8construction" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>构造器 (construction)</h2>
+<pre><code class="language-java">权限修饰符 类名(形参) {}
+</code></pre>
+<ul>
+<li>作用: 创建对象, 给对象属性赋值</li>
+<li>若不显式声明类的构造器的话, 程序会默认提供一个空参的构造器</li>
+<li>一旦显式的定义类的构造器, 那么默认的构造器就不再提供</li>
+<li>一个类中定义的多个构造器, 彼此构成重载</li>
+</ul>
+<h2><a id="%E4%BB%A3%E7%A0%81%E5%9D%97%E5%88%9D%E5%A7%8B%E5%8C%96%E5%9D%97" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>代码块 (初始化块)</h2>
+<ul>
+<li>用于对对象或类属性进行初始化, 代码块的执行早于构造器</li>
+<li>只能不修饰或用 <code>static</code> 修饰</li>
+<li><a href="16222923817986.html">静态代码块 vs 非静态代码块</a></li>
+</ul>
+<h2><a id="%E5%86%85%E9%83%A8%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>内部类</h2>
+<p>一个事物的内部, 还有一个部分需要一个完整的结构进行描述, 这个内部完整的结构又只为外部事物提供服务.<br />
+分类: 成员内部类 (静态 非静态), 局部内部类 (方法 构造器 代码块内)</p>
+<ul>
+<li>
+<p>成员内部类:</p>
+<ul>
+<li>作为一个类, 可以定义属性方法构造器等, 可以被 <code>final</code> <code>abstract</code> 修饰</li>
+<li>作为外部类的成员, 可以调用外部类的成员, 可以被 <code>static</code> <code>四种权限</code> 修饰</li>
+</ul>
+<pre><code class="language-java">class AA {
+    String name;
+    static class CC { // 静态成员内部类
+        String name;
+    }
+    class BB { // 非静态成员内部类
+        String name;
+        public void m(String name) {
+            System.out.println(name); // 型参 的 name
+            System.out.println(this.name); // BB 的 name
+            System.out.println(AA.this.name); // AA 的 name
+        }
+    }
+
+    public void method() {
+        class DD { // 局部内部类
+        }
+    }
+}
+
+// 实例化
+AA.CC cc = new AA.CC(); // 静态成员内部类实例化
+AA.BB bb = new AA().new BB(); // 非静态成员内部类实例化
+</code></pre>
+</li>
+<li>
+<p>局部内部类: <a href="16223735897370.html">抽象类和接口的匿名子类的实例化</a> 都属于局部内部类</p>
+</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16222825796598.html">包装类</a></h1>
+			<p class="meta"><time datetime="2021-05-29T18:02:59+08:00" 
+			pubdate data-updated="true">2021/05/29</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2">相互转换</a>
+<ul>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BB">基本数据类型 --&gt; 包装类</a></li>
+<li><a href="#%E5%8C%85%E8%A3%85%E7%B1%BB%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B">包装类 --&gt; 基本数据类型</a></li>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BBstring">基本数据类型 包装类 --&gt; String</a></li>
+<li><a href="#string%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BB">String --&gt; 基本数据类型 包装类</a></li>
+</ul>
+</li>
+<li><a href="#%E8%87%AA%E5%8A%A8%E8%A3%85%E7%AE%B1">自动装箱</a></li>
+</ul>
+</div>
+<table>
+<thead>
+<tr>
+<th>基本数据类型</th>
+<th>包装类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>byte</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>short</td>
+<td>Short</td>
+</tr>
+<tr>
+<td>int</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td>long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>float</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>chart</td>
+<td>Character</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>Boolean</td>
+</tr>
+</tbody>
+</table>
+<p>Byte Short Integer Long Float Double 的父类是 Number</p>
+<h2><a id="%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>相互转换</h2>
+<h3><a id="%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>基本数据类型 --&gt; 包装类</h3>
+<pre><code class="language-java">// 使用构造器: 参数可以是基本数据类型或字符串
+Integer i1 = new Integer(10);
+Float f1 = new Float(&quot;20.0f&quot;);
+Boolean b1 = new Boolean(&quot;true&quot;);
+// 自动装箱
+Double d1 = 1.9;
+</code></pre>
+<h3><a id="%E5%8C%85%E8%A3%85%E7%B1%BB%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>包装类 --&gt; 基本数据类型</h3>
+<pre><code class="language-java">int i2 = i1.intValue(); // 包装类.xxxValue()
+float f2 = f1; // 自动拆箱
+</code></pre>
+<h3><a id="%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BBstring" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>基本数据类型 包装类 --&gt; String</h3>
+<pre><code class="language-java">int i3 = 1;
+Integer i4 = 5;
+// String.valueOf(xxx)
+String s1 = String.valueOf(i3);
+String s2 = String.valueOf(i4);
+String s3 = i3 + &quot;&quot;;
+</code></pre>
+<h3><a id="string%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>String --&gt; 基本数据类型 包装类</h3>
+<pre><code class="language-java">int i5 = Integer.parseInt(&quot;123&quot;); // 包装类.parseXxx(String)
+float i6 = new Integer(&quot;234&quot;); // 使用包装类的构造器
+</code></pre>
+<h2><a id="%E8%87%AA%E5%8A%A8%E8%A3%85%E7%AE%B1" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>自动装箱</h2>
+<p>使用自动装箱时, 会优先使用内部缓存, 例如 Integer 的 -128 - 127 范围内都是使用的提前 new 好的对象</p>
+<pre><code class="language-java">Integer ii1 = new Integer(1);
+Integer ii2 = new Integer(2);
+System.out.println(ii1 == ii2); // false
+
+Integer ii3 = 1;
+Integer ii4 = 1;
+System.out.println(ii3 == ii4); // true
+
+Integer ii5 = 128;
+Integer ii6 = 128;
+System.out.println(ii5 == ii6); // false
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16222795868244.html">Object</a></h1>
+			<p class="meta"><time datetime="2021-05-29T17:13:06+08:00" 
+			pubdate data-updated="true">2021/05/29</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95">常用方法</a></li>
+<li><a href="#equals">equals</a></li>
+<li><a href="#tostring">toString</a></li>
+</ul>
+</div>
+<h2><a id="%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>常用方法</h2>
+<pre><code class="language-java">clone()
+equals(Object obj)
+finalize() // 没有引用指向的对象, jvm 垃圾回收前会调用这个方法, 程序员不主动去调用
+getClass() // 获取创建对象的类
+hashCode()
+toString()
+notify() / notifyAll()
+wait() / wait(long timeout) / wait(long timeout, int nanos)
+</code></pre>
+<h2><a id="equals" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>equals</h2>
+<p><code>==</code>: 比较的是两个变量在栈中的内容，如果变量时引用类型，栈中保存的时对象地址<br />
+<code>equals</code>: <code>Object</code> 类中默认使用的是 <code>==</code>，如果要比较的是引用类型变量指向的堆内存中的对象，需要重写该方法实现具体的比较逻辑</p>
+<pre><code class="language-java">public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    
+    Person person = (Person) o;
+    return age == person.age &amp;&amp; Objects.equals(name, person.name);
+}
+</code></pre>
+<h2><a id="tostring" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>toString</h2>
+<p>当我们输出一个对象时,实际上是调用的对象的 <code>toString</code> 方法, 需要重写方法, <code>Object</code> 类中默认返回对象的类和地址信息</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16242598041253.html">Java 容器</a></h1>
+			<p class="meta"><time datetime="2021-06-21T15:16:44+08:00" 
+			pubdate data-updated="true">2021/06/21</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p><a href="https://share.mubu.com/doc/2cOewutiRya">Java 容器</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

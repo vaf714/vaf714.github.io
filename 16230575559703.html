@@ -1,0 +1,673 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  HTTP - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">HTTP</h1>
+				<p class="meta"><time datetime="2021-06-07T17:19:15+08:00" pubdate data-updated="true">2021/06/07</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#http%E5%9F%BA%E7%A1%80">HTTP 基础</a>
+<ul>
+<li><a href="#%E7%8A%B6%E6%80%81%E7%A0%81">状态码</a></li>
+<li><a href="#%E5%AD%97%E6%AE%B5">字段</a></li>
+</ul>
+</li>
+<li><a href="#get-post">Get &amp; Post</a></li>
+<li><a href="#session-cookie">Session &amp; Cookie</a></li>
+<li><a href="#http-https">Http &amp; Https</a>
+<ul>
+<li><a href="#http%E5%8A%A0%E5%AF%86">Http + 加密</a></li>
+<li><a href="#https">Https</a></li>
+</ul>
+</li>
+<li><a href="#http%E7%89%88%E6%9C%AC">HTTP 版本</a>
+<ul>
+<li><a href="#http1-1">HTTP/1.1</a></li>
+<li><a href="#http2-0">HTTP/2.0</a></li>
+<li><a href="#http3-0">HTTP/3.0</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="http%E5%9F%BA%E7%A1%80" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>HTTP 基础</h2>
+<blockquote>
+<p>优点：简单、灵活、跨平台；<br />
+缺点：无状态（Cookie 解决）、明文传输不安全（Https 解决）</p>
+</blockquote>
+<h3><a id="%E7%8A%B6%E6%80%81%E7%A0%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>状态码</h3>
+<table>
+<thead>
+<tr>
+<th>状态码</th>
+<th>类别</th>
+<th>含义</th>
+<th>常见状态吗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1XX</td>
+<td>Informational（信息性状态码）</td>
+<td>接收的请求正在处理</td>
+<td>100 - 继续</td>
+</tr>
+<tr>
+<td>2XX</td>
+<td>Success（成功状态码）</td>
+<td>请求正常处理完毕</td>
+<td>200 - 有 body<br/>204 - 没有 body<br/>206 - 分块下载时，表示响应的 body 是全部资源的一部分</td>
+</tr>
+<tr>
+<td>3XX</td>
+<td>Redirection（重定向状态码）</td>
+<td>需要进行附加操作以完成请求</td>
+<td>301 - 永久重定向，说明请求的资源不存在了<br/>302 - 临时重定向，资源还在，暂时用另一个 URL 请求<br/>304 - 缓存重定向，不跳转，表示资源未修改，重定向已存在的缓冲文件</td>
+</tr>
+<tr>
+<td>4XX</td>
+<td>Client Error（客户端错误状态码）</td>
+<td>服务器无法处理请求</td>
+<td>400 - 客户端请求报文有错，笼统的错误<br/>403 - 服务器禁止访问资源<br/>404 - 请求的资源没有找到</td>
+</tr>
+<tr>
+<td>5XX</td>
+<td>Server Error（服务器错误状态码）</td>
+<td>服务器处理请求出错</td>
+<td>500 - 服务器内部错误，笼统的错误<br/>503 - 服务器忙</td>
+</tr>
+</tbody>
+</table>
+<h3><a id="%E5%AD%97%E6%AE%B5" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>字段</h3>
+<p><code>Connection</code>: 为了兼容 1.1 以下 Http 版本，可以使用 <code>Keep-Alive</code> 建立持久连接</p>
+<p><code>Host</code>: 指定服务器域名，可以用来访问同一台服务器的不同网站</p>
+<p><code>Content-Length</code>: 服务器返回数据的字节长度</p>
+<p><code>Accept</code>: 客户端声明自己可以接受的数据格式<br />
+<code>Content-Type</code>: 服务器返回数据的类型和编码格式</p>
+<p><code>Accpect-Encoding</code>: 客户端能接受的数据压缩方法<br />
+<code>Content-Encoding</code>: 服务器返回数据的压缩方法</p>
+<h2><a id="get-post" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get &amp; Post</h2>
+<ul>
+<li>作用：GET 一般用于从服务器获取资源，而 POST 有可能改变服务器上的资源；</li>
+<li>安全：GET 只读取，是安全的；POST 会修改服务器内容，是不安全的；</li>
+<li>幂等：GET 是幂等的，即读取同一个资源，总是得到相同的数据，POST 不是幂等的；</li>
+<li>长度：GET 请求参数在 URL 里，长度有限制；POST 参数在请求体里，无限制。</li>
+</ul>
+<h2><a id="session-cookie" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Session &amp; Cookie</h2>
+<ol>
+<li>
+<p>什么是 Cookie Session<br />
+Cookie 是服务器发送到用户浏览器并保存在本地的一小块数据，浏览器发起请求时被携带并发送到服务器上。主要用于以下三个方面：会话状态管理、个性化设置、浏览器行为跟踪。</p>
+<p>Session 代表着服务器和客户端一次会话的过程。存储特定用户会话所需的属性及配置信息。当客户算第一次请求时，服务器会生成一个 SessionID 返回给客户端并存储在 Cookie。</p>
+</li>
+<li>
+<p>有什么不同</p>
+<ul>
+<li>作用范围（浏览器、服务器）</li>
+<li>有效期（长时间、会话期间）</li>
+<li>存储大小（4K、Session 更大）</li>
+<li>安全性</li>
+</ul>
+</li>
+<li>
+<p>关联<br />
+<img src="media/16230575559703/16230587953656.jpg" alt="" class="mw_img_center" style="width:509px;display: block; clear:both; margin: 0 auto;" /></p>
+</li>
+<li>
+<p>如果浏览器中禁止了 Cookie，如何保障整个机制的正常运转</p>
+<ul>
+<li>每次请求中都携带一个 SessionID 的参数</li>
+<li>Token 机制（类似于 SessionID）</li>
+</ul>
+</li>
+<li>
+<p>分布式如何解决 Session 问题</p>
+<ul>
+<li>使用 Nginx 的 ip_hash 策略：同一 IP 固定 hash 到一个后台服务器</li>
+<li>Session 复制</li>
+<li>Session 共享（推荐）</li>
+</ul>
+</li>
+</ol>
+<h2><a id="http-https" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Http &amp; Https</h2>
+<p>参考：<a href="https://segmentfault.com/a/1190000023936425">为什么HTTPS是安全的</a></p>
+<p>HTTP 协议中的报文都是以明文的方式进行传输，不做任何加密，容易收到中间人篡改。</p>
+<h3><a id="http%E5%8A%A0%E5%AF%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Http + 加密</h3>
+<ul>
+<li>直接使用 AES 对称加密，传输的密钥也容易被中间人获取，加密形同虚设</li>
+<li>如果使用 RSA 非对称加密传输 <code>AES_KEY</code>，也容易被中间人获取公钥，然后对客户端伪装成服务端，对服务端伪装成客户端，从而完成信息篡改</li>
+</ul>
+<h3><a id="https" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Https</h3>
+<p><strong>Https 整体流程如下：</strong></p>
+<ol>
+<li>客户端给服务器 443 端口发起 Https 请求，同时将自己支持的加密算法发过去（还会携带一个随机数 C）</li>
+<li>服务端如果支持客户端的加密算法就将 CA 证书发送给客户端，公钥包含在证书里面（也会携带一个随机数 S）</li>
+<li>客户端验证收到的证书，如果合法，就生成一个随机数 <code>per-master key</code>（用来加密之后传输的数据），这个随机数用服务器的公钥加密（只有服务器私钥能解开），同时对之前所有的信息做摘要，供服务器校验。把这两个信息发回服务器</li>
+<li>服务器收到后，用私钥解开 <code>per-master key</code>，再比对摘要无误后，对之前所有内容再做个摘要发回客户端校验</li>
+<li>如此一来，客户端和服务端都有三个随机数（C、S、per-master），双方用协商好的加密算法，用这<strong>三个随机数生成之后通信用的密钥</strong></li>
+</ol>
+<p><strong>Https 是如何保证安全的？</strong><br />
+CA 机构的公钥是写在操作系统或者浏览器里的，如果是不信任的证书，系统是能够验证的。<br />
+假设中间人拦截了第二步服务器发送的证书，如果篡改了证书发给客户端，客户端能够发现；如果不篡改证书直接发回客户端，虽然客户端无法感知有中间人，但是客户端用证书里的公钥加密过的 per-master，中间人没有服务器的私钥是无法解开的，也就算不出最终通信用的密钥。</p>
+<p><strong>Https 也不是绝对安全的，使用中间人攻击手段，必须要让客户端信任中间人的证书，如果客户端不信任，则这种攻击手段也无法发挥作用。</strong></p>
+<h2><a id="http%E7%89%88%E6%9C%AC" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>HTTP 版本</h2>
+<h3><a id="http1-1" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>HTTP/1.1</h3>
+<p>改进：</p>
+<ul>
+<li>默认长链接</li>
+<li>使用管道网络传输，只要只要第一个请求发出，不必等待响应就可以发出第二个请求</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>每次请求都要发送一些重复的未压缩的 Header，只能压缩 Body</li>
+<li>会产生对头阻塞：某一个请求服务器处理慢，后面的请求会阻塞</li>
+<li>没有请求优先级控制</li>
+<li>请求只能从客户端开始，服务器只能响应</li>
+</ul>
+<h3><a id="http2-0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>HTTP/2.0</h3>
+<p>改进：</p>
+<ul>
+<li>头部压缩（HPack）：通信双方共同维护一张头信息表存放头部字段，请求只发送表的字段索引号即可</li>
+<li>二进制格式：将文本改成二进制格式的头信息帧和数据帧</li>
+<li>多路复用：可以在一个 TCP 连接有多个 Stream 数据流，每个流承载一个请求和回应，在同一个连接内实现并发</li>
+<li>服务器推送：服务器可以主动向客户端推送数据</li>
+</ul>
+<p>缺点：<br />
+多个请求复用一个 TCP 连接，一旦发生丢包，就会阻塞住这个连接里所有的请求（1.1 管道传输如果服务器处理慢，后面的请求会阻塞，2.0 是 TCP 传输时阻塞）</p>
+<h3><a id="http3-0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>HTTP/3.0</h3>
+<p>改进：</p>
+<ul>
+<li>QUIC：把 TCP 改成了基于 UDP 实现的 QUIC，某个流丢包只阻塞这个流，其他流不受影响（同时原先的 TCP 三次握手 + TLS 三次握手共 6 次握手合并成了 3 次握手）</li>
+<li>QPack：头部压缩算法 HPack 升级成了 QPack</li>
+</ul>
+<p>缺点：<br />
+很多设备不认识 QUIC，只能当作 UDP，会出现很多问题，普及速度很慢。</p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html'>计算机网络</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16242597185221.html" 
+	        title="Previous Post: 计算机网络">&laquo; 计算机网络</a>
+	    
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

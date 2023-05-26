@@ -1,0 +1,595 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  ByteBuf - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">ByteBuf</h1>
+				<p class="meta"><time datetime="2021-06-19T15:46:30+08:00" pubdate data-updated="true">2021/06/19</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#%E4%BC%98%E7%82%B9">优点</a></li>
+<li><a href="#%E7%BB%84%E6%88%90">组成</a></li>
+<li><a href="#%E8%AF%BB%E5%8F%96%E5%86%99%E5%85%A5">读取写入</a></li>
+<li><a href="#%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6">内存回收</a></li>
+<li><a href="#%E3%80%90%E9%9B%B6%E6%8B%B7%E8%B4%9D%E3%80%91%E6%96%B9%E6%B3%95">【零拷贝】方法</a>
+<ul>
+<li><a href="#slice">slice</a></li>
+<li><a href="#duplicate">duplicate</a></li>
+<li><a href="#compositebuffer%E5%88%9B%E5%BB%BA-compositebytebuf%E5%AF%B9%E8%B1%A1">compositeBuffer 创建 CompositeByteBuf 对象</a></li>
+</ul>
+</li>
+<li><a href="#%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E7%9A%84%E9%9B%B6%E6%8B%B7%E8%B4%9D">文件传输的零拷贝</a></li>
+</ul>
+</div>
+<p>对字节数组的封装</p>
+<ul>
+<li>
+<p>使用</p>
+<pre><code class="language-java">ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer(10);
+</code></pre>
+</li>
+</ul>
+<h2><a id="%E4%BC%98%E7%82%B9" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>优点</h2>
+<ul>
+<li>直接内存：默认创建直接内存，虽然创建销毁代价大，但是读写性能高，不受 GC 影响，需要主动释放</li>
+<li>池化：可以重用池中的 ByteBuf 对象，高并发下可以节约内存，默认开启</li>
+<li>自动扩容：写入大小不超过 512，选择下一个 16 的整数倍；如果超过 512，选择下一个 2^n。</li>
+<li>读写指针分离，不用切换读写模式</li>
+<li>很多方法体现了零拷贝</li>
+<li>支持链式调用，使用方便</li>
+</ul>
+<h2><a id="%E7%BB%84%E6%88%90" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>组成</h2>
+<ul>
+<li>容量：初始容量</li>
+<li>最大容量：默认是 2^31 ，当容量不够，自动触发扩容</li>
+<li>写指针：记录当前写的位置</li>
+<li>读指针：记录当前读的位置，最多能读到写指针</li>
+</ul>
+<h2><a id="%E8%AF%BB%E5%8F%96%E5%86%99%E5%85%A5" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>读取写入</h2>
+<p>读取使用方法 <code>readInt readByte ...</code>，读取过的字节就作废了，下次再读就继续往后读，如果还想再读，可以使用标记：</p>
+<pre><code class="language-java">markReaderIndex();
+readInt();
+... ...
+resetReaderIndex();
+</code></pre>
+<p>或者使用 get 方法，不会改变读指针</p>
+<h2><a id="%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>内存回收</h2>
+<ul>
+<li><code>UnpooledHeapByteBuf</code>：等待 GC 自动回收</li>
+<li><code>UnpooledDirectByteBuf</code>：特殊方法回收</li>
+<li><code>PooledByteBuf</code>：更复杂的规则回收</li>
+</ul>
+<p>Netty 提供了统一的引用计数法回收内存，每个 ByteBuf 都实现了 <code>ReferenceCounted</code> 接口：初始时引用计数为 1；调用 release 使计数 -1，等于 0 时内存被回收；调用 retain 使计数 +1。</p>
+<p>由于 pipeline 有可能使当前 handler 的 ByteBuf 传给下一个 handler，因此<strong>谁最后使用 ByteBuf 谁调用 release</strong>。</p>
+<p>如果我们不手动释放，pipeline 队列的 head 和 tail 也会自动帮我们释放（前提是 ByteBuf 被我们传到了 head 和 tail）。</p>
+<h2><a id="%E3%80%90%E9%9B%B6%E6%8B%B7%E8%B4%9D%E3%80%91%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>【零拷贝】方法</h2>
+<h3><a id="slice" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>slice</h3>
+<p><code>slice</code> 切片可以将原始 ByteBuf 切成多个小的 ByteBuf，使用的还是原来的内存，并没有发生复制，只不过每个切片在原油的 ByteBuf 位置上维护读写指针。</p>
+<ul>
+<li>切片后最大容量有限制</li>
+<li>释放原有 ByteBuf，切片不可用</li>
+</ul>
+<p><img src="media/16240887909460/0011.png" alt="" class="mw_img_center" style="display: block; clear:both; margin: 0 auto;" /></p>
+<pre><code class="language-java">ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer(10);
+buffer.writeBytes(new byte[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'});
+buffer.slice(0, 5);
+buffer.slice(5, 5);
+</code></pre>
+<h3><a id="duplicate" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>duplicate</h3>
+<p>截取了原始 ByteBuf 所有内容，并且没有扩容的限制，也是与原始 ByteBuf 使用同一块底层内存，只是读写指针是独立的<br />
+注：copy 会将底层内存数据进行深拷贝，因此无论读写，都与原始 ByteBuf 无关</p>
+<p><img src="media/16240887909460/0012.png" alt="" class="mw_img_center" style="display: block; clear:both; margin: 0 auto;" /></p>
+<h3><a id="compositebuffer%E5%88%9B%E5%BB%BA-compositebytebuf%E5%AF%B9%E8%B1%A1" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>compositeBuffer 创建 CompositeByteBuf 对象</h3>
+<p>可以将多个 ByteBuf 合并为一个逻辑上的 ByteBuf，避免拷贝</p>
+<pre><code class="language-java">ByteBuf b1 = ByteBufAllocator.DEFAULT.buffer(2);
+ByteBuf b2 = ByteBufAllocator.DEFAULT.buffer(2);
+b1.writeBytes(new byte[]{'a', 'b'});
+b2.writeBytes(new byte[]{'c', 'd'});
+CompositeByteBuf b3 = ByteBufAllocator.DEFAULT.compositeBuffer();
+b3.addComponents(true, b1, b2); // true 可以使读写指针自动增长
+</code></pre>
+<h2><a id="%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E7%9A%84%E9%9B%B6%E6%8B%B7%E8%B4%9D" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>文件传输的零拷贝</h2>
+<p>和 netty 的零拷贝不太一样。</p>
+<p>java 的 IO 实际不是物理设备级别的读写，而是缓存的复制，底层的真正读写是操作系统来完成的。读的时候调用系统接口，先读到内核缓冲区，再复制到用户缓冲区；写的时候先将用户缓冲区内容复制到 Socket 缓冲区，再写入网卡等。<br />
+<img src="media/16231372487264/0024.png" alt="0024" /></p>
+<p>使用 <code>ByteBuffer.allocateDirect()</code> 获取 <code>DirectByteBuffer</code>，将堆外内存映射到 jvm 内存中来直接访问使用，不受 jvm 垃圾回收的影响，但是读取完还是需要从内核态切换回用户态。<br />
+<img src="media/16231372487264/0025.png" alt="0025" /></p>
+<p>linux 2.1 后，java 中 <code>transferTo/transferFrom</code> 方法从<strong>用户态</strong>切换至<strong>内核态</strong>，内核读取完后不用切换回用户态就可以直接写入 socket 缓冲区再写入网卡<br />
+<img src="media/16231372487264/0026.png" alt="0026" /></p>
+<p>linux 2.4 后，java 的 <code>transferTo</code> 方法可以将 <strong>内核缓冲区</strong> 的数据直接写入网卡，不再复制到 Socket 缓冲区。<br />
+<img src="media/16231372487264/0027.png" alt="0027" /></p>
+<p><strong>零拷贝指的是不在用户和内核之间进行任何拷贝，内核态切换一次，数据拷贝两次，并不是真的指没有任何拷贝。</strong></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E7%BB%84%E4%BB%B6.html'>组件</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16231372487264.html" 
+	        title="Previous Post: NIO">&laquo; NIO</a>
+	    
+	    
+	        <a class="basic-alignment right" href="16232654501204.html" 
+	        title="Next Post: Handler & PipeLine">Handler & PipeLine &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="asset/prism.js"></script>
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

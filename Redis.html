@@ -1,0 +1,748 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  Redis - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16261749989563.html">主从 & 哨兵</a></h1>
+			<p class="meta"><time datetime="2021-07-13T19:16:38+08:00" 
+			pubdate data-updated="true">2021/07/13</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%B5%81%E7%A8%8B">流程</a></li>
+<li><a href="#%E4%B8%BB%E4%BB%8E%E9%93%BE">主从链</a></li>
+<li><a href="#%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F">哨兵模式</a></li>
+</ul>
+</div>
+<h2><a id="%E6%B5%81%E7%A8%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>流程</h2>
+<p>单台 Redis 使用的最大内存不应该超过 20G，超过应该换成集群。数据的复制是单向的，只能从主机到从机，主负责写，从负责读。</p>
+<ol>
+<li>主服务器创建快照文件，发送给从服务器，并在发送期间使用缓冲区记录执行的写命令。快照文件发送完毕之后，开始向从服务器发送存储在缓冲区中的写命令；</li>
+<li>从服务器丢弃所有旧数据，载入主服务器发来的快照文件，之后从服务器开始接受主服务器发来的写命令；</li>
+<li>主服务器每执行一次写命令，就向从服务器发送相同的写命令。</li>
+</ol>
+<h2><a id="%E4%B8%BB%E4%BB%8E%E9%93%BE" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>主从链</h2>
+<p>随着负载不断上升，主服务器可能无法很快地更新所有从服务器，或者重新连接和重新同步从服务器将导致系统超载。为了解决这个问题，可以创建一个中间层来分担主服务器的复制工作。中间层的服务器是最上层服务器的从服务器，又是最下层服务器的主服务器。<br />
+<img src="media/16261749989563/16261750837809.jpg" alt="" class="mw_img_center" style="width:500px;display: block; clear:both; margin: 0 auto;" /></p>
+<h2><a id="%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>哨兵模式</h2>
+<p>自动选举老大的模式，是主从模式的升级，更加健壮。<br />
+哨兵是一个独立的进程，监视主机是否宕机，主机宕机后自动选取一个从机作为主机，如果主机宕机后再连回来，就只能当作从机。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16261740670297.html">淘汰策略</a></h1>
+			<p class="meta"><time datetime="2021-07-13T19:01:07+08:00" 
+			pubdate data-updated="true">2021/07/13</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"></div>
+<p>根据是否设置过期时间分为 <code>volatile-</code> 和 <code>allkeys-</code> 两种</p>
+<ol>
+<li><code>volatile-lru</code>：从已设置过期时间的数据中执行 LRU 淘汰</li>
+<li><code>volatile-ttl</code>：从已设置过期时间的数据中挑选将要过期的数据淘汰</li>
+<li><code>volatile-random</code>：从已设置过期时间的数据中随机挑选淘汰</li>
+<li><code>allkeys-lru</code>：所有的数据执行 LRU 策略</li>
+<li><code>allkeys-random</code>：所有的数据随机挑选</li>
+<li><code>noeviction</code>：禁止</li>
+<li>4.0 新增的两种：<code>volatile-lfu</code>、<code>allkeys-lfu</code></li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16261737897880.html">与 MemCached 对比</a></h1>
+			<p class="meta"><time datetime="2021-07-13T18:56:29+08:00" 
+			pubdate data-updated="true">2021/07/13</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B">数据类型</a></li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96">数据持久化</a></li>
+<li><a href="#%E5%88%86%E5%B8%83%E5%BC%8F">分布式</a></li>
+<li><a href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6">内存管理机制</a></li>
+</ul>
+</div>
+<h2><a id="%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>数据类型</h2>
+<p>Memcached 只支持字符串类型</p>
+<h2><a id="%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>数据持久化</h2>
+<p>Memcached 不支持持久化，Redis 支持 AOF 和 RDB 两种策略</p>
+<h2><a id="%E5%88%86%E5%B8%83%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>分布式</h2>
+<p>Memcached 不支持分布式，只能在客户端使用一致性哈希实现分布式</p>
+<h2><a id="%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>内存管理机制</h2>
+<p>Redis 可以把很久不用的 value 交换到磁盘，Memcached 只能在内存中；<br />
+Memcached 把内存分割成特定长度的块存储数据，内存利用率不高。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16261704935337.html">Redis 数据结构</a></h1>
+			<p class="meta"><time datetime="2021-07-13T18:01:33+08:00" 
+			pubdate data-updated="true">2021/07/13</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#sds">SDS</a></li>
+<li><a href="#%E5%AD%97%E5%85%B8">字典</a>
+<ul>
+<li><a href="#%E7%BB%93%E6%9E%84">结构</a></li>
+<li><a href="#rehash">rehash</a></li>
+</ul>
+</li>
+<li><a href="#%E8%B7%B3%E8%B7%83%E8%A1%A8">跳跃表</a></li>
+<li><a href="#%E9%93%BE%E8%A1%A8">链表</a></li>
+</ul>
+</div>
+<h2><a id="sds" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>SDS</h2>
+<p>Redis 构建了一种名为简单动态字符串（simple dynamic string，SDS）的抽象类型。<br />
+SDS用一个结构体表示，有三个成员：字符串长度、未使用字节的数量、char 数组</p>
+<p>好处：</p>
+<ol>
+<li>可以 O(1) 时间复杂度获取字符串长度</li>
+<li>动态扩容，每次修改 SDS，Redis 会自动扩展至执行修改所需的大小，然后才执行实际的修改操作，所以使用 SDS 既不需要手动修改 SDS 的空间大小，也不会出现前面所说的缓冲区溢出问题。</li>
+<li>空间预分配，空间扩展的时候，会分配额外的未使用空间，减少连续执行字符串增长操作所需的内存重分配次数。（分配策略：SDS长度小于1M时，未分配空间和长度相同，大于1M时，多分配1M空间。）</li>
+</ol>
+<h2><a id="%E5%AD%97%E5%85%B8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>字典</h2>
+<h3><a id="%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>结构</h3>
+<p><code>dict</code> 包含两个 hash 表（<code>dictht</code>），以及 <code>rehashidx</code>，方便进行 rehash；<br />
+<code>dictht</code> 包含一个 <code>dictEntry</code> 数组，还有哈希表大小 <code>size</code>；<br />
+<code>dictEntry</code> 封装了一个 <code>k-v</code>，以及 <code>next</code> 指针，用于拉链法解决哈希冲突。</p>
+<h3><a id="rehash" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>rehash</h3>
+<p>渐进式 rehash，通过记录 <code>rehashidx</code>，从 0 开始，每执行一次 rehash 递增，在 rehash 期间，每对字典进行添加、删除、查找或更新操作，都会执行一次渐进式 rehash。</p>
+<h2><a id="%E8%B7%B3%E8%B7%83%E8%A1%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>跳跃表</h2>
+<p>有序集合的底层实现之一。<br />
+基于多指针有序链表实现。查找时从上层指针开始查找，找到区间后再到下一层去查找。<br />
+<img src="media/16261704935337/16261731677952.jpg" alt="" class="mw_img_center" style="width:500px;display: block; clear:both; margin: 0 auto;" /></p>
+<p>如何构建？<br />
+当原始链表中元素数量足够大，且抽取足够随机的话，我们得到的索引是均匀的。随机选 n/2 个元素做为一级索引、随机选 n/4 个元素做为二级索引、随机选 n/8 个元素做为三级索引，依次类推，一直到最顶层索引。<br />
+在每次新插入元素的时候，尽量让该元素有 1/2 的几率建立一级索引、1/4 的几率建立二级索引、1/8 的几率建立三级索引，以此类推，当建立二级索引的时候，同时也会建立一级索引；当建立三级索引时，同时也会建立一级、二级索引。</p>
+<h2><a id="%E9%93%BE%E8%A1%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>链表</h2>
+<p>list 的底层实现之一。<br />
+链表节点被封装成 <code>listNode</code>，有 <code>prev</code>、<code>next</code>、<code>value</code> 三个成员。<br />
+链表节点使用 <code>list</code> 封装，有 <code>head</code>、<code>tail</code>、<code>len</code> 等成员。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16257616669146.html">Redis 线程模型</a></h1>
+			<p class="meta"><time datetime="2021-07-09T00:27:46+08:00" 
+			pubdate data-updated="true">2021/07/09</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%8D%95%E7%BA%BF%E7%A8%8B">单线程</a></li>
+<li><a href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B">多线程</a></li>
+</ul>
+</div>
+<h2><a id="%E5%8D%95%E7%BA%BF%E7%A8%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>单线程</h2>
+<p>Redis 基于 Reactor 模式来设计开发了自己的一套高效的事件处理模型，对应的是 Redis 中的文件事件处理器（file event handler），是单线程方式运行的，通过 <strong>IO 多路复用程序</strong>来监听多个<strong>套接字</strong>，将到达的事件传给文件事件<strong>分派器</strong>，分派器根据事件类型调用相应的<strong>事件处理器</strong>。</p>
+<p><img src="media/16257616669146/16261748103370.jpg" alt="" class="mw_img_center" style="width:500px;display: block; clear:both; margin: 0 auto;" /></p>
+<p><strong>为什么不使用多线程？</strong></p>
+<ul>
+<li>单线程编程容易并且更容易维护；</li>
+<li>Redis 的性能瓶颈不再 CPU ，主要在内存和网络；</li>
+<li>多线程就会存在死锁、线程上下文切换等问题，甚至会影响性能。</li>
+</ul>
+<h2><a id="%E5%A4%9A%E7%BA%BF%E7%A8%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>多线程</h2>
+<p>Redis6.0 引入多线程主要是为了提高网络 IO 读写性能，因为这个算是 Redis 中的一个性能瓶颈。<br />
+Redis 的多线程只是在网络数据的读写这类<strong>耗时操作</strong>上使用了， 执行命令仍然是单线程顺序执行。因此不需要担心线程安全问题。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16257611818305.html">缓存一致性</a></h1>
+			<p class="meta"><time datetime="2021-07-09T00:19:41+08:00" 
+			pubdate data-updated="true">2021/07/09</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88">解决方案</a></li>
+</ul>
+</div>
+<blockquote>
+<p>保证数据库和缓存的一致性</p>
+</blockquote>
+<h2><a id="%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>解决方案</h2>
+<p>如果为了短时间的不一致性问题，选择让系统设计变得更加复杂的话，完全没必要。</p>
+<p><strong>旁路缓存模式</strong>：更新 DB，然后直接删除 cache 。如果删除 cache 失败</p>
+<ul>
+<li>缓存失效时间变短（不推荐，治标不治本） ：我们让缓存数据的过期时间变短，这样的话缓存就会从数据库中加载数据。另外，这种解决办法对于先操作缓存后操作数据库的场景不适用。</li>
+<li>增加 cache 更新重试机制（常用）： 如果 cache 服务当前不可用导致缓存删除失败的话，我们就隔一段时间进行重试，重试次数可以自己定。如果多次重试还是失败的话，我们可以把当前更新失败的 key 存入队列中，等缓存服务可用之后，再将缓存中对应的 key 删除即可。</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16251589620596.html">缓存击穿、穿透、雪崩</a></h1>
+			<p class="meta"><time datetime="2021-07-02T01:02:42+08:00" 
+			pubdate data-updated="true">2021/07/02</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E9%9B%AA%E5%B4%A9">雪崩</a></li>
+<li><a href="#%E7%A9%BF%E9%80%8F">穿透</a>
+<ul>
+<li><a href="#%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8">布隆过滤器</a></li>
+</ul>
+</li>
+<li><a href="#%E5%87%BB%E7%A9%BF">击穿</a></li>
+</ul>
+</div>
+<h2><a id="%E9%9B%AA%E5%B4%A9" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>雪崩</h2>
+<p>Redis 服务器崩了或者缓存在同一时间大面积的失效，后面的请求都直接落到了数据库上，造成数据库短时间内承受大量请求。</p>
+<p>解决：</p>
+<ul>
+<li>针对 Redis 服务不可用的情况：
+<ul>
+<li>采用 Redis 集群，避免单机出现问题整个缓存服务都没办法使用。</li>
+<li>限流，避免同时处理大量的请求。</li>
+</ul>
+</li>
+<li>针对热点缓存失效的情况：
+<ul>
+<li>设置不同的失效时间比如随机设置缓存的失效时间。</li>
+<li>缓存永不失效。</li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E7%A9%BF%E9%80%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>穿透</h2>
+<p>缓存穿透说简单点就是大量请求的 key 根本不存在于缓存中，导致请求直接到了数据库上，根本没有经过缓存这一层。</p>
+<p>解决：</p>
+<ul>
+<li>缓存无效 key，但是为了避免缓存大量无效的 key，尽量将无效的 key 的过期时间设置短一点比如 1 分钟。</li>
+<li>布隆过滤器（把所有可能存在的请求的值都存放在布隆过滤器中，当用户请求过来，先判断用户发来的请求的值是否存在于布隆过滤器中。不存在的话，直接返回请求参数错误信息给客户端，存在的话才会走下面的流程。）</li>
+</ul>
+<h3><a id="%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>布隆过滤器</h3>
+<ol>
+<li>
+<p>加入</p>
+<ul>
+<li>使用多个哈希函数对元素值进行计算，得到哈希值</li>
+<li>根据得到的哈希值，在位数组中把对应下标的值置为 1</li>
+</ul>
+</li>
+<li>
+<p>判断</p>
+<ul>
+<li>对给定元素再次进行相同的哈希计算</li>
+<li>得到值之后判断位数组中的每个元素是否都为 1，如果值都为 1，那么说明这个值**<em>可能在</em><strong>布隆过滤器中，如果存在一个值不为 1，说明该元素</strong><em>一定不在</em>**布隆过滤器中</li>
+</ul>
+</li>
+</ol>
+<h2><a id="%E5%87%BB%E7%A9%BF" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>击穿</h2>
+<p>大量的并发集中访问一个key，当这个 key 刚好失效了，这时所有的请求全部落在了db，</p>
+<p>解决：</p>
+<ul>
+<li>设置热点数据永远不过期</li>
+<li>缓存失效后访问数据库时，加上互斥锁，保证只有一个请求能访问到 db</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

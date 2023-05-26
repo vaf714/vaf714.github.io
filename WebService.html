@@ -1,0 +1,921 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  WebService - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15784050576311.html">CXF 支持的数据类型</a></h1>
+			<p class="meta"><time datetime="2020-01-07T21:50:57+08:00" 
+			pubdate data-updated="true">2020/01/07</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>CXF 支持以下数据类型：</p>
+<ol>
+<li>简单数据类型：int、string、boolean ... ...</li>
+<li>集合：List、Map、Set ... ...</li>
+<li>自定义数据结构</li>
+</ol>
+<p>JDK 开发的 WebService 不支持 Map</p>
+<ol>
+<li>
+<p>Server：<br />
+<img src="media/15784050576311/clipboard-5.png" alt="clipboard-5" /></p>
+</li>
+<li>
+<p>生成代码：<br />
+<img src="media/15784050576311/clipboard-6.png" alt="clipboard-6" /></p>
+</li>
+<li>
+<p>Client：<br />
+<img src="media/15784050576311/clipboard-7.png" alt="clipboard-7" /></p>
+</li>
+<li>
+<p>运行结果：</p>
+<ul>
+<li>
+<p>Server 端：<br />
+<img src="media/15784050576311/clipboard-8.png" alt="clipboard-8" /></p>
+</li>
+<li>
+<p>Client 端：<br />
+<img src="media/15784050576311/clipboard-9.png" alt="clipboard-9" /></p>
+</li>
+</ul>
+</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15784046277661.html">WSDL 解析</a></h1>
+			<p class="meta"><time datetime="2020-01-07T21:43:47+08:00" 
+			pubdate data-updated="true">2020/01/07</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>wsdl 文档格式组成部分为</p>
+<ul>
+<li>definitions
+<ul>
+<li>types</li>
+<li>message</li>
+<li>portType</li>
+<li>binding</li>
+<li>service</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;wsdl:definitions
+    targetNamespace=&quot;http://com.liuxiang.xfireDemo/HelloService&quot;
+    xmlns:tns=&quot;http://com.liuxiang.xfireDemo/HelloService&quot;
+    xmlns:wsdlsoap=&quot;http://schemas.xmlsoap.org/wsdl/soap/&quot;
+    xmlns:soap12=&quot;http://www.w3.org/2003/05/soap-envelope&quot;
+    xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;
+    xmlns:soapenc11=&quot;http://schemas.xmlsoap.org/soap/encoding/&quot;
+    xmlns:soapenc12=&quot;http://www.w3.org/2003/05/soap-encoding&quot;
+    xmlns:soap11=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;
+    xmlns:wsdl=&quot;http://schemas.xmlsoap.org/wsdl/&quot;&gt;
+    &lt;wsdl:types&gt;
+        &lt;xsd:schema xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;
+            attributeFormDefault=&quot;qualified&quot; elementFormDefault=&quot;qualified&quot;
+            targetNamespace=&quot;http://com.liuxiang.xfireDemo/HelloService&quot;&gt;
+            &lt;xsd:element name=&quot;sayHello&quot;&gt;
+                &lt;xsd:complexType&gt;
+                    &lt;xsd:sequence&gt;
+                        &lt;xsd:element maxOccurs=&quot;1&quot; minOccurs=&quot;1&quot;
+                            name=&quot;name&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+                    &lt;/xsd:sequence&gt;
+                &lt;/xsd:complexType&gt;
+            &lt;/xsd:element&gt;
+            &lt;xsd:element name=&quot;sayHelloResponse&quot;&gt;
+                &lt;xsd:complexType&gt;
+                    &lt;xsd:sequence&gt;
+                        &lt;xsd:element maxOccurs=&quot;1&quot; minOccurs=&quot;1&quot;
+                            name=&quot;out&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+                    &lt;/xsd:sequence&gt;
+                &lt;/xsd:complexType&gt;
+            &lt;/xsd:element&gt;
+        &lt;/xsd:schema&gt;
+    &lt;/wsdl:types&gt;
+    &lt;wsdl:message name=&quot;sayHelloResponse&quot;&gt;
+        &lt;wsdl:part name=&quot;parameters&quot; element=&quot;tns:sayHelloResponse&quot; /&gt;
+    &lt;/wsdl:message&gt;
+    &lt;wsdl:message name=&quot;sayHelloRequest&quot;&gt;
+        &lt;wsdl:part name=&quot;parameters&quot; element=&quot;tns:sayHello&quot; /&gt;
+    &lt;/wsdl:message&gt;
+    &lt;wsdl:portType name=&quot;HelloServicePortType&quot;&gt;
+        &lt;wsdl:operation name=&quot;sayHello&quot;&gt;
+            &lt;wsdl:input name=&quot;sayHelloRequest&quot;
+                message=&quot;tns:sayHelloRequest&quot; /&gt;
+            &lt;wsdl:output name=&quot;sayHelloResponse&quot;
+                message=&quot;tns:sayHelloResponse&quot; /&gt;
+        &lt;/wsdl:operation&gt;
+    &lt;/wsdl:portType&gt;
+    &lt;wsdl:binding name=&quot;HelloServiceHttpBinding&quot;
+        type=&quot;tns:HelloServicePortType&quot;&gt;
+        &lt;wsdlsoap:binding style=&quot;document&quot;
+            transport=&quot;http://schemas.xmlsoap.org/soap/http&quot; /&gt;
+        &lt;wsdl:operation name=&quot;sayHello&quot;&gt;
+            &lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+            &lt;wsdl:input name=&quot;sayHelloRequest&quot;&gt;
+                &lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+            &lt;/wsdl:input&gt;
+            &lt;wsdl:output name=&quot;sayHelloResponse&quot;&gt;
+                &lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+            &lt;/wsdl:output&gt;
+        &lt;/wsdl:operation&gt;
+    &lt;/wsdl:binding&gt;
+    &lt;wsdl:service name=&quot;HelloService&quot;&gt;
+        &lt;wsdl:port name=&quot;HelloServiceHttpPort&quot;
+            binding=&quot;tns:HelloServiceHttpBinding&quot;&gt;
+            &lt;wsdlsoap:address
+                location=&quot;http://localhost:8080/xfire/services/HelloService&quot; /&gt;
+        &lt;/wsdl:port&gt;
+    &lt;/wsdl:service&gt;
+&lt;/wsdl:definitions&gt;
+</code></pre>
+<ol>
+<li>
+<p>definitions<br />
+所有的 WSDL 文档的根元素均是 definitions 元素。该元素封装了整个文档，同时通过其 name 提供了一个 WSDL 文档。除了提供一个命名空间外，该元素没有其他作用。<br />
+这里通过 xmlns:tns=&quot;<a href="http://com.liuxiang.xfireDemo/HelloService">http://com.liuxiang.xfireDemo/HelloService</a>&quot; 引入了自身，方便调用自身的元素。</p>
+<pre><code class="language-xml">&lt;wsdl:definitions
+    targetNamespace=&quot;http://com.liuxiang.xfireDemo/HelloService&quot;
+    xmlns:tns=&quot;http://com.liuxiang.xfireDemo/HelloService&quot;
+    xmlns:wsdlsoap=&quot;http://schemas.xmlsoap.org/wsdl/soap/&quot;
+    xmlns:soap12=&quot;http://www.w3.org/2003/05/soap-envelope&quot;
+    xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;
+    xmlns:soapenc11=&quot;http://schemas.xmlsoap.org/soap/encoding/&quot;
+    xmlns:soapenc12=&quot;http://www.w3.org/2003/05/soap-encoding&quot;
+    xmlns:soap11=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;
+    xmlns:wsdl=&quot;http://schemas.xmlsoap.org/wsdl/&quot;&gt;
+&lt;/wsdl:definitions&gt;
+</code></pre>
+</li>
+<li>
+<p>types<br />
+types 元素用于定义 XML 模式内置类型中没有描述的各种数据类型。当声明消息部分的有效负载时，消息定义使用了在 types 元素中定义的数据类型和元素。在本文的 WSDL 文档中的 types 定义：</p>
+<pre><code class="language-xml">&lt;wsdl:types&gt;
+        &lt;xsd:schema xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;
+            attributeFormDefault=&quot;qualified&quot; elementFormDefault=&quot;qualified&quot;
+            targetNamespace=&quot;http://com.liuxiang.xfireDemo/HelloService&quot;&gt;
+            &lt;xsd:element name=&quot;sayHello&quot;&gt;
+                &lt;xsd:complexType&gt;
+                    &lt;xsd:sequence&gt;
+                        &lt;xsd:element maxOccurs=&quot;1&quot; minOccurs=&quot;1&quot;
+                            name=&quot;name&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+                    &lt;/xsd:sequence&gt;
+                &lt;/xsd:complexType&gt;
+            &lt;/xsd:element&gt;
+            &lt;xsd:element name=&quot;sayHelloResponse&quot;&gt;
+                &lt;xsd:complexType&gt;
+                    &lt;xsd:sequence&gt;
+                        &lt;xsd:element maxOccurs=&quot;1&quot; minOccurs=&quot;1&quot;
+                            name=&quot;out&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+                    &lt;/xsd:sequence&gt;
+                &lt;/xsd:complexType&gt;
+            &lt;/xsd:element&gt;
+        &lt;/xsd:schema&gt;
+    &lt;/wsdl:types&gt;
+</code></pre>
+<p>上面是数据定义部分，该部分定义了两个元素，一个是 sayHello，一个是sayHelloResponse：<br />
+sayHello：定义了一个复杂类型，仅仅包含一个简单的字符串，将来用来描述操作的参入传入部分，样例为：</p>
+<pre><code class="language-xml">&lt;sayHello&gt;
+    &lt;name&gt;zsc&lt;/name&gt;
+&lt;/sayHello&gt;
+</code></pre>
+<p>sayHelloResponse：定义了一个复杂类型，仅仅包含一个简单的字符串，将来用来描述操作的返回值，样例为：</p>
+<pre><code class="language-xml">&lt;sayHelloResponse&gt;
+    &lt;out&gt;hello zsc&lt;/out&gt;
+&lt;/sayHelloResponse&gt;
+</code></pre>
+<p>注：import<br />
+import 元素使得可以在当前的WSDL文档中使用其他WSDL文档中指定的命名空间中的定义元素。本例子中没有使用import元素。通常在用户希望模块化WSDL文档的时候，该功能是非常有效果的。<br />
+import 的格式如下：<code>&lt;wsdl:import namespace=&quot;http://xxx.xxx.xxx/xxx/xxx&quot; location=&quot;http://xxx.xxx.xxx/xxx/xxx.wsdl&quot;/&gt;</code>，如：</p>
+<pre><code class="language-xml">&lt;types&gt;
+        &lt;xsd:schema&gt;
+            &lt;xsd:import namespace=&quot;http://impl.sei.ws_test.vaf714.cn/&quot; schemaLocation=&quot;http://localhost:8989/ws_test/hellosei?xsd=1&quot;/&gt;
+        &lt;/xsd:schema&gt;
+ &lt;/types&gt;
+</code></pre>
+<p>必须有 namespace 属性和 location 属性：<br />
+namespace 属性：值必须与正导入的 WSDL 文档中声明的 targetNamespace 相匹配；<br />
+location 属性：必须指向一个实际的 WSDL 文档，并且该文档不能为空。</p>
+</li>
+<li>
+<p>message<br />
+message 元素描述了 Web 服务使用消息的有效负载。message 元素可以描述输出或者接受消息的有效负载；还可以描述 SOAP 文件头和错误 detail 元素的内容。定义 message 元素的方式取决于使用RPC 样式还是文档样式的消息传递。在本文中的 message 元素的定义，本文档使用了采用文档样式的消息传递：</p>
+<pre><code class="language-xml">&lt;wsdl:message name=&quot;sayHelloResponse&quot;&gt;
+    &lt;wsdl:part name=&quot;parameters&quot; element=&quot;tns:sayHelloResponse&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;sayHelloRequest&quot;&gt;
+     &lt;wsdl:part name=&quot;parameters&quot; element=&quot;tns:sayHello&quot; /&gt;
+ &lt;/wsdl:message&gt;
+</code></pre>
+<p>该部分是消息格式的抽象定义：定义了两个消息 sayHelloResponse 和 sayHelloRequest：<br />
+<code>sayHelloRequest</code>：sayHello 操作的请求消息格式，由一个消息片断组成，名字为 parameters，元素是我们前面定义的 types 中的元素；<br />
+<code>sayHelloResponse</code>：sayHello 操作的响应消息格式，由一个消息片断组成，名字为 parameters，元素是我们前面定义的 types 中的元素；<br />
+如果采用 RPC 样式的消息传递，只需要将文档中的 element 元素修改为 type 即可。</p>
+</li>
+<li>
+<p>portType<br />
+portType 元素定义了 Web 服务的抽象接口。该接口有点类似 Java 的接口，都是定义了一个抽象类型和方法，没有定义实现。在 WSDL 中，portType 元素是由 binding 和 service 元素来实现的，这两个元素用来说明 Web 服务实现使用的 Internet 协议、编码方案以及 Internet 地址。<br />
+一个 portType 中可以定义多个 operation，一个 operation 可以看作是一个方法，本文中 WSDL 文档的定义：</p>
+<pre><code class="language-xml">&lt;wsdl:portType name=&quot;HelloServicePortType&quot;&gt;
+        &lt;wsdl:operation name=&quot;sayHello&quot;&gt;
+            &lt;wsdl:input name=&quot;sayHelloRequest&quot; message=&quot;tns:sayHelloRequest&quot; /&gt;
+            &lt;wsdl:output name=&quot;sayHelloResponse&quot; message=&quot;tns:sayHelloResponse&quot; /&gt;
+        &lt;/wsdl:operation&gt;
+&lt;/wsdl:portType&gt;
+</code></pre>
+<p>portType 定义了服务的调用模式的类型，这里包含一个操作 sayHello 方法，同时包含 input 和 output 表明该操作是一个请求／响应模式，请求消息是前面定义的 sayHelloRequest，响应消息是前面定义的 sayHelloResponse。input 表示传递到 Web 服务的有效负载，output 消息表示传递给客户的有效负载。</p>
+</li>
+<li>
+<p>binding<br />
+binding 元素将一个抽象 portType 映射到一组具体协议（SOAO和HTTP）、消息传递样式、编码样式。通常 binding 元素与协议专有的元素和在一起使用，本文中的例子：</p>
+<pre><code class="language-xml"> &lt;wsdl:binding name=&quot;HelloServiceHttpBinding&quot; type=&quot;tns:HelloServicePortType&quot;&gt;
+        &lt;wsdlsoap:binding style=&quot;document&quot; transport=&quot;http://schemas.xmlsoap.org/soap/http&quot; /&gt;
+        &lt;wsdl:operation name=&quot;sayHello&quot;&gt;
+            &lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+            &lt;wsdl:input name=&quot;sayHelloRequest&quot;&gt;
+                &lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+            &lt;/wsdl:input&gt;
+            &lt;wsdl:output name=&quot;sayHelloResponse&quot;&gt;
+                &lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+            &lt;/wsdl:output&gt;
+        &lt;/wsdl:operation&gt;
+&lt;/wsdl:binding&gt;
+</code></pre>
+<p>这部分将服务访问点的抽象定义与 SOAP HTTP 绑定，描述如何通过 SOAP/HTTP 来访问按照前面描述的访问入口点类型部署的访问入口。其中规定了在具体 SOAP 调用时，应当使用的 soapAction是&quot;&quot;。具体的使用需要参考特定协议定义的元素。</p>
+</li>
+<li>
+<p>service<br />
+service 元素包含一个或者多个 port 元素，其中每个 port 元素表示一个不同的 Web 服务。port 元素将 URL 赋给一个特定的 binding，甚至可以使两个或者多个 port 元素将不同的 URL 赋值给相同的binding。</p>
+<pre><code class="language-xml">&lt;wsdl:service name=&quot;HelloService&quot;&gt;
+        &lt;wsdl:port name=&quot;HelloServiceHttpPort&quot;
+            binding=&quot;tns:HelloServiceHttpBinding&quot;&gt;
+            &lt;wsdlsoap:address location=&quot;http://localhost:8080/xfire/services/HelloService&quot; /&gt;
+        &lt;/wsdl:port&gt;
+&lt;/wsdl:service&gt;
+</code></pre>
+<p>这部分是具体的 Web 服务的定义，在这个名为 HelloService 的 Web 服务中，提供了一个服务访问入口，访问地址是 <code>http://localhost:8080/xfire/services/HelloService</code>，使用的消息模式是由前面的binding 所定义的。</p>
+</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15784036889043.html">开发 WebService</a></h1>
+			<p class="meta"><time datetime="2020-01-07T21:28:08+08:00" 
+			pubdate data-updated="true">2020/01/07</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%88%A9%E7%94%A8jdk%E5%BC%80%E5%8F%91-webservice">利用 JDK 开发 WebService</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8cxf%E5%BC%80%E5%8F%91">使用 cxf 开发</a></li>
+</ul>
+</div>
+<p>etest开发方式：</p>
+<ul>
+<li>JDK 1.6 +</li>
+<li>框架：CXF 等</li>
+</ul>
+<p>开发步骤：</p>
+<ul>
+<li>开发服务端</li>
+<li>开发客户端</li>
+</ul>
+<h2><a id="%E5%88%A9%E7%94%A8jdk%E5%BC%80%E5%8F%91-webservice" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>利用 JDK 开发 WebService</h2>
+<ol>
+<li>
+<p>开发服务端</p>
+<ul>
+<li>
+<p>新建类作为 SEI ，类加注解 @WebService，方法上加注解 @WebMethod（如果使用接口，那么在接口上两个注解都要加，而实现类只需要加 @WebService 即可）</p>
+<ul>
+<li>
+<p>HelloSEI 接口</p>
+<pre><code class="language-java">import javax.jws.WebMethod;
+import javax.jws.WebService;
+
+@WebService
+public interface HelloSEI {
+    @WebMethod
+    String sayHello(String name);
+}
+</code></pre>
+</li>
+<li>
+<p>HelloSEI 实现类 HelloSEIImpl</p>
+<pre><code class="language-java">import cn.vaf714.ws_test.sei.HelloSEI;
+import javax.jws.WebService;
+
+@WebService
+public class HelloSEIImpl implements HelloSEI {
+
+    @Override
+    public String sayHello(String name) {
+        System.out.println(&quot;hello &quot; + name);
+        return &quot;Hello I'm WebService Server&quot;;
+    }
+}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>main 方法内发布该接口</p>
+<pre><code class="language-java">import cn.vaf714.ws_test.sei.impl.HelloSEIImpl;
+import javax.xml.ws.Endpoint;
+
+public class Startup {
+    public static void main(String[] args) {
+        String address = &quot;http://localhost:8989/ws_test/hellosei&quot;;
+        Endpoint.publish(address, new HelloSEIImpl());
+        System.out.println(&quot;WebService发布成功&quot;);
+    }
+}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>开发客户端</p>
+<ul>
+<li>
+<p>使用 JDK 自带的工具（wsimport）根据 webService 的 url?wsdl（也可是本地 wsdl 文件） 生成代码到客户端目录</p>
+<pre><code class="language-plain_text">C:\Users\Acer&gt;d:D:\&gt;cd
+D:\Code\Java_IDEA\ws_test_client\src
+D:\Code\Java_IDEA\ws_test_client\src&gt;wsimport -encoding utf-8 -keep http://localhost:8989/ws_test/hellosei?wsdl
+</code></pre>
+<p>可以看到生成的文件<br />
+<img src="media/15784036889043/clipboard.png" alt="clipboard" /></p>
+</li>
+<li>
+<p>调用 ws 的方法， 有一个类（wsdl 定义）是用于创建发布的 SEI 接口的工厂，利用它创建出 SEI 后，再调用 SEI 里发布的方法即可。</p>
+<pre><code class="language-java">import cn.vaf714.ws_test.sei.impl.HelloSEIImpl;
+import cn.vaf714.ws_test.sei.impl.HelloSEIImplService;
+
+public class Startup {
+    public static void main(String[] args) {
+        HelloSEIImplService service = new HelloSEIImplService();
+        HelloSEIImpl helloSEI = service.getHelloSEIImplPort();
+        String result = helloSEI.sayHello(&quot;zsc&quot;);
+        System.out.println(result);
+    }
+}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>运行结果</p>
+<ul>
+<li>
+<p>客户端<br />
+<img src="media/15784036889043/clipboard-4.png" alt="clipboard-4" /></p>
+</li>
+<li>
+<p>服务端<br />
+<img src="media/15784036889043/clipboard-3.png" alt="clipboard-3" /></p>
+</li>
+</ul>
+</li>
+</ol>
+<h2><a id="%E4%BD%BF%E7%94%A8cxf%E5%BC%80%E5%8F%91" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>使用 cxf 开发</h2>
+<p>直接将 cxf 目录 lib 里的 jar 包加入项目即可，生成客户端代码要使用 cxf 目录 bin 目录里的 wsdl2java.bat 工具（使用 idea 可以配置好 cxf 目录，包右键直接生成客户端代码）<br />
+<img src="media/15784036889043/clipboard-2.png" alt="clipboard-2" /></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15784036386496.html">异常解决</a></h1>
+			<p class="meta"><time datetime="2020-01-07T21:27:18+08:00" 
+			pubdate data-updated="true">2020/01/07</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<ol>
+<li>java 调用 .net 开发的 webService，生成客户端代码时报错
+<ul>
+<li>将 wsdl 文档保存到本地</li>
+<li>将 wsdl 文件内的 <code>&lt;s:element ref=&quot;s:schema&quot; /&gt;&lt;s:any/&gt;</code> 替换成 <code>&lt;s:any minOccurs=&quot;2&quot; maxOccurs=&quot;2&quot;/&gt;</code></li>
+</ul>
+</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15784034414028.html">Schema 约束</a></h1>
+			<p class="meta"><time datetime="2020-01-07T21:24:01+08:00" 
+			pubdate data-updated="true">2020/01/07</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<ol>
+<li>
+<p>先定义一个 schema 文件，用于约束将要定义的 xml 文件，但是 schema 文件也有一个 schema 文件约束，由 w3c 提供，同时 schema 文件需要指定一个 namespace ，类似于 id ，供 xml 文件引用。<br />
+xmlns 属性指定引用的约束<br />
+targetNamespace 属性指定 schema 的namespace<br />
+elementFormDefault 属性默认写 qualified<br />
+<img src="media/15784034414028/%E6%88%AA%E5%9B%BE-2.png" alt="截图-2" /></p>
+</li>
+<li>
+<p>使用 schema 约束 xml，要指定自定义 schema 文件的 namespace，同时还要使用 schemaLocation 属性指自定义 schema 文件的位置，但是 schemaLocation 属性由 w3c 提供，所以这里还需要再引入一个提供 schemaLocation 属性的 schema，引用多个 schema 需要起不同的别名以区分，下面使用 schemaLocation 时前面加上别名。<br />
+<img src="media/15784034414028/%E6%88%AA%E5%9B%BE.png" alt="截图" /></p>
+</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

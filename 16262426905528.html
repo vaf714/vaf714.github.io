@@ -1,0 +1,773 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  常见题 - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">常见题</h1>
+				<p class="meta"><time datetime="2021-07-14T14:04:50+08:00" pubdate data-updated="true">2021/07/14</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<h2><a id="%E5%87%A0%E6%95%B0%E4%B9%8B%E5%92%8C" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>几数之和</h2>
+<p><a href="https://leetcode-cn.com/problems/two-sum">1.两数之和</a> （哈希）<br />
+<a href="https://leetcode-cn.com/problems/3sum">15.三数之和</a> （排序 + 二分查找）</p>
+<h2><a id="%E5%AD%90%E5%BA%8F%E5%88%97%E5%AD%90%E4%B8%B2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>子序列 &amp; 子串</h2>
+<h3><a id="dp" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>dp</h3>
+<p><a href="https://leetcode-cn.com/problems/maximum-subarray">53.最大子序和</a>、<a href="https://leetcode-cn.com/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/">连续子数组的最大和</a><br />
+<a href="https://leetcode-cn.com/problems/edit-distance">72.编辑距离</a><br />
+<a href="https://leetcode-cn.com/problems/longest-increasing-subsequence/">300.最长递增子序列</a> -&gt; <a href="https://leetcode-cn.com/problems/russian-doll-envelopes/">354.俄罗斯套娃信封问题</a> （优化：贪心+二分查找）<br />
+<a href="https://leetcode-cn.com/problems/longest-common-subsequence/">1143.最长公共子序列</a> -&gt; <a href="https://leetcode-cn.com/problems/delete-operation-for-two-strings/">583.两个字符串的删除操作</a> -&gt; <a href="https://leetcode-cn.com/problems/minimum-ascii-delete-sum-for-two-strings/">712.两个字符串的最小ASCII删除和</a><br />
+<a href="https://leetcode-cn.com/problems/longest-palindromic-subsequence">516.最长回文子序列</a><br />
+<a href="https://leetcode-cn.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/submissions/">1312.让字符串成为回文串的最少插入次数</a></p>
+<h3><a id="%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>滑动窗口</h3>
+<p><a href="https://leetcode-cn.com/problems/longest-substring-without-repeating-characters">3.无重复最长子串</a><br />
+<a href="https://leetcode-cn.com/problems/minimum-window-substring">76.最小覆盖子串</a><br />
+<a href="https://leetcode-cn.com/problems/minimum-size-subarray-sum/">209.长度最小的子数组</a><br />
+<a href="https://leetcode-cn.com/problems/maximum-length-of-repeated-subarray/">718.最长重复子数组</a> （交替滑动）</p>
+<h3><a id="%E5%85%B6%E4%BB%96" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>其他</h3>
+<p><a href="https://leetcode-cn.com/problems/longest-palindromic-substring/">5.最长回文子串</a> （中心扩散）<br />
+<a href="https://leetcode-cn.com/problems/subarray-sum-equals-k">560.和为 K 的子数组</a> （前缀和 + hash）<br />
+<a href="https://leetcode-cn.com/problems/shortest-palindrome/">214.最短回文串</a> （字符串哈希）<br />
+<a href="https://leetcode-cn.com/problems/longest-consecutive-sequence/">128.最长连续序列</a> （哈希set）<br />
+<a href="https://leetcode-cn.com/problems/split-array-largest-sum/">410.分割数组的最大值</a> （二分查找）</p>
+<h2><a id="%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88%E5%AD%90%E9%9B%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>排列 &amp; 组合 &amp; 子集</h2>
+<h3><a id="%E5%AD%90%E9%9B%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>子集</h3>
+<p>求数组所有子集：递归回溯</p>
+<pre><code class="language-java">// 注意 i 从 start 开始递增
+for (int i = start; i &lt;= n; i++) {
+    // 回溯 ...
+}
+</code></pre>
+<p><a href="https://leetcode-cn.com/problems/partition-to-k-equal-sum-subsets/">698.划分为k个相等的子集</a></p>
+<h3><a id="%E7%BB%84%E5%90%88" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>组合</h3>
+<p>输出 [1..n] 中 k 个数字的所有组合：递归回溯 + 剪枝：传入一个 start 参数，来排除 start 索引之前的数字</p>
+<pre><code class="language-java">// 剪枝
+if (k == track.size()) {
+    res.push_back(track);
+    return;
+}
+// 注意 i 从 start 开始递增
+for (int i = start; i &lt;= n; i++) {
+    // 回溯 ...
+}
+</code></pre>
+<p><a href="https://leetcode-cn.com/problems/combination-sum-ii/">40.组合总数II</a>，改题目的关键在于如何去重：先排序，然后在同一层次内（<code>i &gt; idx</code>）不添加相同的数字（<code>candidates[i-1] == candidates[i]</code>）</p>
+<pre><code class="language-py">def combinationSum2(self, candidates: List[int], target: int) -&gt; List[List[int]]:
+    candidates.sort() # 排序
+    n = len(candidates)
+    res = []
+    def helper(s, path, idx):
+        if s == target: 
+            res.append(path[:])
+            return
+        
+        for i in range(idx, n):
+            if s + candidates[i] &gt; target: break
+            if i &gt; idx and candidates[i-1] == candidates[i]: continue # 去重
+            path.append(candidates[i])
+            helper(s + candidates[i], path, i + 1)
+            path.pop()
+    
+    helper(0, [], 0)
+    return res
+</code></pre>
+<h3><a id="%E6%8E%92%E5%88%97" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>排列</h3>
+<p>求数组的所有排列：回溯，通过 contains 方法来排除在 track 中已经选择过的数字</p>
+<pre><code class="language-java">for (int i = 0; i &lt; nums.length; i++) {
+    // 排除不合法的选择
+    if (track.contains(nums[i])) continue;
+    // 回溯 ...
+}
+</code></pre>
+<p>方法二：原地交换数组顺序，当前正在排第几个，就把需要遍历的交换到这里，代表这个位置之前的都已经在路径中，就不需要在使用 contains 判断</p>
+<pre><code class="language-py">def helper(idx):
+    if idx == n:
+        res.append(nums.copy())
+        return
+    for i in range(idx, n):
+        nums[i], nums[idx] = nums[idx], nums[i]
+        helper(idx+1)
+        nums[i], nums[idx] = nums[idx], nums[i]
+</code></pre>
+<h2><a id="%E8%83%8C%E5%8C%85" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>背包</h2>
+<p><a href="https://leetcode-cn.com/problems/word-break/solution/yi-tao-kuang-jia-jie-jue-bei-bao-wen-ti-kchg9/">一套框架解决「背包问题」</a></p>
+<h3><a id="0-1%E8%83%8C%E5%8C%85" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>0-1 背包</h3>
+<p>通用状态方程： <code>dp[i][w] = max(dp[i-1][w], dp[i-1][w-wt[i-1]] + val[i-1])</code>，代表使用前 i 个数组成 w</p>
+<ul>
+<li>
+<p><a href="https://leetcode-cn.com/problems/partition-equal-subset-sum/">416.分割等和子集</a></p>
+<pre><code class="language-py">def canPartition(self, nums: List[int]) -&gt; bool:
+    sm = sum(nums)
+    lm = len(nums)
+    if sm &amp; 1 == 1: return False
+    sm //= 2
+    dp = [[True if j == 0 else False for j in range(sm + 1)] for i in range(lm + 1)]
+    for n in range(1, lm+1):
+        for s in range(1, sm+1):
+            if s &lt; nums[n-1]: dp[n][s] = dp[n-1][s]
+            else: dp[n][s] = dp[n-1][s] or dp[n-1][s-nums[n-1]]
+    return dp[lm][sm]
+</code></pre>
+<p>状态压缩：由于 <code>dp[i]</code> 只依赖上一行的 <code>dp[i-1]</code>，可以状态压缩成一维：<code>dp[j] = dp[j] | dp[j-nums[i]]</code>，注意为了不覆盖上一行数据，需要倒序遍历 dp</p>
+<pre><code class="language-py">def canPartition(self, nums: List[int]) -&gt; bool:
+    n = len(nums)
+    s = sum(nums)
+    if s &amp; 1 == 1: return False
+    target = s // 2
+    dp = [False for _ in range(target + 1)]
+    dp[0] = True
+    for i in range(n):
+        num = nums[i]
+        for j in range(target, num - 1, -1): # 倒序
+            dp[j] = dp[j] or dp[j-num]
+
+    return dp[-1]
+</code></pre>
+</li>
+<li>
+<p><a href="https://leetcode-cn.com/problems/target-sum/">494.目标和</a><br />
+因为 <code>target = x - y， sum = x + y</code> 所以 <code>x = (sum + target) // 2</code>，转化成分割子集问题</p>
+<pre><code class="language-py">def findTargetSumWays(self, nums: List[int], target: int) -&gt; int:
+    # target = x - y
+    # sum = x + y
+    # x = (sum + target) // 2
+
+    n = len(nums)
+    x = target + sum(nums)
+    if target &gt; sum(nums) or x &amp; 1 == 1: return 0
+    x = x // 2
+    dp = [0 for _ in range(x + 1)]
+    dp[0] = 1
+
+    for n in nums:
+        for j in range(x, n-1, -1):
+            dp[j] = dp[j] + dp[j-n]
+    
+    return dp[-1]
+</code></pre>
+</li>
+</ul>
+<h3><a id="%E5%AE%8C%E5%85%A8%E8%83%8C%E5%8C%85" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>完全背包</h3>
+<p><code>dp[i][j] = dp[i-1][j] + dp[i][j-coins[i-1]]</code>，状态方程和 0-1 不同的地方在于当选择了第 i 个物品时，那么这个物品由于是不限量的，所以前面的也必须可以选择这个物品，因此，<code>dp[i][j-coins[i-1]]</code> 里面不再是 <code>i-1</code>。<br />
+0-1 背包一个物品只能选一次，所以如果选了这个物品，前面必然不能选这个物品，前面的物品只能是使用前 i-1 个物品组成。</p>
+<ul>
+<li>
+<p><a href="https://leetcode-cn.com/problems/coin-change-2">518.零钱兑换II</a></p>
+<pre><code class="language-py">def change(self, amount: int, coins: List[int]) -&gt; int:
+    n = len(coins)
+    dp = [[1 if j == 0 else 0 for j in range(amount+1)] for i in range(n+1)]
+    
+
+    for i in range(1, n+1):
+        c = coins[i-1]
+        for j in range(1, amount+1):
+            if j &gt;= c:
+                dp[i][j] = dp[i-1][j] + dp[i][j-c]
+            else:
+                dp[i][j] = dp[i-1][j]
+    
+    return dp[n][amount]
+</code></pre>
+<p>状态压缩：更新 dp[i][j] 时，j 位置上依赖上一次的结果 dp[i-1][j]，i 位置上依赖本行刚刚计算过的值，因此可以压缩状态：<code>dp[i] = dp[i] + dp[i-num]</code>，但是需要正向遍历，这样才能保证在 i 行，使用的是前面计算过的值。</p>
+<pre><code class="language-py">def change(self, amount: int, coins: List[int]) -&gt; int:
+    dp = [0 for j in range(amount+1)]
+    dp[0] = 1
+
+    for c in coins:
+        for i in range(c, amount+1):
+            dp[i] = dp[i] + dp[i-c]
+    
+    return dp[-1]
+</code></pre>
+</li>
+<li>
+<p><a href="https://leetcode-cn.com/problems/word-break/">139.单词拆分</a><br />
+可以转化为完全背包问题，但是需要考虑顺序问题，外层循环需要为 target ，内层循环为选择池 wordDict。dp[i] 表示以 i 结尾的字符串是否可以被 wordDict 中组合而成。</p>
+<pre><code class="language-py">def wordBreak(self, s: str, wordDict: List[str]) -&gt; bool:
+    n = len(s)
+    dp = [False for _ in range(n+1)]
+    dp[0] = True
+
+    for i in range(1, n+1):
+        for word in wordDict:
+            size = len(word)
+            if i &gt;= size and s[i-size: i] == word:
+                dp[i] = dp[i] or dp[i-size]
+    
+    return dp[-1]
+</code></pre>
+</li>
+<li>
+<p><a href="https://leetcode-cn.com/problems/combination-sum-iv/">377.组合总和 Ⅳ</a><br />
+需要考虑顺序问题，注意内外层循环</p>
+<pre><code class="language-py">def combinationSum4(self, nums: List[int], target: int) -&gt; int:
+    n = len(nums)
+    dp = [0 for _ in range(target+1)]
+    dp[0] = 1
+
+    for i in range(1, target+1):
+        for n in nums:
+            if i &gt;= n:
+                dp[i] = dp[i] + dp[i-n]
+    
+    return dp[-1]
+</code></pre>
+</li>
+</ul>
+<h3><a id="%E6%80%BB%E7%BB%93" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>总结</h3>
+<ul>
+<li>
+<p>0-1 背包<br />
+即数组中的元素不可重复使用，外循环遍历 arrs，内循环遍历 target，且内循环倒序</p>
+</li>
+<li>
+<p>完全背包</p>
+<ul>
+<li>即数组中的元素可重复使用并且不考虑元素之间顺序，arrs 放在外循环（保证 arrs 按顺序），target在内循环。且内循环正序。</li>
+<li>如合问题需考虑元素之间的顺序，需将 target 放在外循环，将 arrs 放在内循环，且内循环正序。</li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E8%82%A1%E7%A5%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>股票</h2>
+<p>状态方程定义：<code>dp[i][k][0|1]</code>，表示第 i 天，操作 k 次，0 不持有股票，1 持有股票</p>
+<p>框架：</p>
+<pre><code class="language-py">dp[-1][k][0] = dp[i][0][0] = 0
+dp[-1][k][1] = dp[i][0][1] = float('-inf')
+
+dp[i][k][0] = max(dp[i-1][k][0], dp[i-1][k][1] + prices[i])
+dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i])
+</code></pre>
+<ul>
+<li>
+<p>只能买卖一次：省略 k</p>
+<pre><code class="language-py">dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i])
+dp[i][1] = max(dp[i-1][1], -prices[i])
+</code></pre>
+</li>
+<li>
+<p>可以买卖任意次：省略 k</p>
+<pre><code class="language-py">dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i])
+dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i])
+</code></pre>
+</li>
+<li>
+<p>卖了之后隔一天才能交易：买的时候关注前天的利益</p>
+<pre><code class="language-py">dp[i][k][1] = max(dp[i-1][k][1], dp[i-2][k-1][0] - prices[i])
+</code></pre>
+</li>
+<li>
+<p>有手续费：</p>
+<pre><code class="language-py">dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i] - fee)
+</code></pre>
+</li>
+<li>
+<p>限制交易次数：注意遍历 k</p>
+</li>
+</ul>
+<h2><a id="%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>打家劫舍</h2>
+<ul>
+<li>
+<p>不能偷相邻的房屋：<code>dp[i] = max(dp[i-2] + nums[i-1], dp[i-1])</code></p>
+</li>
+<li>
+<p>屋子围城一个圆，不能偷相邻房屋：分两种情况，偷 [0, n-1] 个房屋，偷 [1, n] 个房屋，找较大值</p>
+</li>
+<li>
+<p>二叉树结构的房屋：递归遍历，如果偷某个结点，那么他的两个孩子结点都不能偷，如果不偷这个结点，可以选择两个孩子结点偷或不偷的较优值。返回给付结点这个结点偷或不偷两种情况的收益。</p>
+<pre><code class="language-py">rob = root.val + l_n_rob + r_n_rob
+n_rob = max(l_rob, l_n_rob) + max(r_rob, r_n_rob)
+</code></pre>
+</li>
+</ul>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='Algorithm.html'>Algorithm</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16265229592142.html" 
+	        title="Previous Post: 海量数据算法">&laquo; 海量数据算法</a>
+	    
+	    
+	        <a class="basic-alignment right" href="16255578488940.html" 
+	        title="Next Post: 质因子分解">质因子分解 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="asset/prism.js"></script>
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

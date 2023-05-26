@@ -1,0 +1,1061 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  校招 - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16262572235369.html">字节</a></h1>
+			<p class="meta"><time datetime="2021-07-14T18:07:03+08:00" 
+			pubdate data-updated="true">2021/07/14</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2><a id="%E4%B8%80%E9%9D%A2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>一面</h2>
+<p>手撕：LRU</p>
+<ol>
+<li>硕士期间做的东西</li>
+<li>Netty 相关（线程模型、底层是用的 epoll 吗、EventLoopGroup 线程数量怎么设置的、用了几个 Group 分别是干嘛的、拆包黏包是什么、有哪些解决方案）</li>
+<li>消息分级如何实现的、会不会造成饥饿现象、怎么优化（使用 Java 优先级队列可不可以、可以用多个队列随机选一个、MQ）</li>
+<li>隔离级别</li>
+<li>MVCC</li>
+<li>间隙锁</li>
+<li>select/poll/epoll</li>
+<li>什么是 MPI</li>
+<li>乐观锁、悲观锁</li>
+<li>CAS、有什么问题</li>
+<li>Http2.0 的改进</li>
+<li>Https 如何保证安全</li>
+</ol>
+<h2><a id="%E4%BA%8C%E9%9D%A2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>二面</h2>
+<p>全程项目</p>
+<ol>
+<li>项目挑战，如何解决的？</li>
+<li>如何充分发挥dtu并发性，（异步）</li>
+<li>轮询如何优化（不用信号通知的机制，可能通知会丢失，每次轮训睡眠1s，以稍高负载换取代码简洁性以及更少的业务逻辑）</li>
+<li>验证装置如何设计的？（为了避免当作机器人被屏蔽设置随机时间）</li>
+<li>如何看待后端开发业务和目前的研究生方向？</li>
+<li>手撕：一个用户登录表（userid, login_time, logout_time），量很大，查找这一天的峰值人数和持续时间？</li>
+</ol>
+<pre><code class="language-c">//当天数据容器
+var array = new int[24];
+//初始化数据
+foreach (var item in logs) {
+    //只记录当前在线人数即可
+    for (int i = item.LoginTime; i &lt; item.LogoutTime; i++) {
+        array[i]++;
+    }
+}
+ 
+//统计部分
+int biggest = 0;        //峰值
+int biggestLength = 0;  //持续时长
+int biggestTime = 0;    //最大开始时间
+ 
+for (int i = 0; i &lt; array.Length; i++) {
+    //当前在线人数
+    var currentValue = array[i];
+    
+    //存储最大峰值
+    if (currentValue &gt; biggest) {
+        biggest = currentValue;
+        biggestLength = 0;
+        biggestTime = i;
+    }
+    
+    if (currentValue == biggest)
+        biggestLength++;
+}
+</code></pre>
+<ol>
+<li>反馈：思考问题需要有更多的层次，有时回答的很多点本质上都是一样的。（潜台词思维不够发散）</li>
+</ol>
+<h2><a id="%E4%B8%89%E9%9D%A2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>三面</h2>
+<ol>
+<li>介绍研究生的课题</li>
+<li>介绍一个项目，背景、挑战等，负责哪部分</li>
+<li>webservice 原理</li>
+<li>tcp 建立连接的过程（三次握手、四次挥手）、tcp 传输的内容（除了那几个标志位）、有抓过包吗？有什么工具？</li>
+<li>java 的锁、什么是自旋锁、如何实现自旋锁、哪些场景会用到自旋锁？</li>
+<li>hashmap 源码、为什么从 jdk1.8 从 entry 变成了 node、扩容为什么是 2 倍、扩容因子怎么确定的、默认是多少？</li>
+<li>算法题：最长回文子串</li>
+<li>反馈：要知其然还要知其所以然，理论联系实际还不够</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16251512388574.html">字节飞书面经</a></h1>
+			<p class="meta"><time datetime="2021-07-01T22:53:58+08:00" 
+			pubdate data-updated="true">2021/07/01</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#1">1</a></li>
+<li><a href="#2">2</a></li>
+<li><a href="#3">3</a></li>
+<li><a href="#4">4</a></li>
+<li><a href="#other">other</a></li>
+</ul>
+</div>
+<h2><a id="1" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>1</h2>
+<ol>
+<li>
+<p><del>了解设计模式吗？实现下单例模式</del></p>
+<blockquote>
+<p>4种（<a href="16227359619314.html">单例模式</a>）</p>
+</blockquote>
+</li>
+<li>
+<p><del>MySQL用过吗，出现过什么问题，怎么解决的？</del></p>
+<blockquote>
+<p>索引失效（先试用explain分析性能，查看这条语句扫描了多少数据，如果感觉扫描的数据明显很多，就考虑是不是索引失效问题，针对单列查询，不要把索引放在表达式里，对于多列索引，如果有范围查找或like，那么后面的索引就会失效），此外，在多列索引里尽量让区分度大的索引放在前面，还要尽量建立覆盖索引，减少回表</p>
+</blockquote>
+</li>
+<li>
+<p><del>说说MySQL的存储引擎有什么，有什么区别</del></p>
+<blockquote>
+<p>事务、锁粒度、索引、热备份、故障恢复</p>
+</blockquote>
+</li>
+<li>
+<p><del>用过事务吗，说说他的隔离级别</del></p>
+</li>
+<li>
+<p><del>当前读和快照读的区别</del></p>
+<blockquote>
+<p>当前读（insert、update、delete、select for update）加锁，快照读（select）不加锁</p>
+</blockquote>
+</li>
+<li>
+<p>Redis怎么用的？</p>
+<blockquote>
+<p>计数器string、缓存kv、消息队列list、交集并集实现共同好友、分布式锁</p>
+</blockquote>
+</li>
+<li>
+<p>说说Redis的持久化机制？</p>
+<blockquote>
+<p>RDB快照/AOF追加，三种追加备份时机</p>
+</blockquote>
+</li>
+<li>
+<p>epoll select poll区别</p>
+<blockquote>
+<p><a href="16251055746690.html">select &amp; poll &amp; epoll</a></p>
+</blockquote>
+</li>
+<li>
+<p>说说ET和LT的区别</p>
+</li>
+<li>
+<p><del>说说tcp拥塞控制</del></p>
+</li>
+<li>
+<p><del>Linux常见命令认识哪些</del></p>
+</li>
+<li>
+<p><del>说说软连接，硬链接，目录能不能用硬链接</del></p>
+<blockquote>
+<p>软-符号链接，他有自己的 inode，内容指向真正的路径，删了原文件，就不能用了；硬和原文件使用同一个inode，只是引用计数+1，删除原文件不影响，只是计数-1，计数是0才真正删除；目录不能用硬连接</p>
+</blockquote>
+</li>
+<li>
+<p>用过什么信号，说几个常见的</p>
+<blockquote>
+<p>信号量semaphore、条件变量condition、互斥锁mutex</p>
+</blockquote>
+</li>
+<li>
+<p>了解协程吗？跟线程进程有什么区别</p>
+<blockquote>
+<p>协程是一个线程在执行一个函数的时候可以随时打断去执行另一个程序，然后再返回来继续执行，有点类似CPU的中断，所以协程看起来很像多个线程同时执行。<br />
+区别：协程发生在用户态不需要线程的上下文切换，效率极高；由于是同一个线程，不存在死锁竞争的问题；协程适用于被阻塞的，且需要大量并发的场景，但不适用于大量计算</p>
+</blockquote>
+</li>
+<li>
+<p><del>说说死锁，产生条件，怎么解决</del></p>
+</li>
+</ol>
+<h2><a id="2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>2</h2>
+<ol>
+<li>
+<p><del>堆排序、插入、删除怎么实现</del></p>
+</li>
+<li>
+<p><del>并查集是什么</del></p>
+</li>
+<li>
+<p>跳表是什么？怎么实现？</p>
+<p>当原始链表中元素数量足够大，且抽取足够随机的话，我们得到的索引是均匀的。随机选 n/2 个元素做为一级索引、随机选 n/4 个元素做为二级索引、随机选 n/8 个元素做为三级索引，依次类推，一直到最顶层索引。在每次新插入元素的时候，尽量让该元素有 1/2 的几率建立一级索引、1/4 的几率建立二级索引、1/8 的几率建立三级索引，以此类推，当建立二级索引的时候，同时也会建立一级索引；当建立三级索引时，同时也会建立一级、二级索引。</p>
+</li>
+<li>
+<p><del>树的四种遍历方式？具体怎么实现？</del></p>
+</li>
+<li>
+<p><del>mysql四种隔离机制有哪几种？</del></p>
+</li>
+<li>
+<p><del>mysql如何解决幻读？</del></p>
+</li>
+<li>
+<p><del>当前读和快照读的区别</del></p>
+</li>
+<li>
+<p><del>mvcc怎么实现？</del></p>
+</li>
+<li>
+<p><del>java锁有什么？具体说明</del></p>
+</li>
+<li>
+<p><del>redolog,undolog的区别</del></p>
+</li>
+<li>
+<p><a href="%5B%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF%E3%80%81%E7%A9%BF%E9%80%8F%E3%80%81%E9%9B%AA%E5%B4%A9%5D(16251589620596.html)">redis的缓存雪崩、击穿、穿透</a></p>
+</li>
+<li>
+<p>[redis的字符串具体实现](<a href="mweblib://16251605590461">Redis 字符串</a>)</p>
+</li>
+<li>
+<p><del>布隆过滤器的实现原理</del></p>
+</li>
+<li>
+<p>设计一个酒店管理系统，写出er图。</p>
+</li>
+</ol>
+<h2><a id="3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>3</h2>
+<ol>
+<li>
+<p><del>简单介绍一下线程池吗（七大参数，四大类型）</del></p>
+</li>
+<li>
+<p>线程池的核心线程数大小如何确定（计算密集型为 N+1，IO密集型为 2N）</p>
+<blockquote>
+<p><strong>线程数=cpu可用核心数/（1-阻塞系数）</strong>，其中阻塞系数的取值在[0,1]之间。计算密集型任务的阻塞系数为0，而IO密集型任务的阻塞系数则接近1。一般，我们让线程执行的任务是比较复杂的，不会是单一的计算密集型任务，或者单一的IO密集型任务，通常会夹杂着。那么就需要我们去计算阻塞系数了。阻塞系数的定义就是执行该任务阻塞的时间与（阻塞时间+计算时间）的比值，也就是w/(w+c)。<br />
+一般经验： IO密集型：2倍cpu可用线程数；计算密集型：cpu可用核数</p>
+</blockquote>
+</li>
+<li>
+<p>项目里面的定时任务怎么实现，如果定时五分钟，但是有一个任务需要六分钟才能执行完如何处理</p>
+<blockquote>
+<p>任务里面新开线程？</p>
+</blockquote>
+<pre><code class="language-java">new Timer().schedule(new TimerTask() {
+    @Override
+    public void run() {
+        System.out.println(Thread.currentThread().getName());
+    }
+}, 0, 3000);
+</code></pre>
+</li>
+<li>
+<p>10亿个数字，2G内存，里面怎么找最大值</p>
+<blockquote>
+<p><a href="https://juejin.cn/post/6844903519640616967">https://juejin.cn/post/6844903519640616967</a></p>
+</blockquote>
+</li>
+<li>
+<p>缓存了解吗，说一说本地缓存和分布式缓存都有哪些，有什么特点和区别</p>
+<blockquote>
+<p>本地缓存: 使用 Guava Cache 将数据缓存在服务器本地内存中，服务器代码可以直接读取本地内存中的缓存，速度非常快。</p>
+</blockquote>
+<blockquote>
+<p>分布式缓存: 使用 Redis、Memcache 等分布式缓存将数据缓存在分布式缓存系统中。相对于本地缓存来说，分布式缓存单独部署，可以根据需求分配硬件资源。不仅如此，服务器集群都可以访问分布式缓存，而本地缓存需要在服务器集群之间进行同步，实现难度和性能开销上都非常大。</p>
+</blockquote>
+</li>
+<li>
+<p>讲一下cookies和session区别</p>
+</li>
+<li>
+<p>怎么保证cookies不被劫持</p>
+<blockquote>
+<ul>
+<li>给Cookie添加HttpOnly属性, 这种属性设置后, 只能在http请求中传递, 在脚本中, document.cookie无法获取到该Cookie值. 对XSS的攻击, 有一定的防御值. 但是对网络拦截, 还是泄露了.</li>
+<li>在cookie中添加校验信息, 这个校验信息和当前用户外置环境有些关系,比如ip,user agent等有关. 这样当cookie被人劫持了, 并冒用, 但是在服务器端校验的时候, 发现校验值发生了变化, 因此要求重新登录, 这样也是种很好的思路, 去规避cookie劫持.</li>
+<li>cookie中session id的定时更换, 让session id按一定频率变换, 同时对用户而言, 该操作是透明的, 这样保证了服务体验的一致性.</li>
+</ul>
+</blockquote>
+</li>
+<li>
+<p>TCP和UDP说一下</p>
+</li>
+<li>
+<p>TCP三次握手</p>
+</li>
+<li>
+<p>TCP的可靠性如何实现</p>
+<blockquote>
+<p>应答机制、重传机制、流量控制、拥塞控制</p>
+</blockquote>
+</li>
+<li>
+<p>如果接受到三次ACK都没信号，直接断开连接行吗，会发生什么？</p>
+</li>
+<li>
+<p>布隆过滤器说一下原理</p>
+</li>
+<li>
+<p>说一下HashMap和Hashtable、ConcurrentMap的区别</p>
+</li>
+<li>
+<p>为什么HashMap的容量一定是2的次方</p>
+<blockquote>
+<p>便于数据重新hash快速找到新的位置</p>
+</blockquote>
+</li>
+<li>
+<p>红黑树说一下，跳表说一下，那你知道什么地方用了红黑树和跳表吗</p>
+</li>
+<li>
+<p>sql里面索引了解吗，分为哪些索引，能具体聊聊吗</p>
+</li>
+<li>
+<p>MVCC的隔离机制，原子性怎么实现的，隔离性呢，一致性呢</p>
+</li>
+<li>
+<p>Redis数据库和缓存一致性怎么保证 (<a href="https://segmentfault.com/a/1190000039078249">https://segmentfault.com/a/1190000039078249</a>)</p>
+<blockquote>
+<p>更新 DB，然后直接删除 cache 。如果删除 cache 失败</p>
+<ul>
+<li>缓存失效时间变短（不推荐，治标不治本） ：我们让缓存数据的过期时间变短，这样的话缓存就会从数据库中加载数据。另外，这种解决办法对于先操作缓存后操作数据库的场景不适用。</li>
+<li>增加 cache 更新重试机制（常用）： 如果 cache 服务当前不可用导致缓存删除失败的话，我们就隔一段时间进行重试，重试次数可以自己定。如果多次重试还是失败的话，我们可以把当前更新失败的 key 存入队列中，等缓存服务可用之后，再将 缓存中对应的 key 删除即可。</li>
+</ul>
+</blockquote>
+</li>
+<li>
+<p>你知道Redis里面session共享有几种实现方式吗</p>
+</li>
+<li>
+<p>JVM里面的几个区域，说一下GC的触发条件</p>
+</li>
+<li>
+<p>如果我不断发生OOM，如何排查</p>
+<blockquote>
+<p><a href="16248673414388.html">OOM</a></p>
+</blockquote>
+</li>
+<li>
+<p>知道类加载过程吗，加载器有几种，什么时候舍弃双亲委派</p>
+</li>
+<li>
+<p>数据库用的是Mysql吗，数据库的锁有哪些，数据库的死锁是什么，产生条件，如何避免</p>
+</li>
+<li>
+<p>数据库的三大范式</p>
+</li>
+<li>
+<p>如何实现一个可靠UDP</p>
+<blockquote>
+<p>送端发送数据时，生成一个随机seq=x，然后每一片按照数据大小分配seq。数据到达接收端后接收端放入缓存，并发送一个ack=x的包，表示对方已经收到了数据。发送端收到了ack包后，删除缓冲区对应的数据。时间到后，定时任务检查是否需要重传数据。</p>
+</blockquote>
+</li>
+<li>
+<p>了解Linux什么命令</p>
+</li>
+<li>
+<p>那ping命令是什么协议</p>
+</li>
+<li>
+<p>top命令有哪些参数，说一下<br />
+<img src="media/16251512388574/16254130733963.jpg" alt="" class="mw_img_center" style="width:611px;display: block; clear:both; margin: 0 auto;" /></p>
+</li>
+<li>
+<p>用linux搭建过测试环境吗，用过什么ssh连接工具</p>
+</li>
+<li>
+<p>你能说一下了解哪些网络错误码吗</p>
+</li>
+<li>
+<p>Lock和synchronized有什么区别，自旋和轻量级锁有什么区别，自己debug看过吗</p>
+</li>
+<li>
+<p>ThreadLocal 的原理和适用场景知道吗</p>
+<blockquote>
+<p>每个线程内部有个 ThreadLocal.ThreadLocalMap 变量, 里面定义了Entry 来保存数据。key 就是我们声明的 threadlocal 变量。<br />
+相当于我们使用的还是 线程本身提供的 threadlocalMap，只是使用 threadlocal 作为调用入口。<br />
+ThreadLocal是一个弱引用，当为null时，会被当成垃圾回收。所以有可能 ThreadLocalMap的key没了，但是value还在，这就造成了内存泄漏。使用完ThreadLocal后，执行remove操作，避免出现内存溢出情况。</p>
+</blockquote>
+</li>
+<li>
+<p>四种引用知道吗，三色法又是什么</p>
+<blockquote>
+<p>可达性分析时，把遍历对象图过程中遇到的对象，按“是否访问过”这个条件标记成以下三种颜色：</p>
+<ul>
+<li>白色：尚未访问过。</li>
+<li>本对象已访问过，而且本对象引用到的其他对象也全部访问过了。</li>
+<li>本对象已访问过，但是本对象引用到的其他对象尚未全部访问完。全部访问后，会转换为黑色。</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>初始时，所有对象都在【白色集合】中；<br />
+将 GC Roots 直接引用到的对象挪到 【灰色集合】中；<br />
+从灰色集合中获取对象：</p>
+<ul>
+<li>将本对象引用到的其他对象全部挪到 【灰色集合】中；</li>
+<li>将本对象挪到【黑色集合】里面。</li>
+</ul>
+</blockquote>
+</li>
+<li>
+<p>TreeMap底层说一下</p>
+<blockquote>
+<p>底层使用红黑树实现，实现了NavigableMap接口和SortedMap 接口。相比于HashMap，有了对集合内元素的搜索和排序的能力。</p>
+</blockquote>
+</li>
+</ol>
+<h2><a id="4" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>4</h2>
+<ol>
+<li>
+<p><del>线程和进程的区别</del></p>
+</li>
+<li>
+<p>既然你说到线程切换上下文开销比进程大，为什么？</p>
+<blockquote>
+<p>进程切换涉及虚拟地址空间的切换而线程不会。因为每个进程都有自己的虚拟地址空间，而线程是共享所在进程的虚拟地址空间的，因此同一个进程中的线程进行线程切换时不涉及虚拟地址空间的转换。虚拟空间需要查页表，很慢。</p>
+</blockquote>
+</li>
+<li>
+<p>操作系统父进程执行fork()命令，假如父进程拥有1G的资源，那么子进程会携带这些资源吗？</p>
+<blockquote>
+<p>不会。fork 执行时并不真正复制用户空间的所有页面，而只是复制页面表。这样，无论父进程还是子进程，当发生用户空间的写操作时，都会引发“写复制”操作，而另行分配一块可用的用户空间，使其完全独立。<br />
+vfork 也是创建一个子进程，但是子进程共享父进程的空间，过时了。<br />
+clone 不仅可以创建进程或者线程，还可以指定创建新的命名空间（namespace）、有选择的继承父进程的内存、甚至可以将创建出来的进程变成父进程的兄弟进程等。</p>
+</blockquote>
+</li>
+<li>
+<p>给你10000个IP，你如何快速查找这个IP是否存在，使用什么数据结构?</p>
+</li>
+<li>
+<p>说到平衡树，随便给你一个数据类型的一组数据，怎么去构建平衡树。</p>
+<blockquote>
+<p>LL RR LR RL旋转</p>
+</blockquote>
+</li>
+<li>
+<p>B+树的特点有哪些？</p>
+</li>
+<li>
+<p>既然你说到叶子节点通过指针连接，为什么呢？</p>
+</li>
+<li>
+<p>这些叶子的存储页距离是相近的吗？是的，尽量保证相邻叶子所在页相近。</p>
+</li>
+<li>
+<p>TCP连接过程，如何实现拥塞控制？</p>
+</li>
+<li>
+<p>还了解哪些构造索引的数据结构？</p>
+<blockquote>
+<p>哈希：查找快，无法排序和范围查找<br />
+平衡二叉树：树高、范围查找需要回旋<br />
+B 树：树低，但没有解决查找问题<br />
+B+ 树：叶子节点有指针相连，范围查找效率高</p>
+</blockquote>
+</li>
+<li>
+<p>使用哈希表作为索引有哪些？忘记Memcache还有Redis是使用这个。。。害</p>
+</li>
+<li>
+<p>new 在生成对象的时候发生了什么？默认虚拟机类加载完成时，类的信息保存在哪里？怎么找到的？</p>
+</li>
+<li>
+<p>StringBuilder 和 StringBuffer 的差别</p>
+<blockquote>
+<p>StringBuffer和StringBuilder类长度是可以改变的；<br />
+StringBuffer类是线程安全的，StringBuilder不是线程安全的;<br />
+StringBuffer的append的方法都被toStringCache关键字修饰了, 加了锁，效率差一些</p>
+</blockquote>
+</li>
+<li>
+<p>jvm 的线程状态有几种？</p>
+</li>
+</ol>
+<p><img src="media/16251512388574/16261060643956.jpg" alt="" class="mw_img_center" style="width:500px;display: block; clear:both; margin: 0 auto;" /></p>
+<ol start="11">
+<li>
+<p>sleep() 方法如何被打断。</p>
+<blockquote>
+<p>通过interrupt方法打断sleep。这时会出一个InterruptedException异常。</p>
+</blockquote>
+</li>
+<li>
+<p>运行态为什么会变成阻塞态？</p>
+<blockquote>
+<p>获取不到锁</p>
+</blockquote>
+</li>
+<li>
+<p>wait()对应的notify()和notifyAll()有什么区别？</p>
+</li>
+<li>
+<p>数据库行转列 name, subject, score</p>
+<pre><code class="language-sql">SELECT 
+t.`姓名` AS `姓名`, 
+MAX(CASE WHEN t.`课程`='语文' THEN t.`成绩` END) AS `语文`, 
+MAX(CASE WHEN t.`课程`='数学' THEN t.`成绩` END) AS `数学`, 
+MAX(CASE WHEN t.`课程`='英语' THEN t.`成绩` END) AS `英语` 
+FROM csdnTest t 
+GROUP BY t.姓名
+</code></pre>
+<p>列转行</p>
+<pre><code class="language-sql">SELECT
+    NAME,
+    '语文' AS subject ,
+    MAX(&quot;语文&quot;) AS score
+FROM student1 GROUP BY NAME
+UNION
+SELECT
+    NAME,
+    '数学' AS subject ,
+    MAX(&quot;数学&quot;) AS score
+FROM student1 GROUP BY NAME
+UNION
+SELECT
+    NAME,
+    '英语' AS subject ,
+    MAX(&quot;英语&quot;) AS score
+FROM student1 GROUP BY NAME
+</code></pre>
+</li>
+</ol>
+<p>正常情况下，一个学生对应一个课程只有一个分数，因此可以使用SUM()、MAX()、MIN()、AVG()等聚合函数都可以达到行转列的效果。</p>
+<ol>
+<li>
+<p>delete和truncate的区别有哪些？</p>
+<blockquote>
+<p>DELETE删除一行，作为事务记录在日志中便进行进行回滚操作。TRUNCATE TABLE 从表中删除所有的数据,不记入日志保存<br />
+Truncate table 表名速度快效率高,因为使用的系统和事务日志资源少。DELETE 语句每次删除一行，并在事务日志中为所删除的每行记录一项。<br />
+Truncate 自增主键重置；DELETE会保留</p>
+</blockquote>
+</li>
+<li>
+<p>DDL 和 DML的区别？</p>
+</li>
+<li>
+<p>有五六十个T的一张表，内存2G，表里只有两个字段（用户名、所在城市），如何找出在广东的那些？</p>
+</li>
+<li>
+<p>64批马，有一条赛道，每次比赛只能8批马进行赛跑，最小次数找出最快的4批？</p>
+</li>
+<li>
+<p>linux玩的怎么样？</p>
+</li>
+<li>
+<p>我想知道CPU使用率最高的4个进程？<br />
+ps aux 获取所有进程，grep -v PID 将标题去掉，sort -rn -k +3 中 -rn 的 r 表示是结果倒序排列，n 为以数值大小排序，而-k +3则是针对第3列的内容进行排序，再使用head命令获取默认前10行数据。</p>
+<blockquote>
+<p>ps aux|grep -v PID|sort -rn -k +3|head<br />
+top，按 M 是查看cpu占用，P查看内存占用</p>
+</blockquote>
+</li>
+<li>
+<p>如何统计文本字符串行数？</p>
+<blockquote>
+<p>wc -l</p>
+</blockquote>
+</li>
+<li>
+<p>vi编辑器中如何找出特定字符串的行？</p>
+</li>
+</ol>
+<h2><a id="other" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>other</h2>
+<ol>
+<li>
+<p>数据库主从复制怎么实现？是通过执行sql还是事务来实现主从复制？有几种方式？</p>
+</li>
+<li>
+<p>内存交换和虚拟内存的区别</p>
+</li>
+<li>
+<p>HTTP1.1和2.0的区别</p>
+</li>
+<li>
+<p>Redis 数据结构</p>
+</li>
+<li>
+<p>物理地址、虚拟地址、逻辑地址</p>
+<blockquote>
+<p>虚拟地址: 指由程序产生的由段选择符和段内偏移地址组成的地址。<br />
+逻辑地址: 指由程序产生的段内偏移。有时候直接把逻辑地址当做虚拟地址。<br />
+物理地址: 指CPU外部地址总线上寻址物理内存的地址信号，是地址变换的最终结果。</p>
+</blockquote>
+</li>
+<li>
+<p>数据库三大范式</p>
+</li>
+<li>
+<p>双亲委派模型，什么时候需要打破</p>
+</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

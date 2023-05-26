@@ -1,0 +1,669 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  7. abstract & interface - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">7. abstract & interface</h1>
+				<p class="meta"><time datetime="2021-05-30T19:19:49+08:00" pubdate data-updated="true">2021/05/30</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#abstract">abstract</a>
+<ul>
+<li><a href="#%E6%8A%BD%E8%B1%A1%E7%B1%BB">抽象类</a></li>
+<li><a href="#%E6%8A%BD%E8%B1%A1%E6%96%B9%E6%B3%95">抽象方法</a></li>
+<li><a href="#%E6%8A%BD%E8%B1%A1%E7%B1%BB%E7%9A%84%E5%8C%BF%E5%90%8D%E5%AD%90%E7%B1%BB">抽象类的匿名子类</a></li>
+<li><a href="#%E5%BA%94%E7%94%A8%E6%A8%A1%E7%89%88%E6%96%B9%E6%B3%95">应用: 模版方法</a></li>
+</ul>
+</li>
+<li><a href="#interface">interface</a></li>
+<li><a href="#%E5%AE%9A%E4%B9%89">定义</a>
+<ul>
+<li><a href="#%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%A7%E6%89%BF">接口的继承</a></li>
+<li><a href="#%E6%8E%A5%E5%8F%A3%E5%8C%BF%E5%90%8D%E5%AE%9E%E7%8E%B0%E7%B1%BB">接口匿名实现类</a></li>
+<li><a href="#%E5%BA%94%E7%94%A8%E4%B8%80%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8Fproxy">应用一: 代理模式 (Proxy)</a></li>
+<li><a href="#%E5%BA%94%E7%94%A8%E4%BA%8C%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F">应用二: 工厂模式</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="abstract" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>abstract</h2>
+<h3><a id="%E6%8A%BD%E8%B1%A1%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>抽象类</h3>
+<p>当使用 <code>abstract</code> 修饰类后, 就不可以实例化, 但是一定有构造器, 便于子类实例化调用.<br />
+开发中都会提供抽象类的子类, 让子类实例化, 提供相关操作.</p>
+<h3><a id="%E6%8A%BD%E8%B1%A1%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>抽象方法</h3>
+<ul>
+<li>抽象方法没有方法体, 不能是 <code>private</code>, 不应该被调用, <strong>只能写在抽象类中 (抽象类中可以没有抽象方法)</strong>.</li>
+<li><strong>抽象方法一定要在非抽象子类中实现</strong></li>
+</ul>
+<pre><code class="language-java">public abstract 返回类型 方法名(型参);
+</code></pre>
+<h3><a id="%E6%8A%BD%E8%B1%A1%E7%B1%BB%E7%9A%84%E5%8C%BF%E5%90%8D%E5%AD%90%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>抽象类的匿名子类</h3>
+<pre><code class="language-java">Person p = new Person() { // Person 是抽象类
+    @Override
+    public void show() {
+        System.out.println(&quot;hello&quot;);
+    }
+};
+
+p.show(); // hello
+</code></pre>
+<h3><a id="%E5%BA%94%E7%94%A8%E6%A8%A1%E7%89%88%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>应用: 模版方法</h3>
+<p>当功能一部分实现时确定的 (这部分步骤很固定通用), 一部分实现是不确定的. 这时可以把不确定的部分暴露出去, 让子类去实现.</p>
+<h2><a id="interface" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>interface</h2>
+<ul>
+<li>Java 中, 接口和类是并列的两个结构</li>
+<li>Java 没有多继承, <code>interface</code> 可以得到多继承的效果 (<strong>单继承, 多实现</strong>)</li>
+<li>接口<strong>本质是规范</strong>, 契约等. 继承是一个 &quot;是不是&quot; 的关系, 而接口是 &quot;能不能&quot; 的关系</li>
+<li>接口的实现体现了多态, 接口的实现子类可以赋值给接口的引用变量 (<code>C c = new D();</code> <code>C</code> 是接口, <code>D</code> 实现了 <code>C</code>)</li>
+</ul>
+<h2><a id="%E5%AE%9A%E4%B9%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>定义</h2>
+<ul>
+<li>
+<p>Jdk 7: 只能定义全局常量和抽象方法</p>
+<ul>
+<li>全局常量: <code>public static final</code>, 书写时可以省略, 效果不变</li>
+<li>抽象方法: <code>public abstract</code></li>
+<li><strong>接口不能定义构造器</strong>, 不可以实例化</li>
+</ul>
+<pre><code class="language-java">interface Flyable {
+    public static final int MAX_SPEED = 7900;
+    int MIN_SPEED = 1; // 可以省略 public static final
+
+    public abstract void fly();
+    void stop(); // 可以省略 public abstract
+}
+</code></pre>
+</li>
+<li>
+<p>Jdk 8: 除了全局常量和抽象方法, 还可以定义静态方法和默认方法</p>
+<pre><code class="language-java">interface Java8Interface {
+    // 静态方法
+    public static void method1() { // public 可以省略
+        System.out.println(&quot;m1&quot;);
+    }
+    // 默认方法
+    public default void method2() {
+        System.out.println(&quot;interface m2&quot;);
+    }
+}
+class SuperClass {
+    public void method2() {
+        System.out.println(&quot;super class m2&quot;)
+    }
+}
+class SubClass extends SuperClass implements Java8Interface {
+    // 无需实现静态和默认方法, 但是可以重写
+}
+
+... main {
+    SubClass subClass = new SubClass();
+    // 如果子类继承的父类和实现的接口中声明了同名同参的方法, 在没有重写的情况下, 默认调用父类的方法
+    // 如果子类实现的多个接口中声明了同名同参的静态或默认方法, 子类必须重写
+    subClass.method2(); // super class m2
+    // subClass.method1(); // 接口的静态方法只能用接口调用
+    Java8Interface.method1();
+}
+</code></pre>
+</li>
+</ul>
+<h3><a id="%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%A7%E6%89%BF" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>接口的继承</h3>
+<pre><code class="language-java">interface A {
+    void method1();
+}
+interface B {
+    void method2();
+}
+interface C extends A, B { // 继承两个父接口, 里面实际有三个方法
+    void method3();
+}
+
+class D implements C { // 需要实现 3 个方法
+    @Override
+    public void method1() {}
+    @Override
+    public void method2() {}
+    @Override
+    public void method3() {}
+}
+</code></pre>
+<h3><a id="%E6%8E%A5%E5%8F%A3%E5%8C%BF%E5%90%8D%E5%AE%9E%E7%8E%B0%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>接口匿名实现类</h3>
+<p>和抽象类的匿名子类类似</p>
+<pre><code class="language-java">new A(){
+    @Override
+    public void method1() {
+        System.out.println(&quot;hi&quot;);
+    }
+}.method1(); // hi
+</code></pre>
+<h3><a id="%E5%BA%94%E7%94%A8%E4%B8%80%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8Fproxy" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>应用一: 代理模式 (Proxy)</h3>
+<p>代理模式就是为其他对象提供一种代理以控制对这个对象的访问. 分为静态代理和动态代理 ( 应用场景: 安全代理 / 远程代理 / 延迟加载 )</p>
+<p>静态代理举例:</p>
+<pre><code class="language-java">interface NetWork {
+    void browse();
+}
+class Server implements NetWork {
+    @Override
+    public void browse() {
+        System.out.println(&quot;Server browse...&quot;);
+    }
+}
+class ProxyServer implements NetWork {
+    private Server server;
+    public ProxyServer(Server server) {
+        this.server = server;
+    }
+    @Override
+    public void browse() {
+        System.out.println(&quot;check...&quot;);
+        server.browse();
+        System.out.println(&quot;ok.&quot;);
+    }
+}
+</code></pre>
+<p>调用</p>
+<pre><code class="language-java">Server server = new Server();
+ProxyServer proxyServer = new ProxyServer(server);
+proxyServer.browse();
+</code></pre>
+<p>结果</p>
+<pre><code class="language-plain_text">check...
+Server browse...
+ok.
+</code></pre>
+<h3><a id="%E5%BA%94%E7%94%A8%E4%BA%8C%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>应用二: 工厂模式</h3>
+<p>实现创建者与调用着的分离, 将创建对象的具体过程屏蔽隔离起来, 达到提高灵活性的目的.<br />
+分类: 简单工厂模式, 工厂方法模式, 抽象工厂模式</p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1.html'>面向对象</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16221429228201.html" 
+	        title="Previous Post: 读取键盘">&laquo; 读取键盘</a>
+	    
+	    
+	        <a class="basic-alignment right" href="16222923817986.html" 
+	        title="Next Post: 6. static & final">6. static & final &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="asset/prism.js"></script>
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

@@ -1,0 +1,1722 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  JavaSe - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221777530736.html">6. 数组</a></h1>
+			<p class="meta"><time datetime="2021-05-28T12:55:53+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84">内存结构</a></li>
+<li><a href="#%E4%B8%80%E7%BB%B4%E6%95%B0%E7%BB%84">一维数组</a></li>
+<li><a href="#%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84">二维数组</a></li>
+<li><a href="#java-util-arrays%E5%B7%A5%E5%85%B7%E7%B1%BB">java.util.Arrays 工具类</a></li>
+</ul>
+</div>
+<h2><a id="%E6%A6%82%E8%BF%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>概述</h2>
+<ul>
+<li>数组存放的元素数据类型是统一的</li>
+<li>地址空间连续</li>
+<li>数组本身是<strong>引用类型</strong>, 元素可以是基本类型也可以是引用类型</li>
+<li>长度一旦确定不能修改</li>
+</ul>
+<h2><a id="%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>内存结构</h2>
+<p>栈 ( stack ): 存放局部变量, 对象的引用<br />
+堆 ( heap ): 存放 new 出来的对象. eg. 对象, 数组<br />
+方法区: 类信息 常量池 静态域 ...</p>
+<h2><a id="%E4%B8%80%E7%BB%B4%E6%95%B0%E7%BB%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>一维数组</h2>
+<ul>
+<li>
+<p>声明初始化: 一旦初始化完成, 长度就确定了. <code>[]</code> 放在类型后面和变量名后面都可以</p>
+<pre><code class="language-java">// 静态初始化: 数组初始化和元素赋值同时进行
+int[] is1 = new int[]{1, 2, 3};
+int[] is2 = {1, 2, 3}; // 编译器能够推断 is2 的类型, 可以省略 new int[]
+// int[] is; is = {1, 2, 3}; // 错误, 声明和赋值分开时, 编译器不能推断 is 类型, 不能省略 new int[]
+// 动态初始化: 数组初始化和元素赋值分开进行
+String[] ss = new String[5];
+</code></pre>
+</li>
+<li>
+<p>获取长度: 使用数组的 <code>length</code> 属性</p>
+</li>
+<li>
+<p>默认初始值</p>
+<ul>
+<li>整型 (<code>byte</code> <code>short</code> <code>int</code> <code>long</code>): 0</li>
+<li>浮点型 (<code>float</code> <code>double</code>): 0.0</li>
+<li><code>char</code>: ascii 码为 0 的字符</li>
+<li><code>boolean</code>: <code>false</code></li>
+<li>引用数据类型: <code>null</code></li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>二维数组</h2>
+<ul>
+<li>
+<p>底层没有二维数组, 只不过一维数组的元素仍然是一个数组的引用</p>
+</li>
+<li>
+<p>声明初始化</p>
+<pre><code class="language-java">// 静态初始化
+int[][] is = {{1, 2}, {3, 4, 5}};
+int[][] is = new int[][]{{1, 2}, {3, 4, 5}};
+
+// 动态初始化
+String[][] ss = new String[3][2]; // 外层有 3 个元素, 每个元素引用的数组有 2 个元素
+String[][] ss = new String[3][]; // 外层有 3 个元素, 每个元素引用需要后面定义
+// String[][] ss = new String[][2]; // 错误
+</code></pre>
+</li>
+</ul>
+<h2><a id="java-util-arrays%E5%B7%A5%E5%85%B7%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>java.util.Arrays 工具类</h2>
+<pre><code class="language-java">boolean equals(int[] a, int[] b) // 比较两个数组是否相等
+String toString(int[] a) // 输出数组信息
+void fill(int[] a, int val) // 用 val 填充 a
+void sort(int[] a) // 排序, 默认用快排
+int binarySearch(int[] a, int key) // 二分查找 key, 数组必须是有序的, 未找到返回负数
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221418018700.html">5. 分支循环</a></h1>
+			<p class="meta"><time datetime="2021-05-28T02:56:41+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%88%86%E4%B9%8B%E7%BB%93%E6%9E%84">分之结构</a>
+<ul>
+<li><a href="#if-else">if...else...</a></li>
+<li><a href="#switch-case">switch...case...</a></li>
+</ul>
+</li>
+<li><a href="#%E5%BE%AA%E7%8E%AF%E7%BB%93%E6%9E%84">循环结构</a>
+<ul>
+<li><a href="#for">for</a></li>
+<li><a href="#while">while</a></li>
+<li><a href="#do-while">do...while</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="%E5%88%86%E4%B9%8B%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>分之结构</h2>
+<h3><a id="if-else" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>if...else...</h3>
+<pre><code class="language-java">if(a) {
+    xxxxx;
+}
+
+// 二选一
+if(a) {
+    xxxxx;
+} else {
+    xxxxx;
+}
+
+// 多选一
+if(a) {
+    xxxxx;
+} else if(b) {
+    xxxxx;
+} else {
+    xxxxx;
+}
+</code></pre>
+<h3><a id="switch-case" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>switch...case...</h3>
+<ul>
+<li><code>switch</code> 中的表达式的类型只能是以下 6 种: <code>byte</code> <code>short</code> <code>char</code> <code>int</code> <code>枚举</code> <code>String</code></li>
+<li><code>case</code> 后只能写常量, 不能是范围</li>
+<li>当匹配到一个分支, 后面的分支不需要判断直接执行, 如果不想执行需要添加 <code>break</code></li>
+</ul>
+<pre><code class="language-java">switch(a) { // a 的类型只能是以下6种: byte short char int 枚举 String
+    case b: // a == b
+        xxxxx;
+        break; // 不加 break 会不进行判断直接继续向下执行 case c 和 default 的代码
+    case c: // a == c
+        xxxxx;
+    default: // 位置可任意
+        xxxxx;
+}
+</code></pre>
+<h2><a id="%E5%BE%AA%E7%8E%AF%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>循环结构</h2>
+<p>① 初始化条件<br />
+② 循环条件<br />
+③ 迭代部分<br />
+④ 循环体</p>
+<h3><a id="for" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>for</h3>
+<pre><code class="language-java">for ( ①; ②; ③ ) {
+    ④;
+}
+</code></pre>
+<h3><a id="while" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>while</h3>
+<pre><code class="language-java">①
+while ( ② ) { // 满足进入
+    ④;
+    ③;
+}
+</code></pre>
+<h3><a id="do-while" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>do...while</h3>
+<pre><code class="language-java">①
+do {
+    ④;
+    ③;
+} while ( ② ); // 满足再次进入
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221357067724.html">4. 运算符</a></h1>
+			<p class="meta"><time datetime="2021-05-28T01:15:06+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E7%AE%97%E6%9C%AF%E8%BF%90%E7%AE%97%E7%AC%A6">算术运算符</a></li>
+<li><a href="#%E8%B5%8B%E5%80%BC%E8%BF%90%E7%AE%97%E7%AC%A6">赋值运算符</a></li>
+<li><a href="#%E6%AF%94%E8%BE%83%E8%BF%90%E7%AE%97%E7%AC%A6">比较运算符</a></li>
+<li><a href="#%E9%80%BB%E8%BE%91%E8%BF%90%E7%AE%97%E7%AC%A6">逻辑运算符</a></li>
+<li><a href="#%E4%BD%8D%E8%BF%90%E7%AE%97%E7%AC%A6">位运算符</a></li>
+<li><a href="#%E4%B8%89%E5%85%83%E8%BF%90%E7%AE%97%E7%AC%A6">三元运算符</a></li>
+</ul>
+</div>
+<h2><a id="%E7%AE%97%E6%9C%AF%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>算术运算符</h2>
+<p><code>+ -</code>: 正 负<br />
+<code>+</code>: 字符串连接<br />
+<code>+ - * / %</code>: 加 减 乘 除 取模<br />
+<code>++ --</code>: 自加 自减</p>
+<pre><code class="language-java">int a = 10;
+int b = a++; // 先运算赋值 后自加
+System.out.println(b); // 10
+
+a = 10;
+int c = ++a; // 先自加 后运算赋值
+System.out.println(c); // 11
+
+// ++ -- 不会改变数据类型
+char c1 = 'a';
+System.out.println(++c1); // b
+short s = 1;
+System.out.println(++s); // 2
+</code></pre>
+<h2><a id="%E8%B5%8B%E5%80%BC%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>赋值运算符</h2>
+<p><code>=</code>: 支持连续赋值 <code>a = b = 1;</code><br />
+<code>-= += /= *= ...</code>: 相等于 <code>a = a -+/* b</code>, <strong>不会改变数据类型</strong></p>
+<pre><code class="language-java">char c2 = 'a';
+// c2 = c2 + 2; // 编译不通过, 因为 byte short char 相互运算都转成 int 
+c2 += 2; // 类型不改变
+System.out.println(c2); // c
+
+int i = 1;
+i *= 0.1; // 可以编译通过, 会把结果 0.1 截断成 0 赋值给 i, 不改变 数据类型
+System.out.println(i); // 0
+</code></pre>
+<h2><a id="%E6%AF%94%E8%BE%83%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>比较运算符</h2>
+<p>结果都是 boolean 类型<br />
+<code>== != &lt; &gt; &lt;= &gt;=</code> <code>instanceof</code></p>
+<h2><a id="%E9%80%BB%E8%BE%91%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>逻辑运算符</h2>
+<p>操作的是 boolean 类型<br />
+<code>&amp; |</code>: 逻辑与 逻辑或<br />
+<code>&amp;&amp; ||</code>: 短路与 短路或<br />
+<code>! ^</code>: 逻辑非 逻辑异或(相同为假 不同为真)</p>
+<h2><a id="%E4%BD%8D%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>位运算符</h2>
+<p>操作的是数值类型<br />
+<code>&lt;&lt;</code>: 左移, 低位补 0, <strong>在一定范围内</strong>相等于  [ 原数 * 2^n ], 但当有可能出现符号改变的问题<br />
+<code>&gt;&gt;</code>: 右移, 正数高位补 0, 负数高位补 1, 相等于原数 / 2^n<br />
+<code>&gt;&gt;&gt;</code>: 无符号右移, 不管正负数, 高位都补 0<br />
+<code>&amp; | ^</code>: 与 或 异或<br />
+<code>~</code>: 取反, 按补码各位取反</p>
+<h2><a id="%E4%B8%89%E5%85%83%E8%BF%90%E7%AE%97%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>三元运算符</h2>
+<p><code>b ? a1 : a2</code>: 如果 <code>b == true</code> 则取 <code>a1</code>, 否则取 <code>a2</code><br />
+<strong>要求a1和a2是相同数据类型, 如果不是就会转换</strong></p>
+<pre><code class="language-java">System.out.println(true ? 1 : 2.0); // 输出 1.0
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221160561779.html">3. 数据类型</a></h1>
+			<p class="meta"><time datetime="2021-05-27T19:47:36+08:00" 
+			pubdate data-updated="true">2021/05/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B">数据类型</a></li>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2">基本数据类型转换</a></li>
+<li><a href="#string">String</a></li>
+<li><a href="#%E8%BF%9B%E5%88%B6">进制</a></li>
+</ul>
+</div>
+<h2><a id="%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>数据类型</h2>
+<ul>
+<li>基本数据类型 ( 8 种 )
+<ul>
+<li>数值型
+<ul>
+<li>整数类型:
+<ul>
+<li><code>byte</code>(8): 范围 -128 ~ 127</li>
+<li><code>short</code>(16)</li>
+<li><code>int</code>(32)</li>
+<li><code>long</code>(64): 以 l 或 L 结尾, 有时不加也可以正常编译过, 是因为 <code>int</code> 转成了 <code>long</code>, 如果数字过大, 则会报错</li>
+</ul>
+</li>
+<li>浮点类型
+<ul>
+<li><code>float</code>(32): 有效数字 7 位, 以 f 或 F 结尾</li>
+<li><code>double</code>(64)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>字符型 <code>char</code>(16): 使用 '' 定义, 只能 (且必须) 写一个字符, 转义字符也算一个字符</li>
+<li>布尔型 <code>boolean</code>: true or false</li>
+</ul>
+</li>
+<li>引用数据类型 ( 3 种 )
+<ul>
+<li>类 <code>class</code> (eg. <code>String</code>)</li>
+<li>接口 <code>interface</code></li>
+<li>数组 <code>[]</code></li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>基本数据类型转换</h2>
+<ul>
+<li>
+<p>自动类型转换：容量小的数据类型自动转换为容量大的数据类型</p>
+<ul>
+<li>容量大小指的是, 表示数的范围大小, 不是内存占用大小, 比如: <code>float</code> 表示的范围比 <code>long</code> 大, 但 <code>long</code> 占用 64 bit, <code>long</code> 自动转成 <code>float</code></li>
+<li><code>byte</code> / <code>short</code> / <code>char</code> 之间 ( 甚至同种类型 ) 做运算，结果为 <code>int</code> 型</li>
+<li>整型常量默认位 <code>int</code>; 浮点型常量默认位 <code>double</code></li>
+</ul>
+</li>
+<li>
+<p>强制类型转换: 是自动类型转换的逆过程, 使用 “( )” 实现强转</p>
+</li>
+</ul>
+<h2><a id="string" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>String</h2>
+<ul>
+<li>不是基本类型</li>
+<li>可以和 8 种基本数据类型做运算 (只能是连接运算 <code>+</code>), 运算结果仍然是 <code>String</code></li>
+<li><code>String</code> 转成基本类型不能使用 <code>int(&quot;xxx&quot;)</code>, 要使用包装类例如 <code>Integer.parseInt(&quot;xxx&quot;)</code></li>
+</ul>
+<h2><a id="%E8%BF%9B%E5%88%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>进制</h2>
+<pre><code class="language-java">int n2 = 0b110;
+int n8 = 01;
+int n10 = 1;
+int n16 = 0x110A;
+</code></pre>
+<ul>
+<li>二进制: 以 <code>0b</code> <code>0B</code> 开头, 计算机底层以 <strong><a href="mweblib://15661155257627">补码</a></strong> 方式存储数据
+<ul>
+<li>正数: 补码 = 反码 = 原码</li>
+<li>负数: 补码 = 反码 + 1</li>
+</ul>
+</li>
+<li>八进制: 以 <code>0</code> 开头</li>
+<li>十进制</li>
+<li>十六进制: 以 <code>0x</code> <code>0X</code> 开头</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221150711459.html">2. 关键字</a></h1>
+			<p class="meta"><time datetime="2021-05-27T19:31:11+08:00" 
+			pubdate data-updated="true">2021/05/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%85%B3%E9%94%AE%E5%AD%97%E4%BF%9D%E7%95%99%E5%AD%97%E6%A0%87%E8%AF%86%E7%AC%A6">关键字 保留字 标识符</a></li>
+<li><a href="#%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99">命名规则</a></li>
+</ul>
+</div>
+<h2><a id="%E5%85%B3%E9%94%AE%E5%AD%97%E4%BF%9D%E7%95%99%E5%AD%97%E6%A0%87%E8%AF%86%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>关键字 保留字 标识符</h2>
+<p>关键字（keyword）：被Java语言赋予了特殊含义，用做专门用途的字符（单词）<br />
+保留字：现有Java版本尚未使用，但以后可能会使用的字符<br />
+标识符（Identifier）：对各种变量、方法和类等命名的字符</p>
+<ul>
+<li>字母（大小写）、0-9、_、$</li>
+<li>数字不可以开头</li>
+<li>不可以使用关键字和保留字，但能包含关键字和保留字</li>
+<li>严格区分大小写，长度无限制</li>
+<li>不能包含空格</li>
+</ul>
+<h2><a id="%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>命名规则</h2>
+<p>包名：多单词组成时所有字母都小写：xxxyyyzzz<br />
+类名、接口名：多单词组成时，所有单词的首字母大写：XxxYyyZzz<br />
+变量名、方法名：多单词组成时，第一个单词首字母小写，第二个单词开始每个单词首字母大写：xxxYyyZzz<br />
+常量名：所有字母都大写。多单词时每个单词用下划线连接：XXX_YYY_ZZZ</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221094537419.html">1. Hello World</a></h1>
+			<p class="meta"><time datetime="2021-05-27T17:57:33+08:00" 
+			pubdate data-updated="true">2021/05/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#config">Config</a></li>
+<li><a href="#jdk-jre-jvm">JDK JRE JVM</a></li>
+<li><a href="#%E7%BC%96%E8%AF%91">编译</a></li>
+</ul>
+</div>
+<h2><a id="config" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Config</h2>
+<table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>变量值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>JAVA_HOME</code></td>
+<td>Java 安装路径</td>
+</tr>
+<tr>
+<td><code>PATH</code></td>
+<td><code>%JAVA_HOME%\bin</code></td>
+</tr>
+<tr>
+<td><code>CLASSPATH</code></td>
+<td><code>.;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar</code></td>
+</tr>
+</tbody>
+</table>
+<h2><a id="jdk-jre-jvm" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JDK JRE JVM</h2>
+<p>JDK = JRE + Java 开发工具（javac java javadoc）<br />
+JRE = JVM + Java 核心类<br />
+<img src="media/16221094537419/16221148084817.jpg" alt="" style="width:1021px;" /></p>
+<h2><a id="%E7%BC%96%E8%AF%91" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>编译</h2>
+<p><img src="media/16221094537419/16221094887530.jpg" alt="" style="width:477px;" /></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221429228201.html">读取键盘</a></h1>
+			<p class="meta"><time datetime="2021-05-28T03:15:22+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"></div>
+<pre><code class="language-java">import java.util.Scanner;
+Scanner scan = new Scanner(System.in)
+String s = scan.next()
+int i = scan.nextInt()
+double d = scan.nextDouble()
+boolean b = scan.nextBoolean()
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16223735897370.html">7. abstract & interface</a></h1>
+			<p class="meta"><time datetime="2021-05-30T19:19:49+08:00" 
+			pubdate data-updated="true">2021/05/30</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#abstract">abstract</a>
+<ul>
+<li><a href="#%E6%8A%BD%E8%B1%A1%E7%B1%BB">抽象类</a></li>
+<li><a href="#%E6%8A%BD%E8%B1%A1%E6%96%B9%E6%B3%95">抽象方法</a></li>
+<li><a href="#%E6%8A%BD%E8%B1%A1%E7%B1%BB%E7%9A%84%E5%8C%BF%E5%90%8D%E5%AD%90%E7%B1%BB">抽象类的匿名子类</a></li>
+<li><a href="#%E5%BA%94%E7%94%A8%E6%A8%A1%E7%89%88%E6%96%B9%E6%B3%95">应用: 模版方法</a></li>
+</ul>
+</li>
+<li><a href="#interface">interface</a></li>
+<li><a href="#%E5%AE%9A%E4%B9%89">定义</a>
+<ul>
+<li><a href="#%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%A7%E6%89%BF">接口的继承</a></li>
+<li><a href="#%E6%8E%A5%E5%8F%A3%E5%8C%BF%E5%90%8D%E5%AE%9E%E7%8E%B0%E7%B1%BB">接口匿名实现类</a></li>
+<li><a href="#%E5%BA%94%E7%94%A8%E4%B8%80%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8Fproxy">应用一: 代理模式 (Proxy)</a></li>
+<li><a href="#%E5%BA%94%E7%94%A8%E4%BA%8C%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F">应用二: 工厂模式</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="abstract" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>abstract</h2>
+<h3><a id="%E6%8A%BD%E8%B1%A1%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>抽象类</h3>
+<p>当使用 <code>abstract</code> 修饰类后, 就不可以实例化, 但是一定有构造器, 便于子类实例化调用.<br />
+开发中都会提供抽象类的子类, 让子类实例化, 提供相关操作.</p>
+<h3><a id="%E6%8A%BD%E8%B1%A1%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>抽象方法</h3>
+<ul>
+<li>抽象方法没有方法体, 不能是 <code>private</code>, 不应该被调用, <strong>只能写在抽象类中 (抽象类中可以没有抽象方法)</strong>.</li>
+<li><strong>抽象方法一定要在非抽象子类中实现</strong></li>
+</ul>
+<pre><code class="language-java">public abstract 返回类型 方法名(型参);
+</code></pre>
+<h3><a id="%E6%8A%BD%E8%B1%A1%E7%B1%BB%E7%9A%84%E5%8C%BF%E5%90%8D%E5%AD%90%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>抽象类的匿名子类</h3>
+<pre><code class="language-java">Person p = new Person() { // Person 是抽象类
+    @Override
+    public void show() {
+        System.out.println(&quot;hello&quot;);
+    }
+};
+
+p.show(); // hello
+</code></pre>
+<h3><a id="%E5%BA%94%E7%94%A8%E6%A8%A1%E7%89%88%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>应用: 模版方法</h3>
+<p>当功能一部分实现时确定的 (这部分步骤很固定通用), 一部分实现是不确定的. 这时可以把不确定的部分暴露出去, 让子类去实现.</p>
+<h2><a id="interface" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>interface</h2>
+<ul>
+<li>Java 中, 接口和类是并列的两个结构</li>
+<li>Java 没有多继承, <code>interface</code> 可以得到多继承的效果 (<strong>单继承, 多实现</strong>)</li>
+<li>接口<strong>本质是规范</strong>, 契约等. 继承是一个 &quot;是不是&quot; 的关系, 而接口是 &quot;能不能&quot; 的关系</li>
+<li>接口的实现体现了多态, 接口的实现子类可以赋值给接口的引用变量 (<code>C c = new D();</code> <code>C</code> 是接口, <code>D</code> 实现了 <code>C</code>)</li>
+</ul>
+<h2><a id="%E5%AE%9A%E4%B9%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>定义</h2>
+<ul>
+<li>
+<p>Jdk 7: 只能定义全局常量和抽象方法</p>
+<ul>
+<li>全局常量: <code>public static final</code>, 书写时可以省略, 效果不变</li>
+<li>抽象方法: <code>public abstract</code></li>
+<li><strong>接口不能定义构造器</strong>, 不可以实例化</li>
+</ul>
+<pre><code class="language-java">interface Flyable {
+    public static final int MAX_SPEED = 7900;
+    int MIN_SPEED = 1; // 可以省略 public static final
+
+    public abstract void fly();
+    void stop(); // 可以省略 public abstract
+}
+</code></pre>
+</li>
+<li>
+<p>Jdk 8: 除了全局常量和抽象方法, 还可以定义静态方法和默认方法</p>
+<pre><code class="language-java">interface Java8Interface {
+    // 静态方法
+    public static void method1() { // public 可以省略
+        System.out.println(&quot;m1&quot;);
+    }
+    // 默认方法
+    public default void method2() {
+        System.out.println(&quot;interface m2&quot;);
+    }
+}
+class SuperClass {
+    public void method2() {
+        System.out.println(&quot;super class m2&quot;)
+    }
+}
+class SubClass extends SuperClass implements Java8Interface {
+    // 无需实现静态和默认方法, 但是可以重写
+}
+
+... main {
+    SubClass subClass = new SubClass();
+    // 如果子类继承的父类和实现的接口中声明了同名同参的方法, 在没有重写的情况下, 默认调用父类的方法
+    // 如果子类实现的多个接口中声明了同名同参的静态或默认方法, 子类必须重写
+    subClass.method2(); // super class m2
+    // subClass.method1(); // 接口的静态方法只能用接口调用
+    Java8Interface.method1();
+}
+</code></pre>
+</li>
+</ul>
+<h3><a id="%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%BB%A7%E6%89%BF" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>接口的继承</h3>
+<pre><code class="language-java">interface A {
+    void method1();
+}
+interface B {
+    void method2();
+}
+interface C extends A, B { // 继承两个父接口, 里面实际有三个方法
+    void method3();
+}
+
+class D implements C { // 需要实现 3 个方法
+    @Override
+    public void method1() {}
+    @Override
+    public void method2() {}
+    @Override
+    public void method3() {}
+}
+</code></pre>
+<h3><a id="%E6%8E%A5%E5%8F%A3%E5%8C%BF%E5%90%8D%E5%AE%9E%E7%8E%B0%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>接口匿名实现类</h3>
+<p>和抽象类的匿名子类类似</p>
+<pre><code class="language-java">new A(){
+    @Override
+    public void method1() {
+        System.out.println(&quot;hi&quot;);
+    }
+}.method1(); // hi
+</code></pre>
+<h3><a id="%E5%BA%94%E7%94%A8%E4%B8%80%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8Fproxy" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>应用一: 代理模式 (Proxy)</h3>
+<p>代理模式就是为其他对象提供一种代理以控制对这个对象的访问. 分为静态代理和动态代理 ( 应用场景: 安全代理 / 远程代理 / 延迟加载 )</p>
+<p>静态代理举例:</p>
+<pre><code class="language-java">interface NetWork {
+    void browse();
+}
+class Server implements NetWork {
+    @Override
+    public void browse() {
+        System.out.println(&quot;Server browse...&quot;);
+    }
+}
+class ProxyServer implements NetWork {
+    private Server server;
+    public ProxyServer(Server server) {
+        this.server = server;
+    }
+    @Override
+    public void browse() {
+        System.out.println(&quot;check...&quot;);
+        server.browse();
+        System.out.println(&quot;ok.&quot;);
+    }
+}
+</code></pre>
+<p>调用</p>
+<pre><code class="language-java">Server server = new Server();
+ProxyServer proxyServer = new ProxyServer(server);
+proxyServer.browse();
+</code></pre>
+<p>结果</p>
+<pre><code class="language-plain_text">check...
+Server browse...
+ok.
+</code></pre>
+<h3><a id="%E5%BA%94%E7%94%A8%E4%BA%8C%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>应用二: 工厂模式</h3>
+<p>实现创建者与调用着的分离, 将创建对象的具体过程屏蔽隔离起来, 达到提高灵活性的目的.<br />
+分类: 简单工厂模式, 工厂方法模式, 抽象工厂模式</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16222923817986.html">6. static & final</a></h1>
+			<p class="meta"><time datetime="2021-05-29T20:46:21+08:00" 
+			pubdate data-updated="true">2021/05/29</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#static">static</a>
+<ul>
+<li><a href="#%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F">静态变量</a></li>
+<li><a href="#%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95">静态方法</a></li>
+<li><a href="#%E9%9D%99%E6%80%81%E4%BB%A3%E7%A0%81%E5%9D%97">静态代码块</a></li>
+</ul>
+</li>
+<li><a href="#final">final</a></li>
+</ul>
+</div>
+<h2><a id="static" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>static</h2>
+<p>如果我们希望无论创建多少个实例, 某些特定的属性在内存中只存在一份. 例如每个中国人的国籍都是 <code>中国</code>, 不必每个对象都有一个单独的国籍属性.</p>
+<p>可以修饰的是属性 / 方法 / 代码块 / 内部类</p>
+<h3><a id="%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>静态变量</h3>
+<p>实例变量: 非静态变量, 每个实例都有一个独立的属性<br />
+静态变量: 用 <code>static</code> 修饰的变量, 是共享的属性, 在内存中只有一份. 随着类加载, 存在于方法区的静态域. 可以通过 <code>类.属性</code> 调用</p>
+<pre><code class="language-java">public class StaticTest {
+    public static void main(String[] args) {
+        Chinese c1 = new Chinese();
+        Chinese c2 = new Chinese();
+        c1.name = &quot;a&quot;;
+        c1.nation = &quot;CHN&quot;;
+        c2.name = &quot;b&quot;;
+        c2.nation = &quot;CHINA&quot;;
+        System.out.println(c1.nation); // CHINA
+        System.out.println(Chinese.nation); // CHINA
+    }
+}
+class Chinese {
+    String name;
+    static String nation;
+}
+</code></pre>
+<h3><a id="%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>静态方法</h3>
+<p>随着类的加载而加载, 可以通过类直接调用<br />
+静态方法中只能调用静态方法或静态变量; 非静态方法既可以调用静态也可以调用非静态方法和变量<br />
+静态方法中不能有 <code>this</code> <code>super</code> 关键字</p>
+<h3><a id="%E9%9D%99%E6%80%81%E4%BB%A3%E7%A0%81%E5%9D%97" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>静态代码块</h3>
+<ul>
+<li>静态代码块随着类的加载而加载, 且只加载一次; 非静态代码块每次创建对象时都会加载一次</li>
+<li>静态代码块只能使用静态变量方法</li>
+<li>静态代码块早于非静态代码块的执行</li>
+</ul>
+<h2><a id="final" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>final</h2>
+<p>意为最终的版本, 可以用来修饰类 属性 方法</p>
+<ul>
+<li>修饰类: 这个类就不能被继承</li>
+<li>修饰方法: 这个方法不能被重写</li>
+<li>修饰属性: 这个属性就是常量 (没有默认值), 一旦初始化 (显式赋值 代码块 构造器) 就不能更改</li>
+<li>修饰型参或变量时, 方法内部只读, 不可再更改</li>
+</ul>
+<p><strong><code>static final</code></strong>: 全局静态常量, 内存只有一份, 且不能更改. eg. <code>Math.PI</code></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16222741834695.html">4. 多态</a></h1>
+			<p class="meta"><time datetime="2021-05-29T15:43:03+08:00" 
+			pubdate data-updated="true">2021/05/29</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%A4%9A%E6%80%81">多态</a></li>
+<li><a href="#instanceof">instanceof</a></li>
+</ul>
+</div>
+<h2><a id="%E5%A4%9A%E6%80%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>多态</h2>
+<p>可以理解为一个对象的多种形态<br />
+多态的形式：父类的引用指向子类的对象</p>
+<pre><code class="language-java">PClass p = new SubClass();
+</code></pre>
+<p>多态的应用（虚拟方法调用）：编译时只能调用父类的方法，执行时调用子类重写的方法。编译看左边，执行看右边<br />
+多态的前提：有继承关系，有方法重写</p>
+<p>注意：<strong>对象多态性不是用于属性</strong>，子类和父类属性重名时，运行时访问的是父类的属性</p>
+<p>多态是运行时行为</p>
+<h2><a id="instanceof" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>instanceof</h2>
+<p>如果想在多态时调用子类的特有方法，需要将父类引用向下转型成子类</p>
+<pre><code class="language-java">public class Animal {
+    public void eat() {
+        System.out.println(&quot;animal eat&quot;);
+    }
+
+    public static void main(String[] args) {
+        Animal animal = new Dog();
+        // dog.walk(); // error
+        if (animal instanceof Dog) {
+            Dog dog = (Dog)animal;
+            dog.walk();
+        }
+    }
+}
+
+class Dog extends Animal {
+    @Override
+    public void eat() {
+        System.out.println(&quot;dog eat&quot;);
+    }
+
+    public void walk() {
+        System.out.println(&quot;dog walk&quot;);
+    }
+}
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221979238015.html">3. 继承</a></h1>
+			<p class="meta"><time datetime="2021-05-28T18:32:03+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#object">Object</a></li>
+<li><a href="#%E9%87%8D%E5%86%99overrideoverwrite">重写 (override/overwrite)</a></li>
+<li><a href="#%E5%AD%90%E7%B1%BB%E5%AE%9E%E4%BE%8B%E5%8C%96%E8%BF%87%E7%A8%8B">子类实例化过程</a></li>
+</ul>
+</div>
+<h2><a id="%E6%A6%82%E8%BF%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>概述</h2>
+<pre><code class="language-java">class A extends B { }
+</code></pre>
+<ul>
+<li>子类可以获得父类中有私有的属性或方法，但由于封装性的设计，不可以直接调用</li>
+<li>子类是对父类功能的 “扩展”，不是父类的子集</li>
+<li>Java 一个类只能继承一个父类, 但可以有多个子类 （单继承 多实现）</li>
+<li>好处
+<ul>
+<li>减少代码冗余, 提高复用性</li>
+<li>便于功能扩展</li>
+<li>为多态提供了前提</li>
+</ul>
+</li>
+</ul>
+<h2><a id="object" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Object</h2>
+<p>所有的类都直接或间接的继承 <code>java.lang.Object</code> 类</p>
+<h2><a id="%E9%87%8D%E5%86%99overrideoverwrite" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>重写 (override/overwrite)</h2>
+<p>在继承的基础之上，子类在获取了父类的结构以后，可以对父类中同名的方法 ( 非 <code>private</code> )进行 “重构”</p>
+<ul>
+<li>方法名，形参列表形同</li>
+<li>方法的返回值需要是父类返回值类或父类返回值类子类</li>
+<li>权限修饰符不小于父类；异常类型不大于父类</li>
+<li>两个方法要同为 <code>static</code> 或同为非 <code>static</code></li>
+</ul>
+<h2><a id="%E5%AD%90%E7%B1%BB%E5%AE%9E%E4%BE%8B%E5%8C%96%E8%BF%87%E7%A8%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>子类实例化过程</h2>
+<ul>
+<li>从结果上来看，子类继承父类以后，就获取了父类的属性方法，创建子类的对象，的堆空间中，就会加载所有父类声明的属性。</li>
+<li>从过程来看，当我们通过子类的构造器创建对象的时候，我们一定会直接或间接的调用父类的构造器，进而调用父类的父类的构造器，知道调用了 <code>Object</code> 的空参构造器为止。正因为加载过所有父类的结构，所以才可以在内存中看到父类的结构，子类对象才可以调用。</li>
+<li>虽然创建子类对象时调用了父类构造器，但是自始至终只创建了一个对象，即子类对象<br />
+<img src="media/16221979238015/16222740581782.jpg" alt="" class="mw_img_center" style="width:368px;display: block; clear:both; margin: 0 auto;" /></li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221963348622.html">5. this & super</a></h1>
+			<p class="meta"><time datetime="2021-05-28T18:05:34+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#this">this</a>
+<ul>
+<li><a href="#%E8%B0%83%E7%94%A8%E5%B1%9E%E6%80%A7%E6%96%B9%E6%B3%95">调用属性方法</a></li>
+<li><a href="#%E8%B0%83%E7%94%A8%E6%9E%84%E9%80%A0%E5%99%A8">调用构造器</a></li>
+</ul>
+</li>
+<li><a href="#super">super</a>
+<ul>
+<li><a href="#%E8%B0%83%E7%94%A8%E5%B1%9E%E6%80%A7%E6%96%B9%E6%B3%95">调用属性方法</a></li>
+<li><a href="#%E8%B0%83%E7%94%A8%E6%9E%84%E9%80%A0%E5%99%A8">调用构造器</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="this" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>this</h2>
+<h3><a id="%E8%B0%83%E7%94%A8%E5%B1%9E%E6%80%A7%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>调用属性方法</h3>
+<ul>
+<li><code>this</code> 表示当前对象或正在创建的对象</li>
+<li>当形参与成员变量重名时, 如果在方法内部需要使用成员变量, 必须添加 <code>this</code> 来表明该变量时类成员, 无论是否同名, 都建议添加 <code>this</code> , 增强程序的阅读性</li>
+</ul>
+<h3><a id="%E8%B0%83%E7%94%A8%E6%9E%84%E9%80%A0%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>调用构造器</h3>
+<ul>
+<li>在构造器中使用 <code>this(形参列表)</code> 显式的调用本类中重载的其它的构造器时必须写在构造器的首行</li>
+<li>多个构造器使用 <code>this</code> 调用时, 调用关系不能形成环</li>
+</ul>
+<pre><code class="language-java">class Person{
+	private String name;
+	private int age;
+	
+	public Person(){
+		this.name = &quot;AA&quot;;
+		this.age = 1;
+	}
+	
+	public Person(String name){
+		this();
+		this.name = name;
+	}
+	public Person(String name, int age){
+		this(name);
+		this.age = age;
+	}
+	// ...
+}
+</code></pre>
+<h2><a id="super" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>super</h2>
+<h3><a id="%E8%B0%83%E7%94%A8%E5%B1%9E%E6%80%A7%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>调用属性方法</h3>
+<ul>
+<li>显式的调用父类的指定属性或方法。尤其是当子类与父类有同名的属性、或方法时</li>
+</ul>
+<h3><a id="%E8%B0%83%E7%94%A8%E6%9E%84%E9%80%A0%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>调用构造器</h3>
+<ul>
+<li><strong>任何一个类 (除 <code>Object</code> 类) 的构造器的首行，要么显式的调用本类中重载的其它的构造器 <code>this(形参列表)</code> 或显式的调用父类中指定的构造器 <code>super(形参列表)</code>, 要么默认的调用父类空参的构造器 <code>super()</code></strong></li>
+<li>建议在设计类时，提供一个空参的构造器</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221931135705.html">2. 封装</a></h1>
+			<p class="meta"><time datetime="2021-05-28T17:11:53+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%B0%81%E8%A3%85%E4%B8%8E%E9%9A%90%E8%97%8F">封装与隐藏</a></li>
+<li><a href="#%E4%BD%93%E7%8E%B0">体现</a></li>
+<li><a href="#%E6%9D%83%E9%99%90%E4%BF%AE%E9%A5%B0%E7%AC%A6">权限修饰符</a></li>
+<li><a href="#javabean">JavaBean</a></li>
+</ul>
+</div>
+<h2><a id="%E5%B0%81%E8%A3%85%E4%B8%8E%E9%9A%90%E8%97%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>封装与隐藏</h2>
+<p>当创建了类的对象以后，如果直接通过 &quot;对象.属性&quot; 的方式对相应的对象属性赋值的话，可能会出现不满足实际情况的意外（例如年龄被设置成负数）。<br />
+我们考虑不让对象来直接作用属性，而是通过 &quot;对象.方法&quot; 的形式，来控制对象对属性的访问。</p>
+<h2><a id="%E4%BD%93%E7%8E%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>体现</h2>
+<ul>
+<li>将成员变量权限设置成 <code>private</code>，提供公共的方法 <code>getter setter</code> 调用</li>
+</ul>
+<h2><a id="%E6%9D%83%E9%99%90%E4%BF%AE%E9%A5%B0%E7%AC%A6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>权限修饰符</h2>
+<p><img src="media/16221931135705/16221940741269.jpg" alt="" style="width:678px;" /></p>
+<p>类只可以用 <code>public</code> 和 <code>缺省</code> 修饰<br />
+属性、方法、构造器、内部类可以用上述四种修饰</p>
+<h2><a id="javabean" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JavaBean</h2>
+<p>用户可以使用 JavaBean 将功能、处理、值、数据库访问和其他任何可以用 Java 创建的对象进行打包, 提供了一种随时随地的复制和粘贴功能, 而不用关心任何改变<br />
+JavaBean 是符合如下标准的 Java 类 :</p>
+<ul>
+<li>类是公共的</li>
+<li>有一个无参的公共构造器</li>
+<li>有属性, 且有对应的 get set 方法</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16221841137768.html">1. Class</a></h1>
+			<p class="meta"><time datetime="2021-05-28T14:41:53+08:00" 
+			pubdate data-updated="true">2021/05/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E7%B1%BB%E6%BA%90%E6%96%87%E4%BB%B6">类 &amp; 源文件</a></li>
+<li><a href="#%E6%9E%84%E6%88%90">构成</a></li>
+<li><a href="#%E5%B1%9E%E6%80%A7field">属性 (field)</a></li>
+<li><a href="#%E6%96%B9%E6%B3%95method">方法 (method)</a>
+<ul>
+<li><a href="#%E5%80%BC%E4%BC%A0%E9%80%92">值传递</a></li>
+<li><a href="#%E9%87%8D%E8%BD%BDoverload">重载 (overload)</a></li>
+<li><a href="#%E5%8F%AF%E5%8F%98%E4%B8%AA%E6%95%B0%E7%9A%84%E5%8F%82%E6%95%B0">可变个数的参数</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9E%84%E9%80%A0%E5%99%A8construction">构造器 (construction)</a></li>
+<li><a href="#%E4%BB%A3%E7%A0%81%E5%9D%97%E5%88%9D%E5%A7%8B%E5%8C%96%E5%9D%97">代码块 (初始化块)</a></li>
+<li><a href="#%E5%86%85%E9%83%A8%E7%B1%BB">内部类</a></li>
+</ul>
+</div>
+<h2><a id="%E7%B1%BB%E6%BA%90%E6%96%87%E4%BB%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>类 &amp; 源文件</h2>
+<ul>
+<li>一个源文件中最多只能有一个 <code>public</code> 类, 其它类的个数不限</li>
+<li>如果源文件包含一个 <code>public</code> 类，则文件名必须按该类名命名</li>
+</ul>
+<h2><a id="%E6%9E%84%E6%88%90" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>构成</h2>
+<ul>
+<li><code>field</code> ( 属性 / 成员变量 / 域 / 字段 ): 存在于堆空间中</li>
+<li><code>method</code> ( 方法 / 成员方法 / 函数 )</li>
+<li><code>construction</code> ( 构造器 )</li>
+<li>代码块</li>
+<li>内部类</li>
+</ul>
+<h2><a id="%E5%B1%9E%E6%80%A7field" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>属性 (field)</h2>
+<p>属性 &amp; 局部变量</p>
+<ul>
+<li>相同点
+<ul>
+<li>声明的格式</li>
+<li>先声明, 后使用</li>
+<li>都有对应的作用域</li>
+</ul>
+</li>
+<li>不同点
+<ul>
+<li>声明位置不同: 成员变量声明在类内; 局部变量声明在形参或方法, 代码块, 构造器内部</li>
+<li>是否有权限: 属性声明时可以指定权限: <code>private</code> <code>public</code> <code>defalut</code> <code>protected</code></li>
+<li>初始化值: 属性根据类型都有默认初始化值; 局部变量调用前一定要显式赋值</li>
+<li>内存位置: 属性在堆空间; 局部变量在栈空间</li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E6%96%B9%E6%B3%95method" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>方法 (method)</h2>
+<pre><code class="language-java">权限修饰符 [static final abstract] 返回值类型 方法名([形参]){
+    // ......
+}
+</code></pre>
+<h3><a id="%E5%80%BC%E4%BC%A0%E9%80%92" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>值传递</h3>
+<p>Java 中的参数传递机制: 值传递机制</p>
+<ul>
+<li>形参是基本数据类型: 传递的是变量保存的数据值</li>
+<li>形参是引用数据类型: 传递的是变量保存的数据的地址值</li>
+</ul>
+<h3><a id="%E9%87%8D%E8%BD%BDoverload" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>重载 (overload)</h3>
+<p>同一个类中, 存在<strong>同名</strong>的方法, 但是参数的类型, 数量, 顺序可以不同, 跟权限修饰符, 返回值都没关系</p>
+<pre><code class="language-java">public int getSum(int i, int j) {}
+public int getSum(int i, int j, int k) {}
+public double getSum(double d1, double d2) {}
+public void getSum(double d1, double d2, double d3) {}
+public void getSum(int ... is) {}
+</code></pre>
+<h3><a id="%E5%8F%AF%E5%8F%98%E4%B8%AA%E6%95%B0%E7%9A%84%E5%8F%82%E6%95%B0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>可变个数的参数</h3>
+<p>格式</p>
+<pre><code class="language-java">public void show(int ... is) { // 可变个数的参数必须声明在末尾
+    // 使用时把 is 看作一个数组
+}
+</code></pre>
+<ul>
+<li>调用时, 可以传 0 - n 个参数</li>
+<li>匹配不到其他的重载方法时再调用这个方法</li>
+</ul>
+<h2><a id="%E6%9E%84%E9%80%A0%E5%99%A8construction" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>构造器 (construction)</h2>
+<pre><code class="language-java">权限修饰符 类名(形参) {}
+</code></pre>
+<ul>
+<li>作用: 创建对象, 给对象属性赋值</li>
+<li>若不显式声明类的构造器的话, 程序会默认提供一个空参的构造器</li>
+<li>一旦显式的定义类的构造器, 那么默认的构造器就不再提供</li>
+<li>一个类中定义的多个构造器, 彼此构成重载</li>
+</ul>
+<h2><a id="%E4%BB%A3%E7%A0%81%E5%9D%97%E5%88%9D%E5%A7%8B%E5%8C%96%E5%9D%97" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>代码块 (初始化块)</h2>
+<ul>
+<li>用于对对象或类属性进行初始化, 代码块的执行早于构造器</li>
+<li>只能不修饰或用 <code>static</code> 修饰</li>
+<li><a href="16222923817986.html">静态代码块 vs 非静态代码块</a></li>
+</ul>
+<h2><a id="%E5%86%85%E9%83%A8%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>内部类</h2>
+<p>一个事物的内部, 还有一个部分需要一个完整的结构进行描述, 这个内部完整的结构又只为外部事物提供服务.<br />
+分类: 成员内部类 (静态 非静态), 局部内部类 (方法 构造器 代码块内)</p>
+<ul>
+<li>
+<p>成员内部类:</p>
+<ul>
+<li>作为一个类, 可以定义属性方法构造器等, 可以被 <code>final</code> <code>abstract</code> 修饰</li>
+<li>作为外部类的成员, 可以调用外部类的成员, 可以被 <code>static</code> <code>四种权限</code> 修饰</li>
+</ul>
+<pre><code class="language-java">class AA {
+    String name;
+    static class CC { // 静态成员内部类
+        String name;
+    }
+    class BB { // 非静态成员内部类
+        String name;
+        public void m(String name) {
+            System.out.println(name); // 型参 的 name
+            System.out.println(this.name); // BB 的 name
+            System.out.println(AA.this.name); // AA 的 name
+        }
+    }
+
+    public void method() {
+        class DD { // 局部内部类
+        }
+    }
+}
+
+// 实例化
+AA.CC cc = new AA.CC(); // 静态成员内部类实例化
+AA.BB bb = new AA().new BB(); // 非静态成员内部类实例化
+</code></pre>
+</li>
+<li>
+<p>局部内部类: <a href="16223735897370.html">抽象类和接口的匿名子类的实例化</a> 都属于局部内部类</p>
+</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16222825796598.html">包装类</a></h1>
+			<p class="meta"><time datetime="2021-05-29T18:02:59+08:00" 
+			pubdate data-updated="true">2021/05/29</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2">相互转换</a>
+<ul>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BB">基本数据类型 --&gt; 包装类</a></li>
+<li><a href="#%E5%8C%85%E8%A3%85%E7%B1%BB%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B">包装类 --&gt; 基本数据类型</a></li>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BBstring">基本数据类型 包装类 --&gt; String</a></li>
+<li><a href="#string%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BB">String --&gt; 基本数据类型 包装类</a></li>
+</ul>
+</li>
+<li><a href="#%E8%87%AA%E5%8A%A8%E8%A3%85%E7%AE%B1">自动装箱</a></li>
+</ul>
+</div>
+<table>
+<thead>
+<tr>
+<th>基本数据类型</th>
+<th>包装类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>byte</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>short</td>
+<td>Short</td>
+</tr>
+<tr>
+<td>int</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td>long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>float</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>chart</td>
+<td>Character</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>Boolean</td>
+</tr>
+</tbody>
+</table>
+<p>Byte Short Integer Long Float Double 的父类是 Number</p>
+<h2><a id="%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>相互转换</h2>
+<h3><a id="%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>基本数据类型 --&gt; 包装类</h3>
+<pre><code class="language-java">// 使用构造器: 参数可以是基本数据类型或字符串
+Integer i1 = new Integer(10);
+Float f1 = new Float(&quot;20.0f&quot;);
+Boolean b1 = new Boolean(&quot;true&quot;);
+// 自动装箱
+Double d1 = 1.9;
+</code></pre>
+<h3><a id="%E5%8C%85%E8%A3%85%E7%B1%BB%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>包装类 --&gt; 基本数据类型</h3>
+<pre><code class="language-java">int i2 = i1.intValue(); // 包装类.xxxValue()
+float f2 = f1; // 自动拆箱
+</code></pre>
+<h3><a id="%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BBstring" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>基本数据类型 包装类 --&gt; String</h3>
+<pre><code class="language-java">int i3 = 1;
+Integer i4 = 5;
+// String.valueOf(xxx)
+String s1 = String.valueOf(i3);
+String s2 = String.valueOf(i4);
+String s3 = i3 + &quot;&quot;;
+</code></pre>
+<h3><a id="string%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8C%85%E8%A3%85%E7%B1%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>String --&gt; 基本数据类型 包装类</h3>
+<pre><code class="language-java">int i5 = Integer.parseInt(&quot;123&quot;); // 包装类.parseXxx(String)
+float i6 = new Integer(&quot;234&quot;); // 使用包装类的构造器
+</code></pre>
+<h2><a id="%E8%87%AA%E5%8A%A8%E8%A3%85%E7%AE%B1" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>自动装箱</h2>
+<p>使用自动装箱时, 会优先使用内部缓存, 例如 Integer 的 -128 - 127 范围内都是使用的提前 new 好的对象</p>
+<pre><code class="language-java">Integer ii1 = new Integer(1);
+Integer ii2 = new Integer(2);
+System.out.println(ii1 == ii2); // false
+
+Integer ii3 = 1;
+Integer ii4 = 1;
+System.out.println(ii3 == ii4); // true
+
+Integer ii5 = 128;
+Integer ii6 = 128;
+System.out.println(ii5 == ii6); // false
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16222795868244.html">Object</a></h1>
+			<p class="meta"><time datetime="2021-05-29T17:13:06+08:00" 
+			pubdate data-updated="true">2021/05/29</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95">常用方法</a></li>
+<li><a href="#equals">equals</a></li>
+<li><a href="#tostring">toString</a></li>
+</ul>
+</div>
+<h2><a id="%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>常用方法</h2>
+<pre><code class="language-java">clone()
+equals(Object obj)
+finalize() // 没有引用指向的对象, jvm 垃圾回收前会调用这个方法, 程序员不主动去调用
+getClass() // 获取创建对象的类
+hashCode()
+toString()
+notify() / notifyAll()
+wait() / wait(long timeout) / wait(long timeout, int nanos)
+</code></pre>
+<h2><a id="equals" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>equals</h2>
+<p><code>==</code>: 比较的是两个变量在栈中的内容，如果变量时引用类型，栈中保存的时对象地址<br />
+<code>equals</code>: <code>Object</code> 类中默认使用的是 <code>==</code>，如果要比较的是引用类型变量指向的堆内存中的对象，需要重写该方法实现具体的比较逻辑</p>
+<pre><code class="language-java">public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    
+    Person person = (Person) o;
+    return age == person.age &amp;&amp; Objects.equals(name, person.name);
+}
+</code></pre>
+<h2><a id="tostring" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>toString</h2>
+<p>当我们输出一个对象时,实际上是调用的对象的 <code>toString</code> 方法, 需要重写方法, <code>Object</code> 类中默认返回对象的类和地址信息</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16242598041253.html">Java 容器</a></h1>
+			<p class="meta"><time datetime="2021-06-21T15:16:44+08:00" 
+			pubdate data-updated="true">2021/06/21</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p><a href="https://share.mubu.com/doc/2cOewutiRya">Java 容器</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

@@ -1,0 +1,582 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  AQS - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">AQS</h1>
+				<p class="meta"><time datetime="2021-06-27T14:07:42+08:00" pubdate data-updated="true">2021/06/27</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%8E%9F%E7%90%86">原理</a>
+<ul>
+<li><a href="#%E5%85%B1%E4%BA%AB%E6%96%B9%E5%BC%8F">共享方式</a>
+<ul>
+<li><a href="#%E7%8B%AC%E5%8D%A0">独占</a></li>
+<li><a href="#%E5%85%B1%E4%BA%AB">共享</a></li>
+</ul>
+</li>
+<li><a href="#%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97">等待队列</a></li>
+<li><a href="#%E5%A6%82%E4%BD%95%E8%87%AA%E5%AE%9A%E4%B9%89%E5%90%8C%E6%AD%A5%E5%99%A8%EF%BC%9F">如何自定义同步器？</a></li>
+</ul>
+</li>
+<li>[常见的同步器（<a href="16226447097561.html">辅助类</a>）](#常见的同步器（辅助类16226447097561-html）)
+<ul>
+<li><a href="#semaphore">Semaphore</a></li>
+<li><a href="#countdownlatch">CountDownLatch</a></li>
+<li><a href="#cyclicbarrier">CyclicBarrier</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p><a href="https://snailclimb.gitee.io/javaguide/#/docs/java/multi-thread/AQS%E5%8E%9F%E7%90%86%E4%BB%A5%E5%8F%8AAQS%E5%90%8C%E6%AD%A5%E7%BB%84%E4%BB%B6%E6%80%BB%E7%BB%93?id=_5-cyclicbarrier%E5%BE%AA%E7%8E%AF%E6%A0%85%E6%A0%8F">参考</a></p>
+<h2><a id="%E5%8E%9F%E7%90%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>原理</h2>
+<p>AQS（<code>AbstractQueuedSynchronizer</code>）同步器，可以利用它协调线程之间的同步行为，核心思想是，如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，这个机制 AQS 是用 CLH 队列实现的，即将暂时获取不到锁的线程加入到队列中。<br />
+<img src="media/16247740620828/16247741942725.jpg" alt="" class="mw_img_center" style="width:600px;display: block; clear:both; margin: 0 auto;" /></p>
+<p>同步状态使用成员变量 state（ volatile、原子操作 ）表示，AQS 就是通过对 state 的原子操作来达到同步各个线程的目的。</p>
+<h3><a id="%E5%85%B1%E4%BA%AB%E6%96%B9%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>共享方式</h3>
+<h4><a id="%E7%8B%AC%E5%8D%A0" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>独占</h4>
+<p>只有一个线程可以执行，如 ReentrantLock。又分为公平锁和非公平锁，区别有两点：</p>
+<ol>
+<li>非公平锁在调用 lock 后，会先使用 CAS 进行一次抢锁，抢不到就进入 <code>tryAcquire()</code> 方法；公平锁直接进入 <code>tryAcquire()</code></li>
+<li>如果锁释放了，非公平锁再抢一次锁，而公平锁要判断阻塞队列有没有线程在等待，非公平锁抢不到锁或公平锁有其他线程在等待就进入阻塞队列等待唤醒</li>
+</ol>
+<blockquote>
+<p><code>ReentrantLock</code>，state 初始化为 0，表示未锁定状态。A 线程 <code>lock()</code> 时，会调用 <code>tryAcquire()</code> 独占该锁并将 state+1。此后，其他线程再 <code>tryAcquire()</code> 时就会失败，直到 A 线程 <code>unlock()</code> 到 state=0（即释放锁）为止，其它线程才有机会获取该锁。</p>
+</blockquote>
+<h4><a id="%E5%85%B1%E4%BA%AB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>共享</h4>
+<p>多个线程可以同时执行，如 Semaphore、CountDownLatch。</p>
+<h3><a id="%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>等待队列</h3>
+<p>如果获取锁失败，就加入等待队列，是如何实现的？</p>
+<ol>
+<li>通过当前线程和锁模式新建一个节点</li>
+<li>pred 指针指向尾节点 tail</li>
+<li>将新节点的 prev 指向 pred</li>
+<li>通过 compareAndSetTail 完成尾节点的设置</li>
+<li>如果没有初始化就构造一个空的头结点</li>
+</ol>
+<h3><a id="%E5%A6%82%E4%BD%95%E8%87%AA%E5%AE%9A%E4%B9%89%E5%90%8C%E6%AD%A5%E5%99%A8%EF%BC%9F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>如何自定义同步器？</h3>
+<p>AQS 的设计是基于模版方法的，继承 <code>AbstractQueuedSynchronizer</code> 并重写指定的方法即可（<code>tryAcquire / tryRelease</code> 或 <code>tryAcquireShared / tryReleaseShared</code>）。</p>
+<pre><code class="language-java">isHeldExclusively()//该线程是否正在独占资源。只有用到condition才需要去实现它。
+tryAcquire(int)//独占方式。尝试获取资源，成功则返回true，失败则返回false。
+tryRelease(int)//独占方式。尝试释放资源，成功则返回true，失败则返回false。
+tryAcquireShared(int)//共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。
+tryReleaseShared(int)//共享方式。尝试释放资源，成功则返回true，失败则返回false。
+</code></pre>
+<h2><a id="%E5%B8%B8%E8%A7%81%E7%9A%84%E5%90%8C%E6%AD%A5%E5%99%A8%EF%BC%88%E8%BE%85%E5%8A%A9%E7%B1%BB16226447097561-html%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>常见的同步器（<a href="16226447097561.html">辅助类</a>）</h2>
+<h3><a id="semaphore" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Semaphore</h3>
+<p>可以限制访问共享资源的线程数量。</p>
+<p>原理是初始化 state 为 N，每个线程执行 <code>acquire()</code>，如果 state &gt; 0，就使得 state - 1，如果 state = 0，就加入阻塞队列，并自旋判断 state 是否大于 0；线程调用 <code>release()</code> 使 state + 1，阻塞的线程会竞争这个锁。</p>
+<h3><a id="countdownlatch" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CountDownLatch</h3>
+<p>可以使多个线程阻塞在一个地方，直到所有线程任务都执行完毕。（类似倒计时的效果，<strong>一次性的</strong>）</p>
+<p>原理是初始化 state 为 N，每个线程执行 <code>countDown()</code> 方法使得 state - 1，调用 <code>await()</code> 会阻塞并自旋判断 state，如果 state = 0，就释放所有等待的线程，执行 <code>await()</code> 之后的语句。</p>
+<p>典型用法：</p>
+<ul>
+<li>主线程（<code>await</code>）等待多个子线程执行完毕（<code>countDown</code>）；</li>
+<li>主线程通知（<code>countDown</code>）所有等待的线程执行（<code>await</code>），CountDownLatch 计数器需要初始化为 1。</li>
+</ul>
+<h3><a id="cyclicbarrier" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CyclicBarrier</h3>
+<p>基于 <code>ReentrantLock</code> 实现，和 <code>CountDownLatch</code> 类似但更强大，让一组线程全部到达同步点后，这组线程才向后执行。<br />
+提供了一个高级构造函数，能传入一个 <code>Runnable</code>，所有线程到达屏障后，优先执行 <code>Runnable</code>。</p>
+<p>构造时指定拦截的数量 count = N，每个线程调用 <code>await()</code> 使得 count - 1，如果 count = 0，执行构造器传入的任务，然后通知所有阻塞线程执行；如果 count &gt; 0，就自旋阻塞。</p>
+<blockquote>
+<p><code>CyclicBarrier</code> VS <code>CountDownLatch</code></p>
+<ol>
+<li><code>CyclicBarrier</code> 是多个线程在任意一个没有完成时，所有线程都等待（内部等待）；<code>CountDownLatch</code> 是一/多个线程等待其他 N 个线程完成某件事情（等待外部线程）</li>
+<li><code>CyclicBarrier</code> 调用 <code>await()</code> 减一后会阻塞直到计数器为 0；<code>CountDownLatch</code> 调用 <code>countDown()</code> 减一后继续运行，其他线程调用 <code>await()</code> 阻塞直到计数器为 0</li>
+<li><code>CountDownLatch</code> 是一次性的；<code>CyclicBarrier</code> 提供 reset 方法</li>
+</ol>
+</blockquote>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='JUC.html'>JUC</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16225545153969.html" 
+	        title="Previous Post: JVM 内存划分">&laquo; JVM 内存划分</a>
+	    
+	    
+	        <a class="basic-alignment right" href="16227419427125.html" 
+	        title="Next Post: CAS">CAS &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="asset/prism.js"></script>
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

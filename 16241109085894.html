@@ -1,0 +1,582 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  黏包半包 - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">黏包半包</h1>
+				<p class="meta"><time datetime="2021-06-19T21:55:08+08:00" pubdate data-updated="true">2021/06/19</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#%E9%BB%8F%E5%8C%85">黏包</a></li>
+<li><a href="#%E5%8D%8A%E5%8C%85">半包</a></li>
+<li><a href="#%E8%A7%A3%E5%86%B3%E9%BB%8F%E5%8C%85">解决黏包</a></li>
+<li><a href="#%E5%8D%8F%E8%AE%AE">协议</a>
+<ul>
+<li><a href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8D%8F%E8%AE%AE">自定义协议</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="%E9%BB%8F%E5%8C%85" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>黏包</h2>
+<p>现象：发送 abc abc，接受 abcabc<br />
+原因：</p>
+<ul>
+<li>接收方 ByteBuf 设置太大</li>
+<li>接收方处理消息不及时，同时滑动窗口空余很多</li>
+<li>发送方的 Nagle 算法：由于报文都需要添加报头，当发送消息很小时，也需要添加报文头，Nagle 算法可能将多个小的消息合成一个大的消息发送。</li>
+</ul>
+<h2><a id="%E5%8D%8A%E5%8C%85" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>半包</h2>
+<p>现象：发送 abcabc，接受 abc abc<br />
+原因：</p>
+<ul>
+<li>接收方 ByteBuf 设置太小</li>
+<li>接收方的滑动窗口不够了，发送方只能先发一部分，收到 ack 后再发剩下的</li>
+<li>链路层：MSS 限制，网卡可能对发送数据有限制，发送的数据超过限制后，会将数据切分</li>
+</ul>
+<h2><a id="%E8%A7%A3%E5%86%B3%E9%BB%8F%E5%8C%85" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>解决黏包</h2>
+<ul>
+<li>
+<p>短链接：每发一次数据就断开连接。效率极低，也无法解决半包问题。</p>
+</li>
+<li>
+<p>定长解码器（<code>FixedLengthFrameDecoder</code>）：一个特殊的 handler，需要双方协商消息固定长度，接收时遇到半包可以等待接受，遇到黏包消息可以拆分。会造成浪费，因为不足长度的消息需要用无意义的字节填充。</p>
+</li>
+<li>
+<p>分隔符解码器：需要指定一个最大长度。效率也不高，因为需要依次查看消息，查找分隔符。</p>
+<ul>
+<li><code>LineBasedFrameDecoder</code>: 换行分隔符解码器，支持 <code>\n</code> <code>\r\n</code>；</li>
+<li><code>DelimiterFrameDecoder</code>: 自定义分隔符解码器</li>
+</ul>
+</li>
+<li>
+<p>预设长度（<code>LengthFeildFrameDecoder</code>）：数据的长度约定在数据包里，消息格式为 <code>定长字节表示内容长度 + 实际内容</code></p>
+<p><img src="media/16241109085894/16241163684377.jpg" alt="" class="mw_img_center" style="width:840px;display: block; clear:both; margin: 0 auto;" /></p>
+</li>
+</ul>
+<h2><a id="%E5%8D%8F%E8%AE%AE" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>协议</h2>
+<p>Netty 提供了 Redis、Http 等常用协议的编解码器</p>
+<ol>
+<li>
+<p>Http：<code>HttpServerCodec</code></p>
+<pre><code class="language-java">.childHandler(new ChannelInitializer&lt;NioSocketChannel&gt;() { // 绑定 handle
+        @Override
+        protected void initChannel(NioSocketChannel channel) {
+            channel.pipeline()
+                    .addLast(new LoggingHandler(LogLevel.DEBUG))
+                    .addLast(new HttpServerCodec()) // 包含两个：HttpRequestDecoder, HttpResponseEncoder
+                    // 上一步解析成两个对象，请求头 DefaultHttpRequest，请求体 LastHttpContent
+                    // 这里只关心 DefaultHttpRequest
+                    .addLast(new SimpleChannelInboundHandler&lt;DefaultHttpRequest&gt;() {
+
+                        @Override
+                        protected void channelRead0(ChannelHandlerContext ctx, DefaultHttpRequest msg) throws Exception {
+                            System.out.println(msg.uri());
+                            // 返回
+                            byte[] bytes = &quot;&lt;h1&gt;hello world!&lt;/h1&gt;&quot;.getBytes();
+                            DefaultFullHttpResponse response = new DefaultFullHttpResponse(msg.protocolVersion(), HttpResponseStatus.OK); // http协议版本号、状态码
+                            response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, bytes.length);
+                            response.content().writeBytes(bytes);
+                            ctx.writeAndFlush(response);
+                        }
+                    });
+        }
+</code></pre>
+</li>
+</ol>
+<h3><a id="%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8D%8F%E8%AE%AE" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>自定义协议</h3>
+<p>可以继承 <code>ByteToMessageCodec&lt;Message&gt;</code> 或 <code>MessageToMessageCodec&lt;Message&gt;</code> 父类（区别在于是否可以被多个 EventLoop 共享），重写 <code>encode</code> 和 <code>decode</code> 方法，自己设计协议，既可以出站也可以入站。<br />
+在绑定自定义协议编解码器前，配合帧解码器 <code>LengthFeildFrameDecoder</code> 指明自定义协议中 <code>length</code> 的偏移量，防止黏包半包问题。</p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='Netty.html'>Netty</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16257534482530.html" 
+	        title="Previous Post: 分布式锁">&laquo; 分布式锁</a>
+	    
+	    
+	        <a class="basic-alignment right" href="16232540580406.html" 
+	        title="Next Post: Hello, Netty">Hello, Netty &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="asset/prism.js"></script>
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

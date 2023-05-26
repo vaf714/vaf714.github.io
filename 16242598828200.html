@@ -1,0 +1,579 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  数据库 - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">数据库</h1>
+				<p class="meta"><time datetime="2021-06-21T15:18:02+08:00" pubdate data-updated="true">2021/06/21</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#mvcc%EF%BC%88%E5%A4%9A%E7%89%88%E6%9C%AC%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6%EF%BC%89">MVCC（多版本并发控制）</a>
+<ul>
+<li><a href="#undo-log%E7%89%88%E6%9C%AC%E9%93%BE-readview">undo log &amp; 版本链 &amp; readview</a></li>
+<li><a href="#%E5%BF%AB%E7%85%A7%E8%AF%BB%E6%97%B6%E9%80%89%E6%8B%A9%E5%93%AA%E4%B8%80%E4%B8%AA%E7%89%88%E6%9C%AC%EF%BC%9F">快照读时选择哪一个版本？</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8mvcc%E5%AE%9E%E7%8E%B0%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB">使用 MVCC 实现隔离级别</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0%E5%8F%AF%E6%8F%90%E4%BA%A4%E8%AF%BB%EF%BC%88%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB%EF%BC%89">实现可提交读（解决脏读）</a></li>
+<li><a href="#%E5%AE%9E%E7%8E%B0%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%EF%BC%88%E8%A7%A3%E5%86%B3%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%EF%BC%89">实现可重复读（解决不可重复读）</a></li>
+<li><a href="#%E9%97%B4%E9%9A%99%E9%94%81%EF%BC%88%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%EF%BC%89">间隙锁（解决幻读）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E4%B8%89%E7%BA%A7%E5%B0%81%E9%94%81%E5%AE%9E%E7%8E%B0%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB">使用三级封锁实现隔离级别</a></li>
+</ul>
+</div>
+<blockquote>
+<p><a href="https://share.mubu.com/doc/1XILE1PgAia">数据库思维导图</a></p>
+</blockquote>
+<h2><a id="mvcc%EF%BC%88%E5%A4%9A%E7%89%88%E6%9C%AC%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>MVCC（多版本并发控制）</h2>
+<p>能够在不加锁的情况下，实现<strong>读已提交</strong>和<strong>可重复读</strong>隔离级别，主要针对的是快照读（当前读是悲观锁的一种）</p>
+<ul>
+<li>快照读：MVCC 的 select 读取的是快照中的数据，不加锁；（也可以通过 for updat 或 lock in share mode 实现加 X S 锁成为当前读）</li>
+<li>当前读：MVCC 的 insert、update、delete 读取的是最新的数据，需要加锁。</li>
+</ul>
+<h3><a id="undo-log%E7%89%88%E6%9C%AC%E9%93%BE-readview" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>undo log &amp; 版本链 &amp; readview</h3>
+<ul>
+<li>持久性通过 <code>redo log</code> 实现</li>
+<li>原子性通过 <code>undo log</code> 实现</li>
+<li>隔离性通过 <code>MVCC + 锁</code> 实现</li>
+</ul>
+<p>数据表有一个隐藏的列 <code>trx_id</code> 记录更改它的事务id（自增）；还有一个回滚指针指向上一个快照。<br />
+数据库 undo log 就记录着这一行数据的历史版本以及修改每个版本的事务id</p>
+<p><img src="media/16242598828200/16243672223518.jpg" alt="" class="mw_img_center" style="width:600px;display: block; clear:both; margin: 0 auto;" /></p>
+<p>readview 是一个含有 4 个属性的对象，在生成的时候，会记录当前版本链的一些信息：</p>
+<ul>
+<li><code>m_ids</code>：当前活跃的（未提交）的事务 id 列表</li>
+<li><code>min_trx_id</code>：<code>m_ids</code> 的最小值</li>
+<li><code>max_trx_id</code>：生成 readview 时下一个事务应该分配的 id</li>
+<li><code>creator_trx_id</code>：生成 readview 的事务 id</li>
+</ul>
+<blockquote>
+<p>max_trx_id 并不是 m_ids 中的最大值，事务 id 是递增分配的。假如 1，2，3 这三个事务，之后3 事务提交了。那么一个新的读事务在生成 ReadView 时，m_ids 就包括 1 和 2，min_trx_id 的值就是 1，max_trx_id 的值就是 4。<br />
+只有在对表中的记录做改动时（INSERT、DELETE、UPDATE）才会为事务分配事务 id，否则在一个只读事务中的事务 id 值都默认为0。</p>
+</blockquote>
+<h3><a id="%E5%BF%AB%E7%85%A7%E8%AF%BB%E6%97%B6%E9%80%89%E6%8B%A9%E5%93%AA%E4%B8%80%E4%B8%AA%E7%89%88%E6%9C%AC%EF%BC%9F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>快照读时选择哪一个版本？</h3>
+<p>当 select 时，会生成 readview，然后根据四个属性从 undo log 依次来查找第一个可读的版本：</p>
+<ul>
+<li><code>trx_id</code> == <code>creator_trx_id</code>: 说明更改这个版本的事务就是当前查询的事务，可以访问</li>
+<li><code>trx_id</code> &lt; <code>min_trx_id</code>: 说明更改这个版本的事务已经不活跃了（已提交），可以访问</li>
+<li><code>min_trx_id</code> &lt;= <code>trx_id</code> &lt;= <code>max_trx_id</code>:
+<ul>
+<li><code>trx_id</code> in <code>m_ids</code>: 说明更改这个版本的事务还未提交，不可以访问</li>
+<li><code>trx_id</code> not in <code>m_ids</code>: 说明更改这个版本的事务已经提交了，可以访问</li>
+</ul>
+</li>
+<li><code>trx_id</code> &gt; <code>max_trx_id</code>: 说明更改这个版本的事务是在当前查询的事务之后开启的，不可以访问</li>
+</ul>
+<h3><a id="%E4%BD%BF%E7%94%A8mvcc%E5%AE%9E%E7%8E%B0%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>使用 MVCC 实现隔离级别</h3>
+<h4><a id="%E5%AE%9E%E7%8E%B0%E5%8F%AF%E6%8F%90%E4%BA%A4%E8%AF%BB%EF%BC%88%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>实现可提交读（解决脏读）</h4>
+<p>因为没有提交的事务都在 readview 里面记录着，所以无法读取未提交的事务，保证了可提交读；<br />
+生成 readview 的时机是每次 select 快照读的时候，所以存在同一个事务里两次 select 生成两个不同的 readview，造成了不可重复读</p>
+<h4><a id="%E5%AE%9E%E7%8E%B0%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%EF%BC%88%E8%A7%A3%E5%86%B3%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>实现可重复读（解决不可重复读）</h4>
+<p>把生成 readview 的时机改成启动事务时，整个事务只有一个 readview，保证了同一个事务读取到的版本是相同的。<br />
+由于 MVCC 的版本链是行级别的，所以无法解决幻读。</p>
+<h4><a id="%E9%97%B4%E9%9A%99%E9%94%81%EF%BC%88%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>间隙锁（解决幻读）</h4>
+<p>Mysql 的 InnoDB 通过使用 Next-key Locks 解决幻读：一个事务通过索引查找到一个范围后，就锁住这个索引（Record Locks）以及索引之间的间隙（Gap Locks），这样其他事物就不能往这个范围插入数据了。</p>
+<p>Next-key Locks 锁定的是一个前开后闭的区间，查找过程中只有访问到的数据才加锁。</p>
+<p><img src="media/16242598828200/16243701070756.jpg" alt="" class="mw_img_center" style="width:499px;display: block; clear:both; margin: 0 auto;" /><br />
+例如上图的可能的加锁区间是：</p>
+<pre><code class="language-plain_text">(-inf, 0]、(-inf, 0]、(0, 5]、(5, 10]、(10, 15]、(15, 25]、(25, inf]
+</code></pre>
+<h2><a id="%E4%BD%BF%E7%94%A8%E4%B8%89%E7%BA%A7%E5%B0%81%E9%94%81%E5%AE%9E%E7%8E%B0%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>使用三级封锁实现隔离级别</h2>
+<p>除了 MVCC + Next-key Locks，还可以使用三级封锁实现隔离级别</p>
+<ol>
+<li>修改时加 X 锁，直到事务结束（解决丢失修改）</li>
+<li>读取时加 S 锁，读取完立即释放（解决一个事务修改时，另一个事务还能读导致的读脏数据，但是一个事务有多次读时，读完一次释放了锁，中间可能有其他事务获取 X 锁进行修改）</li>
+<li>读取时加 S 锁，直到事务结束（解决一个事务有多次读时，中间有其他事务进行修改导致的不可重复读）</li>
+</ol>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E6%95%B0%E6%8D%AE%E5%BA%93.html'>数据库</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	    
+	        <a class="basic-alignment right" href="16261749989563.html" 
+	        title="Next Post: 主从 & 哨兵">主从 & 哨兵 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="asset/prism.js"></script>
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

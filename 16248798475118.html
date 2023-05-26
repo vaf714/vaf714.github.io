@@ -1,0 +1,650 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  GC - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">GC</h1>
+				<p class="meta"><time datetime="2021-06-28T19:30:47+08:00" pubdate data-updated="true">2021/06/28</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#gc%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6">GC 触发条件</a></li>
+<li><a href="#%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E6%B4%BB%E7%9D%80">判断对象是否活着</a>
+<ul>
+<li><a href="#%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95">引用计数法</a></li>
+<li><a href="#%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90">可达性分析</a>
+<ul>
+<li><a href="#%E4%B8%89%E8%89%B2%E6%B3%95">三色法</a></li>
+</ul>
+</li>
+<li><a href="#%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8">四种引用</a></li>
+</ul>
+</li>
+<li><a href="#gc%E7%AE%97%E6%B3%95">GC 算法</a>
+<ul>
+<li><a href="#%E6%AF%94%E8%BE%83">比较</a></li>
+<li><a href="#%E5%88%86%E4%BB%A3%E5%9B%9E%E6%94%B6">分代回收</a></li>
+</ul>
+</li>
+<li><a href="#8%E7%A7%8D%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8">8 种垃圾收集器</a>
+<ul>
+<li><a href="#serial">Serial</a></li>
+<li><a href="#parnew">ParNew</a></li>
+<li><a href="#parallel-scavenge-parallel-old">Parallel ScaVenge &amp; Parallel Old</a></li>
+<li><a href="#cms">CMS</a></li>
+<li><a href="#g1">G1</a></li>
+</ul>
+</li>
+<li><a href="#%E5%A6%82%E4%BD%95%E8%B0%83%E4%BC%98">如何调优</a></li>
+</ul>
+</div>
+<p>GC 的作用区域是堆和方法区 ( 规范中不对方法区做要求, 但 HotSpot 为方法区实现了 GC ), 大部分都是在新生代。分为轻 GC (普通 GC), 重 GC (全局 GC)</p>
+<h2><a id="gc%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>GC 触发条件</h2>
+<ul>
+<li>Minor GC：当 Eden 空间满时，就将触发一次 Minor GC</li>
+<li>Full GC：
+<ul>
+<li>
+<p>当调用 <code>System.gc()</code> 建议虚拟机执行 FG，不建议使用</p>
+</li>
+<li>
+<p>老年代空间不足，（可以调大新生代空间或调大进入老年代的年龄尽量避免发生 FG）</p>
+</li>
+<li>
+<p>空间分配担保失败</p>
+<blockquote>
+<p>Minor GC 之前，先检查老年代的最大可用连续空间是否大于新生代所有对象空间，如果是，Minor GC 可以进行；如果不是，再检查 JVM 是否允许担保失败，如果允许再检查老年代的最大可用连续空间是否大于历代晋升到老年代对象的平均大小，如果大于，尝试进行 Minor GC，如果小于或不允许担保失败，就进行一次 Full GC</p>
+</blockquote>
+</li>
+<li>
+<p>JDK 1.7 之前永久代空间不足，且没有采用 CMS GC 时也会执行 Full GC。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E6%B4%BB%E7%9D%80" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>判断对象是否活着</h2>
+<h3><a id="%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>引用计数法</h3>
+<p>为每个对象维护一个计数器, 保存当前被引用次数，为 0 的对象被清除</p>
+<ul>
+<li>优点: 实现简单, 效率高</li>
+<li>缺点: 很难解决对象之间循环引用的问题</li>
+</ul>
+<h3><a id="%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>可达性分析</h3>
+<p>和 GC Roots 对象 ( 栈帧中的本地变量中引用的对象 / 方法区中类静态属性引用的对象 / 方法区中常量引用的对象 / 本地方法栈中引用的对象 ) 直接或间接关联的对象是有效对象，反之则是无效对象。</p>
+<h4><a id="%E4%B8%89%E8%89%B2%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>三色法</h4>
+<p>可达性分析时，把遍历对象图过程中遇到的对象，按“是否访问过”这个条件标记成以下三种颜色：</p>
+<ul>
+<li>白色：尚未访问过。</li>
+<li>黑色：本对象已访问过，而且本对象引用到的其他对象也全部访问过了。</li>
+<li>灰色：本对象已访问过，但是本对象引用到的其他对象尚未全部访问完。全部访问后，会转换为黑色。</li>
+</ul>
+<p><strong>过程</strong>：</p>
+<ol>
+<li>初始时，所有对象都在【白色集合】中；</li>
+<li>将 GC Roots 直接引用到的对象挪到 【灰色集合】中；</li>
+<li>从灰色集合中获取对象：
+<ul>
+<li>将本对象引用到的其他对象全部挪到【灰色集合】中；</li>
+<li>将本对象挪到【黑色集合】里面。</li>
+</ul>
+</li>
+</ol>
+<p><strong>问题</strong>：假设 A -&gt; B -&gt; C，一开始 A 在灰色，然后扫描 A，将 B 添加到灰色，将 A 添加到黑色；此时 A 新增引用 C，B 断开对 C 的引用。因为 A 已经在黑色中，不会再扫描，而 B 也没有了对 C 的引用，那么 C 会被当作垃圾回收，A -&gt; C 就出现了漏标。<br />
+解决：黑色对象引用白色对象或删除灰色对象对白色对象的引用时时，都将白色对象置为灰色；</p>
+<h3><a id="%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>四种引用</h3>
+<ul>
+<li>强引用: 绝大多数都是强引用, 垃圾回收器不会回收它</li>
+<li>软引用: 类似于可有可无的引用，当内存不足时，就会回收。</li>
+<li>弱引用: 也是可有可无的引用，比软引用具有更短暂的生命周期，在GC扫描时，无论内存是否够用，都会回收</li>
+<li>虚引用: 和没有引用一样，任何时候都有可能被回收</li>
+</ul>
+<h2><a id="gc%E7%AE%97%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>GC 算法</h2>
+<ul>
+<li>标记-清除: 第一次遍历 GC Roots 对象, 将 GC Roots 对象可达到的堆内存对象进行标记, 第二次遍历堆内存对象, 将没有标记的对象清除
+<ul>
+<li>优点: 不需要额外的空间</li>
+<li>缺点: 两次扫描效率不高, 产生内存碎片无法生成大对象造成频繁 GC</li>
+</ul>
+</li>
+<li>标记-复制: 进行可达性分析的时候, 凡是能达到的对象都复制到 to 区, 再一次性清除伊甸园区和 from 区
+<ul>
+<li>优点: 没有内存碎片, 因为每次清理, 都会把活下来的对象<strong>连续地</strong>复制到 to  区中</li>
+<li>缺点: 浪费内存空间, 复制的对象比较多时, 效率慢, 适合对象存活率低的情况</li>
+</ul>
+</li>
+<li>标记-压缩: 标记完成以后, 让所有存活对象向一端移动, 然后直接清理掉一端边界外的内存
+<ul>
+<li>优点: 内存规整</li>
+<li>缺点: 效率不如复制算法</li>
+</ul>
+</li>
+</ul>
+<h3><a id="%E6%AF%94%E8%BE%83" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>比较</h3>
+<p>效率: 标记复制 &gt; 标记压缩 &gt; 标记清除 ( 引发更多 GC )<br />
+内存规整率: 标记压缩 = 标记复制 &gt; 标记清除<br />
+内存利用率: 标记压缩 = 标记清除 &gt; 标记复制</p>
+<h3><a id="%E5%88%86%E4%BB%A3%E5%9B%9E%E6%94%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>分代回收</h3>
+<p>结合以上几种算法: 把 Java 堆分为新生代和老年代，根据各个对象的年代采用最合适的收集算法。针对新生代的对象，采取灵活比例的复制算法，只需要复制少量存活对象就可以完成收集。针对老年代的对象，因为这些对象存活率高，没有额外空间进行分配担保，必须使用标记清除或标记压缩算法。</p>
+<h2><a id="8%E7%A7%8D%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>8 种垃圾收集器</h2>
+<p><a href="https://github.com/CyC2018/CS-Notes/blob/master/notes/Java%20%E8%99%9A%E6%8B%9F%E6%9C%BA.md#minor-gc-%E5%92%8C-full-gc">参考</a></p>
+<p><img src="media/16248720428830/16248720638327.jpg" alt="" class="mw_img_center" style="display: block; clear:both; margin: 0 auto;" /></p>
+<h3><a id="serial" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Serial</h3>
+<p>进行垃圾收集工作的时候必须暂停其他所有的工作线程，单线程串行执行，简单高效<br />
+新生代采用<strong>复制算法</strong>，老年代采用<strong>标记-整理</strong>算法。</p>
+<h3><a id="parnew" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ParNew</h3>
+<p>Serial 的多线程版本，性能高，Server 模式下的虚拟机的首要选择，除了 Serial 收集器外，只有它能与 CMS 收集器配合工作<br />
+新生代采用<strong>复制算法</strong>，老年代采用<strong>标记-整理</strong>算法。</p>
+<h3><a id="parallel-scavenge-parallel-old" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parallel ScaVenge &amp; Parallel Old</h3>
+<p>多线程，其他收集器是尽量缩短垃圾收集的停顿时间，适合交互程序，而它的目标是吞吐量优先，尽可能高的利用 CPU，适合后台任务。<br />
+可以通过参数打开自适应调节，能根据系统运行情况动态调整参数以提供最适合的停顿时间或吞吐量。<br />
+Parallel ScaVenge 采用<strong>复制算法</strong>，Parallel Old 采用<strong>标记-整理</strong>算法。</p>
+<h3><a id="cms" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CMS</h3>
+<p>Concurrent Mark Sweep，采用<strong>标记-清除</strong>算法，真正意义上的并发收集器。分四个阶段：</p>
+<ul>
+<li>初始标记：暂停所有线程，记录直接与 root 相连的对象，时间很短</li>
+<li>并发标记：GC 和 用户线程同时开启，并跟踪用户线程发生引用更新的地方</li>
+<li>重新标记：暂停用户进程，根据第二步引用变更的地方，并发重新标记，时间很短</li>
+<li>并发清除：开启用户线程，同时 GC 线程开始清理工作</li>
+</ul>
+<p>在整个过程中耗时最长的并发标记和并发清除过程中，收集器线程都可以与用户线程一起工作，不需要进行停顿。</p>
+<p><img src="media/16248720428830/16248783456729.jpg" alt="" class="mw_img_center" style="width:705px;display: block; clear:both; margin: 0 auto;" /></p>
+<h3><a id="g1" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>G1</h3>
+<p>面向服务端应用，在多 CPU 和大内存的场景下有很好的性能。可以直接对新生代和老年代一起回收。（标记整理，可预测停顿）<br />
+G1 把堆划分成多个大小相等的独立区域（Region），新生代和老年代不再物理隔离，使得每个小空间可以单独进行垃圾回收。通过记录每个 Region 垃圾回收时间以及回收所获得的空间，维护一个优先列表，每次根据允许的收集时间，优先回收价值最大的 Region。<br />
+<img src="media/16248720428830/16248792437880.jpg" alt="" class="mw_img_center" style="width:489px;display: block; clear:both; margin: 0 auto;" /></p>
+<p>回收过程和 CMS 类似，但最后一步是筛选回收，对各个 Region 中的回收价值和成本进行排序，根据用户所期望的 GC 停顿时间来制定回收计划。</p>
+<h2><a id="%E5%A6%82%E4%BD%95%E8%B0%83%E4%BC%98" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>如何调优</h2>
+<p>现在都是分代回收，尽量让对象在新生代就回收，减少大对象的分配。需要平衡分代大小、垃圾回收次数和停顿时间。<br />
+对 GC 进行完整的监控，监控各年代占用大小、YGC、FGC 触发频率，对象分配速率等，然后根据实际情况调优。<br />
+比如 FGC 频率高，可能是第三方库调用了 System.gc，或者 CMS 触发阈值过低等；还有对象年龄晋升阈值、幸存区大小等。</p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='JVM.html'>JVM</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16248800865693.html" 
+	        title="Previous Post: 类加载">&laquo; 类加载</a>
+	    
+	    
+	        <a class="basic-alignment right" href="16248673414388.html" 
+	        title="Next Post: OOM">OOM &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

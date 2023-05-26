@@ -1,0 +1,656 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  锁🔒 - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">锁🔒</h1>
+				<p class="meta"><time datetime="2021-06-02T17:21:02+08:00" pubdate data-updated="true">2021/06/02</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%85%AC%E5%B9%B3%E9%94%81%E9%9D%9E%E5%85%AC%E5%B9%B3%E9%94%81">公平锁 &amp; 非公平锁</a></li>
+<li><a href="#%E4%B9%90%E8%A7%82%E9%94%81%E6%82%B2%E8%A7%82%E9%94%81">乐观锁 &amp; 悲观锁</a></li>
+<li><a href="#%E8%87%AA%E6%97%8B%E9%94%81%EF%BC%88spin-lock%EF%BC%89">自旋锁（spin lock）</a>
+<ul>
+<li><a href="#%E8%87%AA%E6%97%8B%E9%94%81%E6%98%AF%E4%B9%90%E8%A7%82%E9%94%81%E5%90%97%EF%BC%9F">自旋锁是乐观锁吗？</a></li>
+</ul>
+</li>
+<li><a href="#lock">Lock</a>
+<ul>
+<li><a href="#reentrantlock%EF%BC%88%E9%87%8D%E5%85%A5%E9%94%81%EF%BC%89">ReentrantLock（重入锁）</a></li>
+<li><a href="#readwritelock%EF%BC%88%E8%AF%BB%E5%86%99%E9%94%81%E3%80%81%E7%8B%AC%E5%8D%A0%E9%94%81%E3%80%81%E5%85%B1%E4%BA%AB%E9%94%81%EF%BC%89">ReadWriteLock（读写锁、独占锁、共享锁）</a></li>
+</ul>
+</li>
+<li><a href="#synchronized">synchronized</a>
+<ul>
+<li><a href="#%E6%97%A0%E9%94%81%E5%81%8F%E5%90%91%E9%94%81%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81">无锁 -&gt; 偏向锁 -&gt; 轻量级锁 -&gt; 重量级锁</a></li>
+<li><a href="#synchronized%E9%94%81%E5%8D%87%E7%BA%A7">synchronized 锁升级</a></li>
+<li><a href="#%E5%92%8Clock%E7%9A%84%E5%8C%BA%E5%88%AB">和 Lock 的区别</a></li>
+</ul>
+</li>
+<li><a href="#%E6%AD%BB%E9%94%81">死锁</a></li>
+</ul>
+</div>
+<p><strong>Blog: <a href="https://tech.meituan.com/2018/11/15/java-lock.html">不可不说的Java“锁”事</a></strong></p>
+<h2><a id="%E5%85%AC%E5%B9%B3%E9%94%81%E9%9D%9E%E5%85%AC%E5%B9%B3%E9%94%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>公平锁 &amp; 非公平锁</h2>
+<ul>
+<li>公平锁：公平，不可以插队</li>
+<li><strong>非公平锁</strong>：不公平，可以插队，Java 默认</li>
+</ul>
+<h2><a id="%E4%B9%90%E8%A7%82%E9%94%81%E6%82%B2%E8%A7%82%E9%94%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>乐观锁 &amp; 悲观锁</h2>
+<ul>
+<li>
+<p>乐观锁</p>
+<p>乐观锁是一种乐观思想，即认为读多写少，遇到并发写的可能性低，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，采取在写时先读出当前版本号，然后加锁操作（比较跟上一次的版本号，如果一样则更新），如果失败则要重复读-比较-写的操作。乐观锁也是通过 CAS 操作实现的。</p>
+</li>
+<li>
+<p>悲观锁</p>
+<p>悲观锁是就是悲观思想，即认为写多，遇到并发写的可能性高，每次去拿数据的时候都认为别人会修改，所以每次在读写数据的时候都会上锁，这样别人想读写这个数据就会 block 直到拿到锁。java 中的悲观锁就是 Synchronized, <strong>AQS 框架下的锁则是先尝试 cas 乐观锁去获取锁，获取不到，才会转换为悲观锁，如 RetreenLock</strong>。</p>
+</li>
+</ul>
+<h2><a id="%E8%87%AA%E6%97%8B%E9%94%81%EF%BC%88spin-lock%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>自旋锁（spin lock）</h2>
+<p>如果获取不到锁，它们只需要等一等（自旋），等锁被释放后即可立即获取锁，这样就避免用户线程和内核的切换的消耗，使用 CAS 实现。</p>
+<pre><code class="language-java">class SpinLock {
+    private AtomicReference&lt;Thread&gt; atomicReference = new AtomicReference&lt;&gt;();
+
+    public void lock() {
+        Thread thread = Thread.currentThread();
+        while(!atomicReference.compareAndSet(null, thread)); // 没有被锁住的时候，应该是 null
+    }
+    public void unlock() {
+        Thread thread = Thread.currentThread();
+        atomicReference.compareAndSet(thread, null); // 如果是当前线程获得锁，设置成 null
+    }
+}
+</code></pre>
+<h3><a id="%E8%87%AA%E6%97%8B%E9%94%81%E6%98%AF%E4%B9%90%E8%A7%82%E9%94%81%E5%90%97%EF%BC%9F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>自旋锁是乐观锁吗？</h3>
+<p><strong>不是。乐观锁其实是无锁，自旋锁只是在实现的时候利用了乐观锁来实现。应该站在应用层分析，看它们是如何锁住应用数据的，而不是站在底层看抢占锁的过程。如果一个线程尝试获取锁时，发现已经被占用，它是否继续读取数据，还是等后续要更新时再决定要不要重试。其实自旋锁对应用数据的读取操作都被挡住了。</strong></p>
+<h2><a id="lock" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lock</h2>
+<p><code>java.util.concurrent.locks</code> 三个实现类: <code>ReentrantLock</code>, <code>ReentrantReadWriteLock.ReadLock</code>, <code>ReentrantReadWriteLock.WriteLock</code></p>
+<ul>
+<li>如何使用</li>
+</ul>
+<pre><code class="language-java">lock.lock(); // 加锁
+try {
+    // 业务代码
+} catch (Exception e) {
+    e.printStackTrace();
+} finally {
+    lock.unlock(); // 解锁
+}
+</code></pre>
+<h3><a id="reentrantlock%EF%BC%88%E9%87%8D%E5%85%A5%E9%94%81%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ReentrantLock（重入锁）</h3>
+<p>重入锁、递归锁，Java 内置的锁（synchronized、Lock）都是重入锁。<br />
+锁的操作粒度是线程,而不是调用，同一个线程再次进入同步代码的时候，可以使用自己已经获取到的锁。</p>
+<h3><a id="readwritelock%EF%BC%88%E8%AF%BB%E5%86%99%E9%94%81%E3%80%81%E7%8B%AC%E5%8D%A0%E9%94%81%E3%80%81%E5%85%B1%E4%BA%AB%E9%94%81%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ReadWriteLock（读写锁、独占锁、共享锁）</h3>
+<p>读写锁，更加细粒度的控制。一对关联的锁，一个用于只读，一个用于写入。读锁可以共享，写锁只有一个线程可以获得。(可以同时读，不可以同时写，也不可以同时读写)<br />
+语义与 <code>ReentrantLock</code> 类似，也是重入锁，唯一实现类是 <code>ReentrantReadWriteLock</code></p>
+<pre><code class="language-java">ReadWriteLock rwLock = new ReentrantReadWriteLock();
+rwLock.writeLock(); // 获得写锁（独占锁）
+rwLock.readLock(); // 获得读锁（共享锁）
+</code></pre>
+<h2><a id="synchronized" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>synchronized</h2>
+<p>JDK 6 优化了 synchronized，将之前的重量级锁改为锁升级机制</p>
+<h3><a id="%E6%97%A0%E9%94%81%E5%81%8F%E5%90%91%E9%94%81%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>无锁 -&gt; 偏向锁 -&gt; 轻量级锁 -&gt; 重量级锁</h3>
+<p><strong>无锁</strong>：无锁没有对资源进行锁定，所有的线程都能访问并修改同一个资源，但同时只有一个线程能修改成功，例如乐观锁。<br />
+<strong>偏向锁</strong>：（当一个线程访问同步代码块并获取锁时，会记住这个线程 ID。当这个线程再次获取锁的时候，就可以直接获取资源。只需比较 ThreadID）<br />
+<strong>轻量级锁</strong>：是指当锁是偏向锁的时候，被另外的线程所访问，偏向锁就会升级为轻量级锁，其他线程会通过自旋的形式尝试获取锁（自旋锁），不会阻塞，从而提高性能。（自旋）<br />
+<strong>重量级锁</strong>：等待锁的线程都会进入阻塞状态。当轻量级锁自旋超过一定的次数，或者一个线程在持有锁，一个在自旋，又有第三个来访时，轻量级锁升级为重量级锁。（依赖OS的互斥锁 mutex lock）</p>
+<h3><a id="synchronized%E9%94%81%E5%8D%87%E7%BA%A7" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>synchronized 锁升级</h3>
+<p>初次执行到 synchronized 代码块的时候，锁对象变成偏向锁，执行完同步代码块后，线程并不会主动释放偏向锁。</p>
+<p>当第二次到达同步代码块时，线程会判断此时持有锁的线程ID是否就是自己，如果是则直接往下执行，性能极高。</p>
+<p>但是，一旦有第二个线程加入锁竞争，偏向锁就升级为轻量级锁（自旋锁），没有抢到锁的线程将自旋。抢到锁后线程将当前锁的持有者信息修改为自己。</p>
+<p>如果锁竞争情况严重，某个达到最大自旋次数的线程，会将轻量级锁升级为重量级锁，当后续线程尝试获取锁时，则直接将自己挂起（而不是忙等），等待将来被唤醒。</p>
+<p>⚠️：<strong>当第二个线程执行到这个 synchronized 代码块时是否一定会发生锁竞争然后升级为轻量级锁呢？</strong></p>
+<p>线程A第一次执行完同步代码块后，当线程B尝试获取锁的时候，发现是偏向锁，会判断线程A是否仍然存活。如果线程A仍然存活，将线程A暂停，此时偏向锁升级为轻量级锁，之后线程A继续执行，线程B自旋。但是如果判断结果是线程A不存在了，则线程B持有此偏向锁，锁不升级。</p>
+<h3><a id="%E5%92%8Clock%E7%9A%84%E5%8C%BA%E5%88%AB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>和 Lock 的区别</h3>
+<p><code>synchronized</code> 无法判断锁的状态<br />
+<code>synchronized</code> 会自动释放锁; Lock 必须手动释放<br />
+<code>synchronized</code> 获取不到锁会阻塞; Lock 可以使用 <code>tryLock()</code> 尝试获取不到不会一直等待<br />
+<code>synchronized</code> 适合锁少量代码同步; Lock 适合大量同步代码<br />
+<code>synchronized</code> 会锁升级，但是是不可逆的，一旦升级为重量级锁，就回不去了，如果并发量不稳定，可能造成性能损失<br />
+<code>synchronized</code> 由 JVM 实现，底层锁住的是对象头，<code>Lock</code> 由 JDK 实现，依赖 AQS，通过 state 判断</p>
+<p>synchronized 锁的是方法的调用者 (<code>this</code>), 静态方法锁的是 Class 对象, 所有的实例共享一把锁</p>
+<p>分别使用 <code>synchronized</code> 和 <code>Lock</code> 实现 <a href="16227416766193.html">生产者消费者</a><br />
+使用 Condition 有什么好处: 可以使用多个 Condition 达到精准通知某个线程的目的</p>
+<pre><code class="language-java">class ConditionTest {
+    private Lock lock = new ReentrantLock();
+    private Condition condition1 = lock.newCondition();
+    private Condition condition2 = lock.newCondition();
+    private int num = 1; // 默认第一个先执行
+    
+    public void show1() {
+        lock.lock();
+        try {
+            while (num != 1) condition1.await(); // 1等待
+            System.out.println(Thread.currentThread().getName());
+            num = 2;
+            condition2.signal(); // 执行完通知2
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    public void show2() {
+        lock.lock();
+        try {
+            while (num != 2) condition2.await(); // 2等待
+            System.out.println(Thread.currentThread().getName());
+            num = 1;
+            condition1.signal(); // 执行完通知1
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+</code></pre>
+<pre><code class="language-java">// 调用
+ConditionTest conditionTest = new ConditionTest();
+new Thread(() -&gt; { for (int i = 0; i &lt; 10; i++) conditionTest.show1(); }, &quot;A&quot;).start();
+    
+new Thread(() -&gt; { for (int i = 0; i &lt; 10; i++) conditionTest.show2(); }, &quot;B&quot;).start();
+// 结果: A B A B A B A B .....
+</code></pre>
+<h2><a id="%E6%AD%BB%E9%94%81" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>死锁</h2>
+<p>尝试获取对方的锁，如何排查？</p>
+<ol>
+<li>查看日志</li>
+<li><strong>查看堆栈信息</strong>（使用 <code>jps -l</code> 查看 java 进程号、使用 <code>jstack 进程号</code> 查看进程信息）</li>
+</ol>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='JUC.html'>JUC</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16226261701341.html" 
+	        title="Previous Post: JUC 容器">&laquo; JUC 容器</a>
+	    
+	    
+	        <a class="basic-alignment right" href="16226153690757.html" 
+	        title="Next Post: 线程进程">线程进程 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="asset/prism.js"></script>
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

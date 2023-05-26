@@ -1,0 +1,1007 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  JVM - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16248800865693.html">类加载</a></h1>
+			<p class="meta"><time datetime="2021-06-28T19:34:46+08:00" 
+			pubdate data-updated="true">2021/06/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8">类加载器</a></li>
+<li><a href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%EF%BC%88%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B%EF%BC%89">类加载机制（对象创建过程）</a>
+<ul>
+<li><a href="#%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6">双亲委派机制</a></li>
+</ul>
+</li>
+<li><a href="#%E6%B2%99%E7%AE%B1%E5%AE%89%E5%85%A8%E6%9C%BA%E5%88%B6">沙箱安全机制</a></li>
+</ul>
+</div>
+<h2><a id="%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>类加载器</h2>
+<p>作用: 加载 Class 文件 (<code>new Student();</code>), 从jvm角度来看只存在两种类加载器:</p>
+<ul>
+<li>启动类加载器（<code>Bootstrap ClassLoader</code>）</li>
+<li>其他类加载器：由Java语言实现，继承自抽象类 <code>ClassLoader</code>
+<ul>
+<li>扩展类加载器（<code>Extension ClassLoader</code>）: 负责加载<code>&lt;JAVA_HOME&gt;\lib\ext</code> 或 <code>java.ext.dirs</code> 系统变量指定的路径中的所有类库</li>
+<li>应用程序类加载器（<code>Application ClassLoader</code>）: 负责加载用户类路径上的指定类库，我们可以直接使用这个类加载器。一般情况，如果我们没有自定义类加载器默认就是用这个加载器。</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">Car car = new Car();
+Class c = car.getClass();
+System.out.println(c); // class cn.jvm.Car
+ClassLoader cl = c.getClassLoader();
+System.out.println(cl); // AppClassLoader
+System.out.println(cl.getParent()); // ExtClassLoader
+System.out.println(cl.getParent().getParent()); // null, BootClassLoader 调用的是 C++ 代码, java 获取不到
+</code></pre>
+<p><img src="media/16225545153969/16225606494777.jpg" alt="" class="mw_img_center" style="width:491px;display: block; clear:both; margin: 0 auto;" /></p>
+<h2><a id="%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%EF%BC%88%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>类加载机制（对象创建过程）</h2>
+<ul>
+<li>加载 ( Loading ): 将类的 <code>.class</code> 文件生成 Class 对象</li>
+<li>链接 ( Linking ):
+<ul>
+<li>验证 ( Verify ): 保证这个被加载的class类的正确性</li>
+<li>准备 ( Prepare ): 为类中的静态字段分配内存，并设置默认的初始值</li>
+<li>解析 ( Resolve ): 将常量池内的符号引用转换为直接引用的过程</li>
+</ul>
+</li>
+<li>初始化 ( initialization ): 执行类的构造器方法 <code>init()</code></li>
+</ul>
+<h3><a id="%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>双亲委派机制</h3>
+<p>如果一个类加载器收到了类加载的请求，它首先不会自己去加载这个类，而是把这个请求委派给父类加载器去完成，每一层的类加载器都是如此 (<code>BOOT &lt;-- EXT &lt;-- APP</code>)，这样所有的加载请求都会被传送到顶层的启动类加载器中，只有当父加载无法完成加载请求（它的搜索范围中没找到所需的类报出 <code>ClassNotFound</code>）时，子加载器才会尝试去加载类. 防止系统类库被恶意替换成用户自定义的类.</p>
+<p>例如: 程序员写了一个 <code>java.lang.String</code> 类, 执行加载类的时候, BOOT 加载器会发现 <code>rt.jar</code> 里有 <code>java.lang.String</code> 类, 这时最终加载的类就是 <code>rt.jar</code> 里面的类.</p>
+<pre><code class="language-java">package java.lang;
+    
+public class String {
+    public String toString() {
+        return &quot;hello, my String !&quot;;
+    }
+    
+    public static void main(String[] args) {
+        String s = new String();
+        s.toString();
+    }
+}
+// 错误: 在类 java.lang.String 中找不到 main 方法, 请将 main 方法定义为:
+// public static void main(String[] args)
+// 否则 JavaFX 应用程序类必须扩展javafx.application.Application
+</code></pre>
+<p>为了完成某些操作，可以 “破坏” 模型。</p>
+<ol>
+<li>重写 <code>ClassLoader</code> 类的 <code>loadClass</code> 方法</li>
+<li>利用线程上下文加载器（Thread Context ClassLoader）。这个类加载器可以通过 <code>java.lang.Thread</code> 类的 <code>setContextClassLoaser()</code> 方法进行设置，如果创建线程时还未设置，它将会从父线程中继承一个，如果在应用程序的全局范围内都没有设置过的话，那这个类加载器默认就是应用程序类加载器。</li>
+<li>为了实现热插拔，热部署，模块化，意思是添加一个功能或减去一个功能不用重启，只需要把这模块连同类加载器一起换掉就实现了代码的热替换。</li>
+</ol>
+<h2><a id="%E6%B2%99%E7%AE%B1%E5%AE%89%E5%85%A8%E6%9C%BA%E5%88%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>沙箱安全机制</h2>
+<p>沙箱安全机制: 将 Java 代码限定在虚拟机 JVM 特定的范围中，严格限制代码对本地资源的访问。</p>
+<p>由以下部分组成</p>
+<ul>
+<li>字节码校验器: 确保 Java 类文件遵循 Java 语言规范</li>
+<li>类装载器: 防止恶意代码干涉善意代码(双亲委派) / 守护被信任的类库边界 / 确定代码可以进行哪些操作(沙箱)</li>
+</ul>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16248798475118.html">GC</a></h1>
+			<p class="meta"><time datetime="2021-06-28T19:30:47+08:00" 
+			pubdate data-updated="true">2021/06/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#gc%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6">GC 触发条件</a></li>
+<li><a href="#%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E6%B4%BB%E7%9D%80">判断对象是否活着</a>
+<ul>
+<li><a href="#%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95">引用计数法</a></li>
+<li><a href="#%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90">可达性分析</a>
+<ul>
+<li><a href="#%E4%B8%89%E8%89%B2%E6%B3%95">三色法</a></li>
+</ul>
+</li>
+<li><a href="#%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8">四种引用</a></li>
+</ul>
+</li>
+<li><a href="#gc%E7%AE%97%E6%B3%95">GC 算法</a>
+<ul>
+<li><a href="#%E6%AF%94%E8%BE%83">比较</a></li>
+<li><a href="#%E5%88%86%E4%BB%A3%E5%9B%9E%E6%94%B6">分代回收</a></li>
+</ul>
+</li>
+<li><a href="#8%E7%A7%8D%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8">8 种垃圾收集器</a>
+<ul>
+<li><a href="#serial">Serial</a></li>
+<li><a href="#parnew">ParNew</a></li>
+<li><a href="#parallel-scavenge-parallel-old">Parallel ScaVenge &amp; Parallel Old</a></li>
+<li><a href="#cms">CMS</a></li>
+<li><a href="#g1">G1</a></li>
+</ul>
+</li>
+<li><a href="#%E5%A6%82%E4%BD%95%E8%B0%83%E4%BC%98">如何调优</a></li>
+</ul>
+</div>
+<p>GC 的作用区域是堆和方法区 ( 规范中不对方法区做要求, 但 HotSpot 为方法区实现了 GC ), 大部分都是在新生代。分为轻 GC (普通 GC), 重 GC (全局 GC)</p>
+<h2><a id="gc%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>GC 触发条件</h2>
+<ul>
+<li>Minor GC：当 Eden 空间满时，就将触发一次 Minor GC</li>
+<li>Full GC：
+<ul>
+<li>
+<p>当调用 <code>System.gc()</code> 建议虚拟机执行 FG，不建议使用</p>
+</li>
+<li>
+<p>老年代空间不足，（可以调大新生代空间或调大进入老年代的年龄尽量避免发生 FG）</p>
+</li>
+<li>
+<p>空间分配担保失败</p>
+<blockquote>
+<p>Minor GC 之前，先检查老年代的最大可用连续空间是否大于新生代所有对象空间，如果是，Minor GC 可以进行；如果不是，再检查 JVM 是否允许担保失败，如果允许再检查老年代的最大可用连续空间是否大于历代晋升到老年代对象的平均大小，如果大于，尝试进行 Minor GC，如果小于或不允许担保失败，就进行一次 Full GC</p>
+</blockquote>
+</li>
+<li>
+<p>JDK 1.7 之前永久代空间不足，且没有采用 CMS GC 时也会执行 Full GC。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2><a id="%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E6%B4%BB%E7%9D%80" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>判断对象是否活着</h2>
+<h3><a id="%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>引用计数法</h3>
+<p>为每个对象维护一个计数器, 保存当前被引用次数，为 0 的对象被清除</p>
+<ul>
+<li>优点: 实现简单, 效率高</li>
+<li>缺点: 很难解决对象之间循环引用的问题</li>
+</ul>
+<h3><a id="%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>可达性分析</h3>
+<p>和 GC Roots 对象 ( 栈帧中的本地变量中引用的对象 / 方法区中类静态属性引用的对象 / 方法区中常量引用的对象 / 本地方法栈中引用的对象 ) 直接或间接关联的对象是有效对象，反之则是无效对象。</p>
+<h4><a id="%E4%B8%89%E8%89%B2%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>三色法</h4>
+<p>可达性分析时，把遍历对象图过程中遇到的对象，按“是否访问过”这个条件标记成以下三种颜色：</p>
+<ul>
+<li>白色：尚未访问过。</li>
+<li>黑色：本对象已访问过，而且本对象引用到的其他对象也全部访问过了。</li>
+<li>灰色：本对象已访问过，但是本对象引用到的其他对象尚未全部访问完。全部访问后，会转换为黑色。</li>
+</ul>
+<p><strong>过程</strong>：</p>
+<ol>
+<li>初始时，所有对象都在【白色集合】中；</li>
+<li>将 GC Roots 直接引用到的对象挪到 【灰色集合】中；</li>
+<li>从灰色集合中获取对象：
+<ul>
+<li>将本对象引用到的其他对象全部挪到【灰色集合】中；</li>
+<li>将本对象挪到【黑色集合】里面。</li>
+</ul>
+</li>
+</ol>
+<p><strong>问题</strong>：假设 A -&gt; B -&gt; C，一开始 A 在灰色，然后扫描 A，将 B 添加到灰色，将 A 添加到黑色；此时 A 新增引用 C，B 断开对 C 的引用。因为 A 已经在黑色中，不会再扫描，而 B 也没有了对 C 的引用，那么 C 会被当作垃圾回收，A -&gt; C 就出现了漏标。<br />
+解决：黑色对象引用白色对象或删除灰色对象对白色对象的引用时时，都将白色对象置为灰色；</p>
+<h3><a id="%E5%9B%9B%E7%A7%8D%E5%BC%95%E7%94%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>四种引用</h3>
+<ul>
+<li>强引用: 绝大多数都是强引用, 垃圾回收器不会回收它</li>
+<li>软引用: 类似于可有可无的引用，当内存不足时，就会回收。</li>
+<li>弱引用: 也是可有可无的引用，比软引用具有更短暂的生命周期，在GC扫描时，无论内存是否够用，都会回收</li>
+<li>虚引用: 和没有引用一样，任何时候都有可能被回收</li>
+</ul>
+<h2><a id="gc%E7%AE%97%E6%B3%95" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>GC 算法</h2>
+<ul>
+<li>标记-清除: 第一次遍历 GC Roots 对象, 将 GC Roots 对象可达到的堆内存对象进行标记, 第二次遍历堆内存对象, 将没有标记的对象清除
+<ul>
+<li>优点: 不需要额外的空间</li>
+<li>缺点: 两次扫描效率不高, 产生内存碎片无法生成大对象造成频繁 GC</li>
+</ul>
+</li>
+<li>标记-复制: 进行可达性分析的时候, 凡是能达到的对象都复制到 to 区, 再一次性清除伊甸园区和 from 区
+<ul>
+<li>优点: 没有内存碎片, 因为每次清理, 都会把活下来的对象<strong>连续地</strong>复制到 to  区中</li>
+<li>缺点: 浪费内存空间, 复制的对象比较多时, 效率慢, 适合对象存活率低的情况</li>
+</ul>
+</li>
+<li>标记-压缩: 标记完成以后, 让所有存活对象向一端移动, 然后直接清理掉一端边界外的内存
+<ul>
+<li>优点: 内存规整</li>
+<li>缺点: 效率不如复制算法</li>
+</ul>
+</li>
+</ul>
+<h3><a id="%E6%AF%94%E8%BE%83" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>比较</h3>
+<p>效率: 标记复制 &gt; 标记压缩 &gt; 标记清除 ( 引发更多 GC )<br />
+内存规整率: 标记压缩 = 标记复制 &gt; 标记清除<br />
+内存利用率: 标记压缩 = 标记清除 &gt; 标记复制</p>
+<h3><a id="%E5%88%86%E4%BB%A3%E5%9B%9E%E6%94%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>分代回收</h3>
+<p>结合以上几种算法: 把 Java 堆分为新生代和老年代，根据各个对象的年代采用最合适的收集算法。针对新生代的对象，采取灵活比例的复制算法，只需要复制少量存活对象就可以完成收集。针对老年代的对象，因为这些对象存活率高，没有额外空间进行分配担保，必须使用标记清除或标记压缩算法。</p>
+<h2><a id="8%E7%A7%8D%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>8 种垃圾收集器</h2>
+<p><a href="https://github.com/CyC2018/CS-Notes/blob/master/notes/Java%20%E8%99%9A%E6%8B%9F%E6%9C%BA.md#minor-gc-%E5%92%8C-full-gc">参考</a></p>
+<p><img src="media/16248720428830/16248720638327.jpg" alt="" class="mw_img_center" style="display: block; clear:both; margin: 0 auto;" /></p>
+<h3><a id="serial" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Serial</h3>
+<p>进行垃圾收集工作的时候必须暂停其他所有的工作线程，单线程串行执行，简单高效<br />
+新生代采用<strong>复制算法</strong>，老年代采用<strong>标记-整理</strong>算法。</p>
+<h3><a id="parnew" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>ParNew</h3>
+<p>Serial 的多线程版本，性能高，Server 模式下的虚拟机的首要选择，除了 Serial 收集器外，只有它能与 CMS 收集器配合工作<br />
+新生代采用<strong>复制算法</strong>，老年代采用<strong>标记-整理</strong>算法。</p>
+<h3><a id="parallel-scavenge-parallel-old" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parallel ScaVenge &amp; Parallel Old</h3>
+<p>多线程，其他收集器是尽量缩短垃圾收集的停顿时间，适合交互程序，而它的目标是吞吐量优先，尽可能高的利用 CPU，适合后台任务。<br />
+可以通过参数打开自适应调节，能根据系统运行情况动态调整参数以提供最适合的停顿时间或吞吐量。<br />
+Parallel ScaVenge 采用<strong>复制算法</strong>，Parallel Old 采用<strong>标记-整理</strong>算法。</p>
+<h3><a id="cms" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>CMS</h3>
+<p>Concurrent Mark Sweep，采用<strong>标记-清除</strong>算法，真正意义上的并发收集器。分四个阶段：</p>
+<ul>
+<li>初始标记：暂停所有线程，记录直接与 root 相连的对象，时间很短</li>
+<li>并发标记：GC 和 用户线程同时开启，并跟踪用户线程发生引用更新的地方</li>
+<li>重新标记：暂停用户进程，根据第二步引用变更的地方，并发重新标记，时间很短</li>
+<li>并发清除：开启用户线程，同时 GC 线程开始清理工作</li>
+</ul>
+<p>在整个过程中耗时最长的并发标记和并发清除过程中，收集器线程都可以与用户线程一起工作，不需要进行停顿。</p>
+<p><img src="media/16248720428830/16248783456729.jpg" alt="" class="mw_img_center" style="width:705px;display: block; clear:both; margin: 0 auto;" /></p>
+<h3><a id="g1" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>G1</h3>
+<p>面向服务端应用，在多 CPU 和大内存的场景下有很好的性能。可以直接对新生代和老年代一起回收。（标记整理，可预测停顿）<br />
+G1 把堆划分成多个大小相等的独立区域（Region），新生代和老年代不再物理隔离，使得每个小空间可以单独进行垃圾回收。通过记录每个 Region 垃圾回收时间以及回收所获得的空间，维护一个优先列表，每次根据允许的收集时间，优先回收价值最大的 Region。<br />
+<img src="media/16248720428830/16248792437880.jpg" alt="" class="mw_img_center" style="width:489px;display: block; clear:both; margin: 0 auto;" /></p>
+<p>回收过程和 CMS 类似，但最后一步是筛选回收，对各个 Region 中的回收价值和成本进行排序，根据用户所期望的 GC 停顿时间来制定回收计划。</p>
+<h2><a id="%E5%A6%82%E4%BD%95%E8%B0%83%E4%BC%98" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>如何调优</h2>
+<p>现在都是分代回收，尽量让对象在新生代就回收，减少大对象的分配。需要平衡分代大小、垃圾回收次数和停顿时间。<br />
+对 GC 进行完整的监控，监控各年代占用大小、YGC、FGC 触发频率，对象分配速率等，然后根据实际情况调优。<br />
+比如 FGC 频率高，可能是第三方库调用了 System.gc，或者 CMS 触发阈值过低等；还有对象年龄晋升阈值、幸存区大小等。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16248673414388.html">OOM</a></h1>
+			<p class="meta"><time datetime="2021-06-28T16:02:21+08:00" 
+			pubdate data-updated="true">2021/06/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E5%A0%86%E7%A9%BA%E9%97%B4%E6%BA%A2%E5%87%BA%EF%BC%88java-lang-outofmemoryerror%EF%BC%9Ajava-heap-space%EF%BC%89">堆空间溢出（<code>java.lang.OutOfMemoryError：java heap space</code>）</a></li>
+<li><a href="#%E6%B0%B8%E4%B9%85%E4%BB%A3%E6%BA%A2%E5%87%BA%EF%BC%88java-lang-outofmemoryerror%EF%BC%9Apermgen-space%EF%BC%89">永久代溢出（<code>java.lang.OutOfMemoryError：PermGen space</code>）</a></li>
+<li><a href="#%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88outofmemoryerror-direct-buffer-memory%EF%BC%89">直接内存溢出（<code>OutOfMemoryError: Direct buffer memory</code>）</a></li>
+<li><a href="#jprofiler">Jprofiler</a></li>
+</ul>
+</div>
+<h2><a id="%E5%A0%86%E7%A9%BA%E9%97%B4%E6%BA%A2%E5%87%BA%EF%BC%88java-lang-outofmemoryerror%EF%BC%9Ajava-heap-space%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>堆空间溢出（<code>java.lang.OutOfMemoryError：java heap space</code>）</h2>
+<p>老年代区域剩余的内存，已经无法满足将要晋升到老年代区域的对象大小，会报此错。</p>
+<p>原因：</p>
+<ul>
+<li>设置的堆内存太小；</li>
+<li>内存泄露如 File 资源没有回收；</li>
+<li>请求创建超大对象或数组；</li>
+<li>设计问题如使用过多的缓存</li>
+</ul>
+<p>解决：</p>
+<ul>
+<li>调高 <code>-Xmx</code> 参数增大堆内存</li>
+<li>如果是内存泄漏，检查持有的对象，修改代码</li>
+<li>如果是超大对象，检查它的合理性，比如一次性查询了数据库全部结果</li>
+<li>业务峰值压力可以考虑增加机器资源，或者限流</li>
+</ul>
+<h2><a id="%E6%B0%B8%E4%B9%85%E4%BB%A3%E6%BA%A2%E5%87%BA%EF%BC%88java-lang-outofmemoryerror%EF%BC%9Apermgen-space%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>永久代溢出（<code>java.lang.OutOfMemoryError：PermGen space</code>）</h2>
+<p>该错误表示永久代（Permanent Generation）已用满，通常是因为加载的 class 数目太多或体积太大。</p>
+<p>解决：</p>
+<ul>
+<li>如果程序启动时报错，修改 <code>-XX:MaxPermSize</code> 或 <code>-XX:MaxMetaspaceSize</code> 调大永久区</li>
+<li>应用重新部署时报错，可能是应用根本没有重启，导致加载了过多的 class，重启 JVM</li>
+<li>运行时报错，可能是动态创建了大量 class，可以通过设置 <code>-XX:+CMSClassUnloadingEnabled</code> 和 <code>-XX:+UseConcMarkSweepGC</code> 这两个参数允许 JVM 卸载 class。</li>
+</ul>
+<h2><a id="%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%EF%BC%88outofmemoryerror-direct-buffer-memory%EF%BC%89" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>直接内存溢出（<code>OutOfMemoryError: Direct buffer memory</code>）</h2>
+<p>Java 允许应用程序直接访问堆外内存，通过直接内存结合内存映射文件实现高速 IO。直接内存最大是 64 MB，一旦使用超出限制，就会抛出 Directbuffer memory 错误。</p>
+<p>解决：</p>
+<ul>
+<li>通过<code>-XX:MaxDirectMemorySize</code> 调整 Direct ByteBuffer 的上限值。</li>
+<li>检查是否有 <code>-XX:+DisableExplicitGC</code> 参数，如果有就去掉，因为该参数会使 <code>System.gc()</code> 失效。</li>
+<li>尝试使用 Cleaner 的 <code>clean()</code> 方法主动释放直接内存空间。</li>
+</ul>
+<h2><a id="jprofiler" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Jprofiler</h2>
+<p>内存快照分析工具 ( MAT, Jprofiler ) 分析 Dump 内存文件 ( 使用 <code>-XX:+HeapDumpOnOutOfMemoryError</code> 生成, 其中 <code>OutOfMemoryError</code> 可以改成其他错误类型 ), 查看堆中的数据和大对象, 然后查看 Thread Dump 里面具体的代码位置</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16227314617502.html">JMM</a></h1>
+			<p class="meta"><time datetime="2021-06-03T22:44:21+08:00" 
+			pubdate data-updated="true">2021/06/03</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#%E6%A6%82%E5%BF%B5">概念</a></li>
+<li><a href="#jmm%E6%93%8D%E4%BD%9C">JMM 操作</a></li>
+<li><a href="#%E5%90%8C%E6%AD%A5%E7%9A%84%E7%BA%A6%E5%AE%9A">同步的约定</a></li>
+<li><a href="#jmm%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98">JMM 解决的问题</a></li>
+<li><a href="#volatile%E4%BD%9C%E7%94%A8">volatile 作用</a></li>
+</ul>
+</div>
+<blockquote>
+<p>JMM (Java Memory Model)</p>
+</blockquote>
+<h2><a id="%E6%A6%82%E5%BF%B5" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>概念</h2>
+<p>JMM 规范了 Java 虚拟机与计算机内存是如何协同工作的, 用于屏蔽掉各种硬件和操作系统的内存访问差异，以实现让 Java 程序在各种平台下都能达到一致的并发效果</p>
+<p>JMM 定义了线程和主内存之间抽象关系:</p>
+<ul>
+<li>线程之间的共享变量存储在主内存 (硬件的内存)</li>
+<li>每个线程都有一个私有的本地内存, 这个本地内存是一个抽象概念, 涵盖了cpu寄存器和高速缓存等</li>
+</ul>
+<h2><a id="jmm%E6%93%8D%E4%BD%9C" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JMM 操作</h2>
+<p>JMM 定义了以下八种操作来完成主内存与工作内存之间的具体交互:</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>作用在哪里</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lock</td>
+<td>主内存</td>
+<td>锁定主内存变量, 让他只供一个线程使用</td>
+</tr>
+<tr>
+<td>read</td>
+<td>主内存</td>
+<td>把一个变量值从主内存传输到线程的工作内存中</td>
+</tr>
+<tr>
+<td>load</td>
+<td>线程内存</td>
+<td>把 read 到的变量值放入工作内存的变量副本中</td>
+</tr>
+<tr>
+<td>use</td>
+<td>线程内存</td>
+<td>把工作内存中的一个变量值传递给执行引擎</td>
+</tr>
+<tr>
+<td>assign</td>
+<td>线程内存</td>
+<td>把一个从执行引擎接收到的值赋值给工作内存的变量</td>
+</tr>
+<tr>
+<td>store</td>
+<td>线程内存</td>
+<td>把工作内存中的一个变量的值传送到主内存中</td>
+</tr>
+<tr>
+<td>write</td>
+<td>主内存</td>
+<td>把 store 操作传过来的值更新到主内存中</td>
+</tr>
+<tr>
+<td>unlock</td>
+<td>主内存</td>
+<td>解锁主内存变量</td>
+</tr>
+</tbody>
+</table>
+<h2><a id="%E5%90%8C%E6%AD%A5%E7%9A%84%E7%BA%A6%E5%AE%9A" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>同步的约定</h2>
+<ul>
+<li>解锁前，必须把共享变量立刻刷新会主存</li>
+<li>加锁前，必须读取主存中最新值到工作内存中</li>
+<li>加锁解锁是同一把锁</li>
+<li>read 和 load, store 和 write, lock 和 unlock 必须成对按顺序出现, 但可以不连续</li>
+</ul>
+<h2><a id="jmm%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JMM 解决的问题</h2>
+<ul>
+<li>可见性: 当一个线程修改了共享变量的值，其他线程能够立刻得知这个修改, 可以使用 <code>volatile</code>, <code>synchronized</code>, <code>final</code> 来保证</li>
+<li>原子性: 一个操作是不可分割，不可中断的, 可以使用 <code>synchronized</code> ，锁或原子类来保证</li>
+<li>有序性: 使用 <code>volatile</code> 和 <code>synchronized</code> 保证多线程之间操作的有序性</li>
+</ul>
+<h2><a id="volatile%E4%BD%9C%E7%94%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>volatile 作用</h2>
+<ol>
+<li>
+<p><strong>保证线程间变量的可见性</strong>: 读取变量时, 总是读取主存新值, 变量被修改后会立刻刷新到主内存。(可见性不能保证操作的原子性，需要保证线程安全的话，使用 <code>synchronized</code> 关键字或者 lock 锁)</p>
+</li>
+<li>
+<p><strong>不保证原子型</strong></p>
+</li>
+<li>
+<p><strong>禁止 CPU 进行指令重排序</strong>: 在加 <strong>volatile</strong> 的地方上下加一层<strong>内存屏障</strong> ( 禁止上面的指令和下面的指令顺序交换 )</p>
+<pre><code class="language-java">// 语句 3 固定位置, 但是语句1和2的顺序是不能保证的，同理，语句4、5也不能保证顺序
+a = 1;  //语句1
+b = 2;  //语句2
+k = 3;  // volatile 语句3
+a = 4;  //语句4
+b = 5;  //语句5
+</code></pre>
+</li>
+</ol>
+<p><strong>如果不加 lock 和 synchronized 怎么保证原子性？</strong><br />
+使用 <code>java.util.concurrent.atomic</code> 包下的原子类，解决原子性问题。 例如 <code>AtomicInteger</code> 类的 <code>getAndIncrement()</code> 使用的是底层 CAS 的 +1 方法，直接和操作系统挂钩，直接在内存中修改值，效率极高。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="16225545153969.html">JVM 内存划分</a></h1>
+			<p class="meta"><time datetime="2021-06-01T21:35:15+08:00" 
+			pubdate data-updated="true">2021/06/01</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<div class="mweb_toc"><ul>
+<li><a href="#jvm%E4%BD%8D%E7%BD%AE">JVM 位置</a></li>
+<li><a href="#jvm%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84">JVM 的体系结构</a></li>
+<li><a href="#native%E9%87%8D%E7%82%B9">Native (重点)</a></li>
+<li><a href="#pc%E5%AF%84%E5%AD%98%E5%99%A8">PC 寄存器</a></li>
+<li><a href="#%E6%96%B9%E6%B3%95%E5%8C%BA">方法区</a></li>
+<li><a href="#%E6%A0%88">栈</a></li>
+<li><a href="#%E5%A0%86%E9%87%8D%E7%82%B9">堆 (重点)</a>
+<ul>
+<li><a href="#%E6%96%B0%E7%94%9F%E4%BB%A3">新生代</a></li>
+<li><a href="#%E8%80%81%E5%B9%B4%E4%BB%A3">老年代</a></li>
+<li><a href="#%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D">内存分配</a></li>
+</ul>
+</li>
+<li><a href="#%E6%B0%B8%E4%B9%85%E5%8C%BA%E5%85%83%E7%A9%BA%E9%97%B4%E6%96%B9%E6%B3%95%E5%8C%BA">永久区 &amp; 元空间 &amp; 方法区</a></li>
+</ul>
+</div>
+<h2><a id="jvm%E4%BD%8D%E7%BD%AE" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JVM 位置</h2>
+<p>JVM本质是虚拟机, 运行在操作系统之上, 而 Java 程序运行在 JVM 之上, 运行 Java 程序只需要 JRE 就够了, JRE 包括了 Java 运行环境以及 JVM, 如果需要开发 Java 程序, 才需要安装 JDK</p>
+<ul>
+<li>三种 JVM
+<ul>
+<li>Sun 公司: HotSpot</li>
+<li>BEA 公司: JRockit, 不常用, 但性能很高</li>
+<li>IBM 公司: J9VM, 不常用, 资料少, 在 IBM 独占平台会用到</li>
+</ul>
+</li>
+</ul>
+<h2><a id="jvm%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>JVM 的体系结构</h2>
+<p>我们所说的 JVM 调优就是调<strong>方法区</strong>和<strong>堆</strong>, 其他的地方不会产生垃圾</p>
+<p><img src="media/16225545153969/16225646536509.jpg" alt="" class="mw_img_center" style="width:479px;display: block; clear:both; margin: 0 auto;" /></p>
+<h2><a id="native%E9%87%8D%E7%82%B9" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Native (重点)</h2>
+<p>凡是带了 <code>native</code> 关键字的, 说明 Java 的作用范围达不到了, 会调用底层的库</p>
+<p>过程: 在内存区域中专门开辟了一块标记的区域 (Native Method Stack), 登记了 native 方法, 等到执行的时候, 再通过 JNI 执行本地方法库中的方法</p>
+<p>作用: 扩展 Java 的使用, 融合不同的编程语言为 Java 所用 (最初: C/C++)<br />
+目前 Java 调用其他接口方法: Socket / WebService / http 等</p>
+<h2><a id="pc%E5%AF%84%E5%AD%98%E5%99%A8" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>PC 寄存器</h2>
+<p>每个线程都有一个 PC, 是一个指向下一条指令的指针, 用于执行引擎执行下一条指令, 空间非常小可以忽略不计</p>
+<h2><a id="%E6%96%B9%E6%B3%95%E5%8C%BA" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>方法区</h2>
+<ul>
+<li>方法区是所有线程<strong>共享</strong>的, 所有定义的方法 (字段 / 方法字节码 / 构造函数 / 接口等) 都保存在该区域</li>
+<li><strong>静态变量 / 常量 / 类信息 (构造函数 接口定义) / 运行时常量池存在方法区中, 但是实例变量存在堆内存中</strong></li>
+</ul>
+<h2><a id="%E6%A0%88" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>栈</h2>
+<ul>
+<li>
+<p>栈内存主要存放 8 大基本类型 / 对象引用 / 实例的方法</p>
+</li>
+<li>
+<p><strong>栈是线程级的</strong>, 主管程序的运行, 当调用另一个方法, 就会把这个方法压入栈顶 (栈帧), 执行完毕就被弹出栈, 继续执行调用它的方法, 生命周期和线程同步, 线程结束, 栈内存也就释放<br />
+<code>StackOverflowError</code>: 递归程序处理不当容易栈满</p>
+</li>
+</ul>
+<p><img src="media/16225545153969/16225662992996.jpg" alt="" class="mw_img_center" style="width:223px;display: block; clear:both; margin: 0 auto;" /></p>
+<h2><a id="%E5%A0%86%E9%87%8D%E7%82%B9" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>堆 (重点)</h2>
+<ul>
+<li>一个 JVM 只有一个堆内存, 内存大小是可以调节的</li>
+<li>堆中存放类 / 方法 / 常量 / 变量, 保存所有引用类型的真实对象</li>
+<li>堆内存分为两个区域: 新生区, 老年区</li>
+</ul>
+<h3><a id="%E6%96%B0%E7%94%9F%E4%BB%A3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>新生代</h3>
+<ul>
+<li>一个类诞生, 成长的地方, 甚至死亡</li>
+<li>分为两个区
+<ul>
+<li>伊甸园 <code>Eden Space</code>: 所有的对象都是在伊甸园区 New 出来的</li>
+<li>幸存区(from, to 区): 轻 GC 后活下来的对象</li>
+</ul>
+</li>
+</ul>
+<h3><a id="%E8%80%81%E5%B9%B4%E4%BB%A3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>老年代</h3>
+<p>大对象直接进入老年代，存活年龄超过阈值的对象进入老年代</p>
+<h3><a id="%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>内存分配</h3>
+<ol>
+<li>对象优先在 Eden 分配</li>
+<li>大对象直接进入老年代</li>
+<li>存活年龄超过阈值的对象进入老年代（动态年龄判断：如果幸存区相同年龄的对象超过一半，那么超过这个年龄的对象直接进入老年代）</li>
+</ol>
+<h2><a id="%E6%B0%B8%E4%B9%85%E5%8C%BA%E5%85%83%E7%A9%BA%E9%97%B4%E6%96%B9%E6%B3%95%E5%8C%BA" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>永久区 &amp; 元空间 &amp; 方法区</h2>
+<p>参考: <a href="https://blog.csdn.net/u011635492/article/details/81046174">永久区 &amp; 方法区</a></p>
+<p>Java 虚拟机规范只是规定了有方法区这么个概念和它的作用，并没有规定如何去实现它。在不同的 JVM 上方法区的实现不同。在 HotSpot 中利用永生代实现方法区。其他的虚拟机实现并没有永久带这一说法。</p>
+<ul>
+<li>在 1.7 之前，HotSpot 把堆中一部分区域用来实现方法区, 同时 GC 分代收集也扩展至这一区域，就称为永久代。</li>
+<li>对于 Java8， HotSpots 取消了永久代. 取代永久代的就是元空间。永生代和元空间不同点为:
+<ul>
+<li>存储位置不同: 永久代物理是是堆的一部分，和新生代，老年代地址是连续的，而元空间属于本地内存</li>
+<li>存储内容不同: 元空间存储类的元信息，静态变量和常量池等并入堆中。相当于永久代的数据被分到了堆和元空间中。</li>
+</ul>
+</li>
+<li>一个启动类, 加载了大量的第三方 Jar 包, tomcat 部署了太多应用, 大量动态生成的反射类. 不断加载就会出现 OOM</li>
+</ul>
+<p><strong>为什么使用元空间替换永久代？</strong><br />
+为了避免OOM异常。因为通常使用PermSize和MaxPermSize设置永久代的大小就决定了永久代的上限，但是不是总能知道应该设置为多大合适, 如果使用默认值很容易遇到OOM错误。<br />
+当使用元空间时，可以加载多少类的元数据就不再由MaxPermSize控制, 而由系统的实际可用空间来控制。<br />
+更深层的原因还是要合并HotSpot和JRockit的代码，JRockit从来没有所谓的永久代，也不需要开发运维人员设置永久代的大小，但是运行良好。同时也不用担心运行性能问题了,在覆盖到的测试中, 程序启动和运行速度降低不超过1%，但是这点性能损失换来了更大的安全保障。</p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>

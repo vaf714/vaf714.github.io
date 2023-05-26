@@ -1,0 +1,624 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  传输层 - 
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html"></a></h1>
+  
+    <h2></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="_self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">传输层</h1>
+				<p class="meta"><time datetime="2021-08-22T15:04:04+08:00" pubdate data-updated="true">2021/08/22</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<div class="mweb_toc"><ul>
+<li><a href="#udp">UDP</a>
+<ul>
+<li><a href="#%E9%A6%96%E9%83%A8%E6%A0%BC%E5%BC%8F">首部格式</a></li>
+<li><a href="#%E5%92%8Ctcp%E5%8C%BA%E5%88%AB">和 TCP 区别</a></li>
+</ul>
+</li>
+<li><a href="#tcp">TCP</a>
+<ul>
+<li><a href="#%E9%A6%96%E9%83%A8%E6%A0%BC%E5%BC%8F">首部格式</a></li>
+<li><a href="#%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B">三次握手</a></li>
+<li><a href="#mss-mtu">MSS &amp; MTU</a></li>
+<li><a href="#syn%E6%94%BB%E5%87%BB">SYN 攻击</a></li>
+<li><a href="#%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B">四次挥手</a>
+<ul>
+<li><a href="#tcp%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93">TCP可靠传输</a>
+<ul>
+<li><a href="#%E8%B6%85%E6%97%B6%E9%87%8D%E4%BC%A0%E6%9C%BA%E5%88%B6">超时重传机制</a></li>
+<li><a href="#tcp%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6">TCP流量控制</a></li>
+<li><a href="#tcp%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3">TCP滑动窗口</a></li>
+<li><a href="#tcp%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6%EF%BC%9A%E9%92%88%E5%AF%B9%E7%BD%91%E7%BB%9C%E7%9A%84%E6%8B%A5%E5%A0%B5%EF%BC%8C%E5%B9%B6%E4%B8%8D%E4%B8%80%E5%AE%9A%E6%8E%A5%E5%8F%97%E7%AA%97%E5%8F%A3%E6%BB%A1%E4%BA%86">TCP拥塞控制：针对网络的拥堵，并不一定接受窗口满了</a></li>
+<li><a href="#%E6%85%A2%E5%BC%80%E5%A7%8B%E4%B8%8E%E6%8B%A5%E5%A1%9E%E9%81%BF%E5%85%8D">慢开始与拥塞避免</a></li>
+<li><a href="#%E5%BF%AB%E9%87%8D%E4%BC%A0%E4%B8%8E%E5%BF%AB%E6%81%A2%E5%A4%8D">快重传与快恢复</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h2><a id="udp" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>UDP</h2>
+<h3><a id="%E9%A6%96%E9%83%A8%E6%A0%BC%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>首部格式</h3>
+<ul>
+<li><code>源端口</code>（16 bit）、<code>目的端口</code>（16 bit）</li>
+<li><code>包长度</code>、<code>校验和</code></li>
+</ul>
+<h3><a id="%E5%92%8Ctcp%E5%8C%BA%E5%88%AB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>和 TCP 区别</h3>
+<ul>
+<li>连接：UDP 不面向连接，传输数据前不需要建立连接</li>
+<li>服务对象：UDP 可以一对多、多对多，TCP 只能一对一</li>
+<li>可靠性：UDP 尽最大努力交付，不保证可靠，没有保证可靠的一系列机制</li>
+<li>分片：TCP 数据如果大于 MSS 限制，需要在传输层进行分片组装；UDP 数据如果大于 MTU 限制，会在 IP 层分片组装</li>
+</ul>
+<h2><a id="tcp" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>TCP</h2>
+<h3><a id="%E9%A6%96%E9%83%A8%E6%A0%BC%E5%BC%8F" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>首部格式</h3>
+<ul>
+<li><code>源端口</code>（16 bit）、<code>目的端口</code>（16 bit）</li>
+<li><code>序号</code>（32 bit）、<code>确认号</code>（32 bit）：用来解决网络包乱序和丢包的问题</li>
+<li><code>控制位</code>
+<ul>
+<li><code>ACK</code>：为 1 时，确认号才有效，除了最初建立连接时的 SYN 包之外该位必须为 1</li>
+<li><code>SYN</code>：为 1 时，表示希望建立连接</li>
+<li><code>FIN</code>：为 1 时，表示之后不会再有数据发送，希望断开连接</li>
+<li><code>RST</code>：为 1 时，强制断开连接</li>
+</ul>
+</li>
+<li><code>...</code></li>
+</ul>
+<h3><a id="%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>三次握手</h3>
+<p><strong>1. 握手过程</strong></p>
+<ul>
+<li>客户端发送请求「SYN 报文」，SYN=1，ACK=0，序号=x，不携带数据</li>
+<li>服务端收到后发送「SYN + ACK 报文」，SYN=1，ACK=1，序号=y，确认号=x+1，不携带数据</li>
+<li>客户端收到后发出「ACK 报文」，确认号=y+1，序号=x+1，可以携带数据</li>
+<li>服务端收到后建立连接<br />
+<img src="media/16296158444559/16296209164060.jpg" alt="" class="mw_img_center" style="width:400px;display: block; clear:both; margin: 0 auto;" /></li>
+</ul>
+<p><strong>2. 为什么需要第三次握手？</strong></p>
+<ul>
+<li>阻止重复历史连接：如果一个「旧的 SYN」比「新的 SYN」报文早到达了服务器，此时服务器返回一个「SYN + ACK」报文，客户端收到后可以根据自身上下文判断出序列号是否过期超时，过期会发送一个「RST」报文给服务器中止。</li>
+<li>同步双方初始序列号：序列号关乎着数据传输的可靠，客户端发送初始序列号后，服务端返回 ACK 的同时也是在发送一个服务端的序列号，然后第三次握手时客户端回应 ACK。</li>
+</ul>
+<p><strong>3. 为什么二次握手和四次握手不行？</strong></p>
+<ul>
+<li>二次握手：无法防止历史连接的建立，造成资源浪费，也无法同步双方序列号</li>
+<li>四次握手：理论上可行，但是二三次可以合并为一步，三次是理论上最少可靠连接建立</li>
+</ul>
+<h3><a id="mss-mtu" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>MSS &amp; MTU</h3>
+<p><img src="media/16296158444559/16296229720296.jpg" alt="" class="mw_img_center" style="width:400px;display: block; clear:both; margin: 0 auto;" /></p>
+<ul>
+<li>MTU：IP 层，一个网络包的最大长度</li>
+<li>MSS：TCP 层，报文能容纳的「数据」的最大长度</li>
+</ul>
+<p><strong>1. 为什么 IP 层会分片，还需要 TCP 层根据 MSS 分片？</strong><br />
+因为 IP 协议没有超时重传和序列号机制，如果一个 IP 分片丢失，接收方不知道，整个 TCP 报文都需要重传，经过 TCP 层分片后，如果某一片丢失，重发也只是已 MSS 为单位，增加重传效率。</p>
+<h3><a id="syn%E6%94%BB%E5%87%BB" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>SYN 攻击</h3>
+<p>攻击者短时间伪造不同 IP 地址的 SYN 报文，服务器每收到一个 SYN，就要进入 SYN_RCVD 状态，发出「SYN + ACK」报文，但等不到「ACK」应答。久而久之就会占满整个 SYN 接受队列，不能正常提供服务。</p>
+<p><strong>1. 如何避免？</strong></p>
+<ul>
+<li>修改 linux 内核参数，控制队列大小和队列满时的操作</li>
+<li>启用 SYN cookie 功能，当 SYN 队列满了以后，后续的 SYN 包不进入 SYN 队列，而是计算一个 cookie 以「SYN + ACK」返回客户端，服务器收到「ACK」后，如果合法直接放入 Accept 队列。</li>
+</ul>
+<h3><a id="%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>四次挥手</h3>
+<p><strong>1. 过程</strong></p>
+<ul>
+<li>客户端发送「FIN 报文」，FIN = 1</li>
+<li>服务端收到后发出「ACK 报文」，此时进入半关闭状态，服务端能发给客户端，客户端不能发给服务端</li>
+<li>服务端把数据发完后需要关闭时，发送「FIN 报文」</li>
+<li>客户端收到后发出「ACK」，然后等待 2MSL 后释放连接</li>
+<li>服务端收到「ACK」后释放连接</li>
+</ul>
+<p><strong>2. 为什么需要四次挥手？</strong><br />
+发送「FIN 报文」的一方，仅仅表示他的数据发送完了，另一方可能还有未发送完的数据，所以二三步需要分开发送<br />
+导致了比连接多一次。</p>
+<p><strong>3. time_wait 为什么是 2 MSL？</strong><br />
+<code>MSL</code> 是报文最大生存时间，Linux 默认为 30s。网络中可能存在来自于发送方的数据包，被服务器处理后返回，一来一回可能需要消耗 2 MSL 的时间。<br />
+就能够确保本连接报文从网络中消失， 不影响下一次连接。<br />
+<img src="media/16296158444559/16296242691391.jpg" alt="" class="mw_img_center" style="width:400px;display: block; clear:both; margin: 0 auto;" /></p>
+<h4><a id="tcp%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>TCP可靠传输</h4>
+<h5><a id="%E8%B6%85%E6%97%B6%E9%87%8D%E4%BC%A0%E6%9C%BA%E5%88%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>超时重传机制</h5>
+<p>超时时间 RTO = RTTs + 4*RTTd RTTs是加权平均往返时间，RTTd 是偏差的加权平均值</p>
+<h5><a id="tcp%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>TCP流量控制</h5>
+<p>通过窗口字段控制对方发送速率</p>
+<h5><a id="tcp%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>TCP滑动窗口</h5>
+<p>缓存的一部分，告诉对方自己的缓冲区大小，接受窗口只对最后一个按序到达的字节进行确认，发送方通过这个确认的序号可以知道序号之前的字节都已经被接受</p>
+<h5><a id="tcp%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6%EF%BC%9A%E9%92%88%E5%AF%B9%E7%BD%91%E7%BB%9C%E7%9A%84%E6%8B%A5%E5%A0%B5%EF%BC%8C%E5%B9%B6%E4%B8%8D%E4%B8%80%E5%AE%9A%E6%8E%A5%E5%8F%97%E7%AA%97%E5%8F%A3%E6%BB%A1%E4%BA%86" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>TCP拥塞控制：针对网络的拥堵，并不一定接受窗口满了</h5>
+<h5><a id="%E6%85%A2%E5%BC%80%E5%A7%8B%E4%B8%8E%E6%8B%A5%E5%A1%9E%E9%81%BF%E5%85%8D" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>慢开始与拥塞避免</h5>
+<p>发送数量（拥塞窗口）从1开始，收到确认后数量加倍，发送数量大于一个阈值，进入拥塞避免，每次数量只+1，当出现超时，阈值设为当前发送数量的一半后重新进入慢开始</p>
+<h5><a id="%E5%BF%AB%E9%87%8D%E4%BC%A0%E4%B8%8E%E5%BF%AB%E6%81%A2%E5%A4%8D" class="anchor" aria-hidden="true"><span class="octicon octicon-link"></span></a>快重传与快恢复</h5>
+<p>接收方每次只对最后一个已收到的有序报文进行确认，例如收到1 2和4，发送2的确认。 发送方如果收到3个重复的ack就认为报文丢失了，此时执行快重传，立即重传下一个报文3。（超时重传和快重传不一样，超时是一定时间没收到确认，快重传是连续收到三次一样的确认） 这种情况知识丢失个别报文，而不是拥塞，因此执行快恢复，阈值设为拥塞窗口的一半，拥塞窗口设为阈值，直接进入拥塞控制</p>
+<blockquote>
+<p>参考：小林 coding - 图解网络</p>
+</blockquote>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html'>计算机网络</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="16242597682603.html" 
+	        title="Previous Post: 操作系统">&laquo; 操作系统</a>
+	    
+	    
+	        <a class="basic-alignment right" href="16292717470443.html" 
+	        title="Next Post: TCP/IP">TCP/IP &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Redis.html"><strong>Redis&nbsp;(7)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%88%86%E5%B8%83%E5%BC%8F.html"><strong>分布式&nbsp;(3)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A1%86%E6%9E%B6.html"><strong>框架&nbsp;(15)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="Netty.html">Netty&nbsp;(10)</a>&nbsp;&nbsp;
+	        
+	        	<a href="WebService.html">WebService&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%A0%A1%E6%8B%9B.html"><strong>校招&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Algorithm.html"><strong>Algorithm&nbsp;(13)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Java.html"><strong>Java&nbsp;(35)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="JVM.html">JVM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JUC.html">JUC&nbsp;(13)</a>&nbsp;&nbsp;
+	        
+	        	<a href="JavaSe.html">JavaSe&nbsp;(17)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.html"><strong>操作系统&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html"><strong>计算机网络&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="16242598828200.html">数据库</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261749989563.html">主从 & 哨兵</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261740670297.html">淘汰策略</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261737897880.html">与 MemCached 对比</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="16261704935337.html">Redis 数据结构</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  
+/* PrismJS 1.14.0
+https://prismjs.com/download.html#themes=prism-solarizedlight&languages=markup+css+clike+javascript */
+/*
+ Solarized Color Schemes originally by Ethan Schoonover
+ http://ethanschoonover.com/solarized
+
+ Ported for PrismJS by Hector Matos
+ Website: https://krakendev.io
+ Twitter Handle: https://twitter.com/allonsykraken)
+*/
+
+/*
+SOLARIZED HEX
+--------- -------
+base03    #002b36
+base02    #073642
+base01    #586e75
+base00    #657b83
+base0     #839496
+base1     #93a1a1
+base2     #eee8d5
+base3     #fdf6e3
+yellow    #b58900
+orange    #cb4b16
+red       #dc322f
+magenta   #d33682
+violet    #6c71c4
+blue      #268bd2
+cyan      #2aa198
+green     #859900
+*/
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #657b83; /* base00 */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  background: #073642; /* base02 */
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  background: #073642; /* base02 */
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  margin: .5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background-color: #fdf6e3; /* base3 */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #93a1a1; /* base1 */
+}
+
+.token.punctuation {
+  color: #586e75; /* base01 */
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #268bd2; /* blue */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.url,
+.token.inserted {
+  color: #2aa198; /* cyan */
+}
+
+.token.entity {
+  color: #657b83; /* base00 */
+  background: #eee8d5; /* base2 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #859900; /* green */
+}
+
+.token.function,
+.token.class-name {
+  color: #b58900; /* yellow */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #cb4b16; /* orange */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+  
+    
+
+
+</body>
+</html>
